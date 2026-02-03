@@ -1,0 +1,38 @@
+{% extends 'base.html' %} {% block title %}Downloads{% endblock %} {% block
+extra_css %}
+<link
+    rel="stylesheet"
+    href="{{ url_for('static', filename='css/dashboard.css') }}" />
+{% endblock %} {% block content %}
+<div class="actions-header">
+    <div class="search-container">
+        <input
+            type="text"
+            id="searchInput"
+            oninput="filterTable()"
+            placeholder="Search title..." />
+        <i id="clearBtn" class="fa-solid fa-times" onclick="clearSearch()"></i>
+    </div>
+
+    <div class="button-group">
+        <button id="tableInfo" class="btn-base" onclick="showTableInfo()">
+            <i class="fa-solid fa-circle-info"></i>
+        </button>
+
+        <button id="themeToggle" class="btn-base">
+            <i class="fas fa-moon"></i>
+        </button>
+    </div>
+</div>
+
+<div id="downloadsTable"></div>
+{% endblock %} {% block extra_js %}
+<script>
+    // Inject config variables here
+    window.MEDIA_SERVER_KEY = "{{ config.get('MEDIA_SERVER_KEY', '') }}";
+</script>
+
+<script
+    type="module"
+    src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+{% endblock %}
