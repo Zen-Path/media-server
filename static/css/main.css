@@ -1,0 +1,204 @@
+:root {
+    /* Gruvbox Palette */
+    --gb-bg-hard: #f9f5d7;
+    --gb-bg-soft: #f2e5bc;
+
+    --gb-bg-0: #fbf1c7;
+    --gb-bg-1: #ebdbb2;
+    --gb-bg-2: #d5c4a1;
+
+    --gb-fg-0: #282828;
+    --gb-fg-1: #3c3836;
+    --gb-fg-2: #504945;
+    --gb-fg-3: #665c54;
+    --gb-fg-4: #7c6f64;
+
+    --gb-red: #cc241d;
+    --gb-red-dark: #9d0006;
+    --gb-green: #98971a;
+    --gb-yellow: #d79921;
+    --gb-blue: #458588;
+    --gb-blue-dark: #076678;
+    --gb-purple: #b16286;
+    --gb-aqua: #689d6a;
+    --gb-orange: #d65d0e;
+    --gb-orange-dark: #af3a03;
+
+    /* Backgrounds */
+    --bg-body: var(--gb-bg-hard);
+    --bg-surface: var(--gb-bg-0);
+    --bg-header: var(--gb-bg-1);
+    --bg-hover: var(--gb-bg-soft);
+    --bg-input: #ffffff;
+
+    /* Text */
+    --text-main: var(--gb-fg-1);
+    --text-muted: var(--gb-fg-4);
+    --text-inverse: var(--gb-bg-0);
+
+    /* Borders & Lines */
+    --border-main: var(--gb-bg-2);
+    --border-subtle: var(--gb-bg-1);
+
+    /* Actions & Accents */
+    --clr-primary: var(--gb-blue);
+    --clr-primary-hover: var(--gb-blue-dark);
+
+    --clr-danger: var(--gb-red);
+    --clr-danger-hover: var(--gb-red-dark);
+
+    --clr-warning: var(--gb-orange);
+    --clr-success: var(--gb-green);
+
+    /* Interactive */
+    --focus-ring: var(--gb-blue);
+}
+
+/* Overrides for dark mode */
+body.dark-mode {
+    --gb-bg-hard: #1d2021;
+    --gb-bg-soft: #32302f;
+
+    --gb-bg-0: #282828;
+    --gb-bg-1: #3c3836;
+    --gb-bg-2: #504945;
+
+    --gb-fg-0: #fbf1c7;
+    --gb-fg-1: #ebdbb2;
+    --gb-fg-4: #a89984;
+
+    /* Semantic remapping */
+    --bg-body: var(--gb-bg-hard);
+    --bg-surface: var(--gb-bg-0);
+    --bg-header: var(--gb-bg-1);
+    --bg-hover: var(--gb-bg-soft);
+    --bg-input: var(--gb-bg-1);
+
+    --text-main: var(--gb-fg-1);
+    --text-muted: var(--gb-fg-4);
+    --text-inverse: var(--gb-bg-0);
+
+    --border-main: var(--gb-bg-2);
+    --border-subtle: var(--gb-bg-1);
+
+    /* Brighter accents for readability */
+    --clr-primary: #83a598;
+    --gb-blue-dark: #779c9f;
+    --clr-danger: #fb4934;
+    --clr-warning: #fabd2f;
+}
+
+/* CSS RESET */
+
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+}
+
+/* Avoid text overflows */
+p,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    overflow-wrap: break-word;
+}
+
+/* Remove underline */
+a {
+    text-decoration: none;
+}
+
+/* Improve media defaults */
+img,
+video {
+    display: block;
+    max-width: 100%;
+}
+
+/* Remove "3D" look */
+button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: inherit;
+}
+
+/* Remove weird gabs between cells */
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+/* Remove bullets */
+ol,
+ul {
+    list-style: none;
+}
+
+input {
+    color: inherit;
+}
+
+/* CUSTOM */
+
+body {
+    display: flex;
+    min-height: 100vh;
+    /* Fallback */
+    min-height: 100dvh;
+    flex-direction: column;
+
+    color: var(--text-main);
+    background-color: var(--bg-body);
+
+    font-family: "Segoe UI", sans-serif;
+}
+
+main {
+    /* Push the footer to the bottom */
+    flex: 1;
+
+    width: 100%;
+    max-width: 1600px;
+
+    margin: 0 auto;
+    padding: 20px;
+}
+
+footer {
+    margin-top: 20px;
+    padding: 1rem;
+    border-top: 1px solid var(--gb-bg-1);
+
+    color: var(--text-muted);
+
+    font-size: 0.85rem;
+    text-align: center;
+}
+
+footer a {
+    color: var(--gb-blue-dark);
+    text-decoration: none;
+}
+
+footer .version {
+    font-family: monospace;
+    font-weight: bold;
+}
+
+.hidden {
+    display: none !important;
+}
+
+.flip {
+    transform: rotate(180deg);
+}
