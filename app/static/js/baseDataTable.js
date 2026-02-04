@@ -41,22 +41,21 @@ export class BaseDataTable {
     }
 
     _addEntries(dataList, RowClass, tableRef) {
-        const items = Array.isArray(dataList) ? dataList : [dataList];
         const fragment = document.createDocumentFragment();
 
         const isFirstCall = this.entryList.length === 0;
 
-        for (const data of items) {
+        for (const item of dataList.data) {
             try {
-                const id = data?.id;
+                const id = item?.id;
                 if (typeof id !== "number") {
-                    console.error("ID is missing or invalid:", id, data);
+                    console.error("ID is missing or invalid:", id, item);
                     continue;
                 }
 
                 if (this.entryMap.has(id)) continue;
 
-                const entry = new RowClass(data, tableRef);
+                const entry = new RowClass(item, tableRef);
 
                 this.entryMap.set(id, entry);
                 this.entryList.unshift(entry);
@@ -82,7 +81,7 @@ export class BaseDataTable {
                     fragment.prepend(rowEl);
                 }
             } catch (error) {
-                console.error(`Couldn't add entry ${data?.id}:`, error);
+                console.error(`Couldn't add entry ${item?.id}:`, error);
             }
         }
 

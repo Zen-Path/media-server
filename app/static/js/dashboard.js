@@ -41,8 +41,8 @@ function bulkDelete(ids) {
         return false;
     }
 
-    fetch("/api/bulkDelete", {
-        method: "POST",
+    fetch("/api/downloads", {
+        method: "DELETE",
         headers: {
             "Content-Type": "application/json",
             "X-API-Key": apiKey,
@@ -132,7 +132,7 @@ document.addEventListener("DOMContentLoaded", () => {
         });
 
     // SSE Listener
-    const stream = new StreamManager(`/api/stream?apiKey=${apiKey}`);
+    const stream = new StreamManager(`/api/events?apiKey=${apiKey}`);
     stream.connect(({ type, data }) => {
         switch (type) {
             case EVENT_TYPE.CREATE:

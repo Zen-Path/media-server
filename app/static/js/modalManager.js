@@ -81,7 +81,7 @@ export const ModalManager = {
         });
 
         try {
-            const res = await fetch(`/api/bulkEdit`, {
+            const res = await fetch(`/api/downloads`, {
                 method: "PATCH",
                 headers: {
                     "Content-Type": "application/json",

@@ -1,5 +1,7 @@
 from enum import IntEnum
 
+APP_VERSION = "3.2.1"
+
 
 # fmt: off
 class DownloadStatus(IntEnum):
