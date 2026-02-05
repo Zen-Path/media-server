@@ -10,9 +10,10 @@ from pathlib import Path
 from common.logger import logger, setup_logging
 from common.variables import flex_scripts
 from dotenv import load_dotenv
-from flask import Flask, abort, current_app, jsonify, redirect, render_template, request
+from flask import Flask, abort, current_app, jsonify, request
 from flask_cors import CORS
 from scripts.media_server.routes.api import api_bp
+from scripts.media_server.routes.main import bp as main_bp
 from scripts.media_server.routes.media import media_bp
 from scripts.media_server.src.logging_middleware import register_logging
 from scripts.media_server.src.models import db
@@ -28,6 +29,7 @@ app = Flask(
     static_folder=Path(flex_scripts / "media_server" / "static"),
 )
 
+app.register_blueprint(main_bp)
 app.register_blueprint(api_bp, url_prefix="/api")
 app.register_blueprint(media_bp, url_prefix="/api/media")
 
@@ -68,16 +70,6 @@ def inject_global_vars():
         "github_url": "https://github.com/Zen-Path/flexycon/tree/main/dotfiles/src/scripts/media_server",
         "site_name": "Media Server",
     }
-
-
-@app.route("/")
-def index():
-    return redirect("/dashboard")
-
-
-@app.route("/dashboard")
-def dashboard_page():
-    return render_template("dashboard.html")
 
 
 def main():
