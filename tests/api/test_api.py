@@ -3,14 +3,13 @@ from unittest.mock import patch
 
 import requests
 from scripts.media_server.src.models import db
-from sqlalchemy.exc import SQLAlchemyError
-
-from media_server.tests.conftest import (
+from scripts.media_server.tests.conftest import (
     API_BULK_DELETE,
     API_GET_DOWNLOADS,
     API_HEALTH,
     BASE_URL,
 )
+from sqlalchemy.exc import SQLAlchemyError
 
 
 def test_health_check(client):
