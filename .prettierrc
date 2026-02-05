@@ -1,0 +1,18 @@
+{
+    "arrowParens": "always",
+    "bracketSameLine": true,
+    "bracketSpacing": true,
+    "endOfLine": "lf",
+    "experimentalTernaries": false,
+    "jsonRecursiveSort": true,
+    "jsxSingleQuote": false,
+    "plugins": ["prettier-plugin-sort-json"],
+    "printWidth": 80,
+    "proseWrap": "preserve",
+    "quoteProps": "as-needed",
+    "semi": true,
+    "singleQuote": false,
+    "tabWidth": 4,
+    "trailingComma": "es5",
+    "useTabs": false
+}
