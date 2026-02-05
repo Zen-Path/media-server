@@ -132,7 +132,7 @@ document.addEventListener("DOMContentLoaded", () => {
         });
 
     // SSE Listener
-    const stream = new StreamManager(`/api/stream?apiKey=${apiKey}`);
+    const stream = new StreamManager(`/api/events?apiKey=${apiKey}`);
     stream.connect(({ type, data }) => {
         switch (type) {
             case EVENT_TYPE.CREATE:

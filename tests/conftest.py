@@ -148,7 +148,7 @@ def sample_download_row():
 
 API_GET_DOWNLOADS = "/api/downloads"
 API_HEALTH = "/api/health"
-API_STREAM = "/api/stream"
+API_STREAM = "/api/events"
 API_DOWNLOAD = "/api/media/download"
 API_BULK_DELETE = "/api/bulkDelete"
 API_BULK_EDIT = "/api/bulkEdit"

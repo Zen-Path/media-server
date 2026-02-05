@@ -15,7 +15,7 @@ def parse_sse(raw_msg: str) -> dict:
 
 
 def test_stream_endpoint_connectivity(client, announcer, auth_headers):
-    """Verify that the /stream route is open and receiving data without hanging."""
+    """Verify that the /events route is open and receiving data without hanging."""
     test_payload = {"id": 99, "status": "testing"}
 
     # Start the listener and announcer on different threads,

@@ -5,7 +5,8 @@ from typing import Dict, Optional, Tuple
 import requests
 from bs4 import BeautifulSoup
 from common.logger import logger
-from flask import Blueprint, current_app, jsonify, request
+from flask import current_app, jsonify, request
+from scripts.media_server.routes.api import bp
 from scripts.media_server.src.constants import (
     DownloadStatus,
     EventType,
@@ -16,8 +17,6 @@ from scripts.media_server.src.models import Download, db
 from scripts.media_server.src.utils.downloaders import Gallery
 from scripts.media_server.src.utils.scraper import expand_collection_urls
 from scripts.media_server.src.utils.tools import DownloadReportItem
-
-media_bp = Blueprint("media", __name__)
 
 
 def start_download_record(
@@ -113,7 +112,7 @@ def complete_download_record(
         return False, err_msg
 
 
-@media_bp.route("/download", methods=["POST"])
+@bp.route("/media/download", methods=["POST"])
 def download_media():
     data = request.get_json()
     urls = data.get("urls")

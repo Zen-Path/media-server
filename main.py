@@ -12,9 +12,8 @@ from common.variables import flex_scripts
 from dotenv import load_dotenv
 from flask import Flask, abort, current_app, jsonify, request
 from flask_cors import CORS
-from scripts.media_server.routes.api import api_bp
+from scripts.media_server.routes.api import bp as api_bp
 from scripts.media_server.routes.main import bp as main_bp
-from scripts.media_server.routes.media import media_bp
 from scripts.media_server.src.logging_middleware import register_logging
 from scripts.media_server.src.models import db
 from scripts.media_server.src.utils.database import init_db, seed_db
@@ -32,7 +31,6 @@ app = Flask(
 
 app.register_blueprint(main_bp)
 app.register_blueprint(api_bp, url_prefix="/api")
-app.register_blueprint(media_bp, url_prefix="/api/media")
 
 
 @app.before_request

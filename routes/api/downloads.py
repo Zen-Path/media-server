@@ -1,33 +1,12 @@
-from datetime import datetime, timezone
-
 from common.logger import logger
-from flask import Blueprint, Response, current_app, jsonify, request
+from flask import current_app, jsonify, request
+from scripts.media_server.routes.api import bp
 from scripts.media_server.src.constants import DownloadStatus, EventType, MediaType
 from scripts.media_server.src.models import Download, db
 from scripts.media_server.src.utils.tools import OperationResult
 
-api_bp = Blueprint("api", __name__)
 
-
-@api_bp.route("/health", methods=["GET"])
-def health_check():
-    """
-    Standard health check for monitoring tools.
-    Returns 200 OK if the server is up.
-    """
-    return (
-        jsonify(
-            {
-                "status": "healthy",
-                "timestamp": datetime.now(timezone.utc).isoformat(),
-                "version": current_app.config.get("APP_VERSION", "unknown"),
-            }
-        ),
-        200,
-    )
-
-
-@api_bp.route("/downloads")
+@bp.route("/downloads")
 def get_downloads():
     """
     Fetch downloads ordered by ID descending
@@ -53,20 +32,7 @@ def get_downloads():
     )
 
 
-@api_bp.route("/stream")
-def stream():
-    announcer = current_app.config["ANNOUNCER"]
-
-    def stream_messages():
-        messages = announcer.listen()
-        while True:
-            msg = messages.get()
-            yield msg
-
-    return Response(stream_messages(), mimetype="text/event-stream")
-
-
-@api_bp.route("/bulkEdit", methods=["PATCH"])
+@bp.route("/bulkEdit", methods=["PATCH"])
 def bulk_edit_entries():
     data = request.get_json()
 
@@ -160,7 +126,7 @@ def bulk_edit_entries():
     return jsonify(master_result.to_dict()), 200
 
 
-@api_bp.route("/bulkDelete", methods=["POST"])
+@bp.route("/bulkDelete", methods=["POST"])
 def bulk_delete():
     data = request.get_json()
     ids = data.get("ids")
