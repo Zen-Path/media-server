@@ -231,6 +231,7 @@ export class DownloadRow extends BaseDataRow {
     }
 
     #validateDateField(value) {
+        // TODO: update to handle unix timestamps instead
         const valueText = this.#validateTextField(value);
         if (valueText.includes("Z")) return valueText;
         return "";

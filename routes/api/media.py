@@ -14,7 +14,7 @@ from scripts.media_server.src.constants import (
     ScraperConfig,
 )
 from scripts.media_server.src.extensions import db
-from scripts.media_server.src.models import Download
+from scripts.media_server.src.models.download import Download
 from scripts.media_server.src.utils.downloaders import Gallery
 from scripts.media_server.src.utils.scraper import expand_collection_urls
 from scripts.media_server.src.utils.tools import DownloadReportItem
@@ -47,9 +47,9 @@ def start_download_record(
                     "id": last_id,
                     "url": url,
                     "mediaType": media_type,
-                    "startTime": new_download.start_time_iso,
+                    "startTime": new_download.start_time,
                     "status": new_download.status,
-                    "statusMessage": new_download.status_msg,
+                    "statusMessage": new_download.status_message,
                 },
             )
         except Exception as e:
@@ -94,11 +94,11 @@ def complete_download_record(
                 {
                     "id": download_id,
                     "title": title,
-                    "endTime": record.end_time_iso,
-                    "updatedTime": record.updated_time_iso,
+                    "endTime": record.end_time,
+                    "updatedTime": record.update_time,
                     "orderNumber": record.order_number,
                     "status": record.status,
-                    "statusMessage": record.status_msg,
+                    "statusMessage": record.status_message,
                 },
             )
         except Exception as e:

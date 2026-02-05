@@ -3,7 +3,7 @@ from flask import current_app, jsonify, request
 from scripts.media_server.routes.api import bp
 from scripts.media_server.src.constants import DownloadStatus, EventType, MediaType
 from scripts.media_server.src.extensions import db
-from scripts.media_server.src.models import Download
+from scripts.media_server.src.models.download import Download
 from scripts.media_server.src.utils.tools import OperationResult
 
 
@@ -22,11 +22,11 @@ def get_downloads():
                 "title": d.title,
                 "mediaType": d.media_type,
                 "orderNumber": d.order_number,
-                "startTime": d.start_time_iso,
-                "endTime": d.end_time_iso,
-                "updatedTime": d.updated_time_iso,
+                "startTime": d.start_time,
+                "endTime": d.end_time,
+                "updatedTime": d.update_time,
                 "status": d.status,
-                "statusMessage": d.status_msg,
+                "statusMessage": d.status_message,
             }
             for d in downloads
         ]
@@ -113,7 +113,7 @@ def bulk_edit_entries():
                         "title": target.title,
                         "mediaType": target.media_type,
                         "status": target.status,
-                        "statusMessage": target.status_msg,
+                        "statusMessage": target.status_message,
                     },
                 )
             except Exception as e:

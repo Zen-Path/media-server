@@ -4,7 +4,7 @@ from typing import Any, Dict, List, Optional
 from common.logger import logger
 from scripts.media_server.data.demo_downloads import get_demo_downloads
 from scripts.media_server.src.extensions import db
-from scripts.media_server.src.models import Download
+from scripts.media_server.src.models.download import Download
 
 
 def init_db(app):
