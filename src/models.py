@@ -1,10 +1,8 @@
 from datetime import datetime, timezone
 
-from flask_sqlalchemy import SQLAlchemy
+from scripts.media_server.src.extensions import db
 
 from .constants import DownloadStatus
-
-db = SQLAlchemy()
 
 
 class Download(db.Model):  # type: ignore[name-defined]

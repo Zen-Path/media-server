@@ -2,7 +2,8 @@ from common.logger import logger
 from flask import current_app, jsonify, request
 from scripts.media_server.routes.api import bp
 from scripts.media_server.src.constants import DownloadStatus, EventType, MediaType
-from scripts.media_server.src.models import Download, db
+from scripts.media_server.src.extensions import db
+from scripts.media_server.src.models import Download
 from scripts.media_server.src.utils.tools import OperationResult
 
 

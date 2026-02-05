@@ -13,7 +13,8 @@ from scripts.media_server.src.constants import (
     MediaType,
     ScraperConfig,
 )
-from scripts.media_server.src.models import Download, db
+from scripts.media_server.src.extensions import db
+from scripts.media_server.src.models import Download
 from scripts.media_server.src.utils.downloaders import Gallery
 from scripts.media_server.src.utils.scraper import expand_collection_urls
 from scripts.media_server.src.utils.tools import DownloadReportItem
