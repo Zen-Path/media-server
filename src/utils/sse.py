@@ -1,6 +1,6 @@
 import json
 import queue
-from typing import Any, Dict, List
+from typing import Any, Dict, Generator, List
 
 from common.logger import logger
 from scripts.media_server.src.constants import EventType
@@ -30,3 +30,14 @@ class MessageAnnouncer:
         logger.debug(f"Announcement: {msg}")
 
         self._announce(f"data: {json.dumps(msg)}\n\n")
+
+
+def event_generator(announcer: MessageAnnouncer) -> Generator[str, None, None]:
+    """
+    Yields messages from the announcer queue for SSE.
+    """
+    messages = announcer.listen()
+    while True:
+        # Blocks here until a new message arrives in the queue
+        msg = messages.get()
+        yield msg
