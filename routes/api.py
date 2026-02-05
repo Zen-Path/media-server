@@ -4,7 +4,7 @@ from common.logger import logger
 from flask import Blueprint, Response, current_app, jsonify, request
 from scripts.media_server.src.constants import DownloadStatus, EventType, MediaType
 from scripts.media_server.src.models import Download, db
-from scripts.media_server.src.utils import OperationResult
+from scripts.media_server.src.utils.tools import OperationResult
 
 api_bp = Blueprint("api", __name__)
 
