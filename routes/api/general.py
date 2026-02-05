@@ -50,4 +50,6 @@ def sse_events() -> Response:
     Server-Sent Events (SSE) endpoint.
     """
     announcer = current_app.config["ANNOUNCER"]
-    return Response(event_generator(announcer), mimetype="text/event-stream")
+    messages = announcer.listen()
+
+    return Response(event_generator(messages), mimetype="text/event-stream")

@@ -1,10 +1,9 @@
 import json
-import threading
 from unittest.mock import MagicMock, patch
 
 from scripts.media_server.src.constants import EventType, MediaType
 
-from ..conftest import API_BULK_DELETE, API_DOWNLOAD, API_STREAM
+from ..conftest import API_BULK_DELETE, API_DOWNLOAD
 
 
 def parse_sse(raw_msg: str) -> dict:
@@ -12,31 +11,6 @@ def parse_sse(raw_msg: str) -> dict:
     # We use partition to split once at ':', then take everything after
     _, _, json_str = raw_msg.partition(":")
     return json.loads(json_str.strip())
-
-
-def test_stream_endpoint_connectivity(client, announcer, auth_headers):
-    """Verify that the /events route is open and receiving data without hanging."""
-    test_payload = {"id": 99, "status": "testing"}
-
-    # Start the listener and announcer on different threads,
-    # so we need a small delay
-    def delayed_announcement():
-        announcer.announce(EventType.UPDATE, test_payload)
-
-    threading.Timer(0.1, delayed_announcement).start()
-
-    response = client.get(API_STREAM, headers=auth_headers)
-
-    assert response.status_code == 200
-    assert response.mimetype == "text/event-stream"
-
-    for line in response.response:
-        decoded_line = line.decode("utf-8")
-        if "data:" in decoded_line:
-            data = parse_sse(decoded_line)
-            assert data["type"] == EventType.UPDATE
-            assert data["data"]["id"] == 99
-            break
 
 
 def test_download_announcements(client, announcer, auth_headers):

@@ -42,11 +42,10 @@ class MessageAnnouncer:
                 del self.listeners[i]
 
 
-def event_generator(announcer: MessageAnnouncer) -> Generator[str, None, None]:
+def event_generator(messages: queue.Queue) -> Generator[str, None, None]:
     """
-    Yields messages from the announcer queue for SSE.
+    Yields SSE from the provided message queue.
     """
-    messages = announcer.listen()
     while True:
         # Blocks here until a new message arrives in the queue
         msg = messages.get()
