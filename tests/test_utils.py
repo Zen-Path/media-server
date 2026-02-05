@@ -1,11 +1,11 @@
 from unittest.mock import patch
 
-from scripts.media_server.src.utils.tools import expand_collection_urls
+from scripts.media_server.src.utils.scraper import expand_collection_urls
 
 
 def test_expand_collection_urls_depth_limit():
     """Ensure recursion stops at depth 3."""
-    with patch("scripts.media_server.src.utils.tools.run_command") as mock_run:
+    with patch("scripts.media_server.src.utils.scraper.run_command") as mock_run:
         # If it didn't stop, it would call run_command indefinitely
 
         result = expand_collection_urls("http://test.com", depth=4)

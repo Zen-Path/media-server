@@ -14,10 +14,8 @@ from scripts.media_server.src.constants import (
 )
 from scripts.media_server.src.downloaders import Gallery
 from scripts.media_server.src.models import Download, db
-from scripts.media_server.src.utils.tools import (
-    DownloadReportItem,
-    expand_collection_urls,
-)
+from scripts.media_server.src.utils.scraper import expand_collection_urls
+from scripts.media_server.src.utils.tools import DownloadReportItem
 
 media_bp = Blueprint("media", __name__)
 
