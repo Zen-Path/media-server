@@ -17,7 +17,8 @@ from scripts.media_server.routes.main import bp as main_bp
 from scripts.media_server.routes.media import media_bp
 from scripts.media_server.src.logging_middleware import register_logging
 from scripts.media_server.src.models import db
-from scripts.media_server.src.utils.tools import MessageAnnouncer, init_db, seed_db
+from scripts.media_server.src.utils.database import init_db, seed_db
+from scripts.media_server.src.utils.tools import MessageAnnouncer
 
 __version__ = "3.2.1"
 

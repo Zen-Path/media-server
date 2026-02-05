@@ -9,7 +9,8 @@ import pytest
 from scripts.media_server.main import app
 from scripts.media_server.src.constants import MediaType
 from scripts.media_server.src.models import Download, db
-from scripts.media_server.src.utils.tools import MessageAnnouncer, seed_db
+from scripts.media_server.src.utils.database import seed_db
+from scripts.media_server.src.utils.tools import MessageAnnouncer
 from werkzeug.serving import make_server
 
 # --- CONFIGURATION ---
