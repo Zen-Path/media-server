@@ -49,7 +49,7 @@ def test_download_announcements(client, announcer, auth_headers):
     # Mock the internal download logic
     with (
         patch("requests.get") as mock_get,
-        patch("scripts.media_server.src.downloaders.Gallery.download") as mock_dl,
+        patch("scripts.media_server.src.utils.downloaders.Gallery.download") as mock_dl,
     ):
         # Mock title scrape
         mock_resp = MagicMock()
