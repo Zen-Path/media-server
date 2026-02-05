@@ -96,7 +96,7 @@ def test_system_resilience_to_announcer_failure(client, auth_headers, seed):
     seed([{"url": "test.com", "id": 100}])
 
     with patch(
-        "scripts.media_server.src.utils.tools.MessageAnnouncer.announce_event"
+        "scripts.media_server.src.utils.sse.MessageAnnouncer.announce_event"
     ) as mock_announce:
         mock_announce.side_effect = Exception("Socket Connection Lost")
 
