@@ -66,6 +66,21 @@
                         },
                     ],
             },
+            # TOML
+            {
+                "repo": "local",
+                "hooks":
+                    [
+                        {
+                            "id": "taplo-format",
+                            "name": "TOML: Taplo",
+                            "entry": "taplo",
+                            "language": "system",
+                            "types": ["toml"],
+                            "args": ["format"],
+                        },
+                    ],
+            },
             # PYTHON
             {
                 "repo": "https://github.com/astral-sh/ruff-pre-commit",
