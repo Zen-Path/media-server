@@ -3,6 +3,8 @@ import re
 import pytest
 from playwright.sync_api import Page, expect
 
+pytestmark = pytest.mark.ui
+
 
 def test_static_elements_presence(dashboard, mock_downloads):
     """Verify that all global UI controls are present."""

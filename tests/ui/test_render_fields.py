@@ -4,6 +4,8 @@ import pytest
 from playwright.sync_api import expect
 from scripts.media_server.src.constants import DownloadStatus, MediaType
 
+pytestmark = pytest.mark.ui
+
 # IDs
 
 

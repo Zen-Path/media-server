@@ -3,6 +3,8 @@ import re
 import pytest
 from playwright.sync_api import expect
 
+pytestmark = pytest.mark.ui
+
 
 @pytest.fixture
 def sort_data(mock_downloads):
