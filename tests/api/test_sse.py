@@ -21,7 +21,7 @@ def test_stream_endpoint_connectivity(client, announcer, auth_headers):
     # Start the listener and announcer on different threads,
     # so we need a small delay
     def delayed_announcement():
-        announcer.announce_event(EventType.UPDATE, test_payload)
+        announcer.announce(EventType.UPDATE, test_payload)
 
     threading.Timer(0.1, delayed_announcement).start()
 
@@ -96,7 +96,7 @@ def test_system_resilience_to_announcer_failure(client, auth_headers, seed):
     seed([{"url": "test.com", "id": 100}])
 
     with patch(
-        "scripts.media_server.src.utils.sse.MessageAnnouncer.announce_event"
+        "scripts.media_server.src.utils.sse.MessageAnnouncer.announce"
     ) as mock_announce:
         mock_announce.side_effect = Exception("Socket Connection Lost")
 

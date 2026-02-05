@@ -7,29 +7,39 @@ from scripts.media_server.src.constants import EventType
 
 
 class MessageAnnouncer:
-    def __init__(self) -> None:
-        self.listeners: List[queue.Queue[str]] = []
-        self.max_listeners = 10
+    """
+    Handles subscriptions for SSE.
+    """
 
-    def listen(self) -> queue.Queue[str]:
-        q: queue.Queue[str] = queue.Queue(maxsize=self.max_listeners)
+    def __init__(self) -> None:
+        self.listeners: List[queue.Queue] = []
+        self.msg_buffer_size = 10
+
+    def listen(self) -> queue.Queue:
+        """
+        Returns a Queue that receives new messages.
+        """
+        q: queue.Queue = queue.Queue(maxsize=self.msg_buffer_size)
         self.listeners.append(q)
         return q
 
-    def _announce(self, msg: str) -> None:
-        # Iterate backwards to remove dead listeners safely
-        for i in reversed(range(len(self.listeners))):
-            try:
-                self.listeners[i].put_nowait(msg)
-            except queue.Full:
-                del self.listeners[i]
-
-    def announce_event(self, event_type: EventType, payload: Dict[str, Any]) -> None:
-        """Wraps the payload in a standard envelope and announces it."""
+    def announce(self, event_type: EventType, payload: Dict[str, Any]) -> None:
+        """
+        Broadcasts a message to all active listeners.
+        Removes listeners that are full (stale or disconnected).
+        """
         msg = {"type": event_type.value, "data": payload}
         logger.debug(f"Announcement: {msg}")
 
-        self._announce(f"data: {json.dumps(msg)}\n\n")
+        # SSE Standard format: "data: <json>\n\n"
+        msg_fmt = f"data: {json.dumps(msg)}\n\n"
+
+        # Iterate backwards to safely delete while looping
+        for i in reversed(range(len(self.listeners))):
+            try:
+                self.listeners[i].put_nowait(msg_fmt)
+            except queue.Full:
+                del self.listeners[i]
 
 
 def event_generator(announcer: MessageAnnouncer) -> Generator[str, None, None]:

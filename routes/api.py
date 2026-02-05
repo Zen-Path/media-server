@@ -139,7 +139,7 @@ def bulk_edit_entries():
             results.append(OperationResult(True, entry_id))
 
             try:
-                current_app.config["ANNOUNCER"].announce_event(
+                current_app.config["ANNOUNCER"].announce(
                     EventType.UPDATE,
                     {
                         "id": entry_id,
@@ -197,7 +197,7 @@ def bulk_delete():
 
             # Even if notification fails, we should still delete the data.
             try:
-                current_app.config["ANNOUNCER"].announce_event(
+                current_app.config["ANNOUNCER"].announce(
                     EventType.DELETE, {"ids": list(existing_ids)}
                 )
             except Exception as e:

@@ -41,7 +41,7 @@ def start_download_record(
         last_id = new_download.id
 
         try:
-            current_app.config["ANNOUNCER"].announce_event(
+            current_app.config["ANNOUNCER"].announce(
                 EventType.CREATE,
                 {
                     "id": last_id,
@@ -89,7 +89,7 @@ def complete_download_record(
         db.session.commit()
 
         try:
-            current_app.config["ANNOUNCER"].announce_event(
+            current_app.config["ANNOUNCER"].announce(
                 EventType.UPDATE,
                 {
                     "id": download_id,
@@ -270,7 +270,7 @@ def download_media():
             report[url].error = str(e)
 
         try:
-            current_app.config["ANNOUNCER"].announce_event(
+            current_app.config["ANNOUNCER"].announce(
                 EventType.PROGRESS,
                 {"id": download_id, "current": i, "total": final_processing_count},
             )
