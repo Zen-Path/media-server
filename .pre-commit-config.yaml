@@ -1,0 +1,135 @@
+{
+    # Stop at the first hook that fails
+    "fail_fast": true,
+    "default_stages": ["pre-commit"],
+
+    "repos": [
+            # SAFETY & HOUSEKEEPING
+            {
+                "repo": "https://github.com/pre-commit/pre-commit-hooks",
+                "rev": "v5.0.0",
+                "hooks":
+                    [
+                        {
+                            "id": "check-added-large-files",
+                            "name": "Safety: No Large Files",
+                            "args": ["--maxkb=500"],
+                        },
+                        {
+                            "id": "check-case-conflict",
+                            "name": "Safety: Case Insensitive Filenames",
+                        },
+                        {
+                            "id": "check-illegal-windows-names",
+                            "name": "Safety: Illegal Windows Filenames",
+                        },
+                        {
+                            "id": "check-merge-conflict",
+                            "name": "Safety: No Merge Conflicts",
+                        },
+                        {
+                            "id": "end-of-file-fixer",
+                            "name": "Style: End of File Fixer",
+                        },
+                        {
+                            "id": "mixed-line-ending",
+                            "name": "Style: Enforce LF",
+                            "args": ["--fix=lf"],
+                        },
+                        {
+                            "id": "trailing-whitespace",
+                            "name": "Style: Trailing Whitespace",
+                        },
+                    ],
+            },
+            # WEB & DOCS
+            {
+                "repo": "https://github.com/pre-commit/mirrors-prettier",
+                "rev": "v4.0.0-alpha.8",
+                "hooks":
+                    [
+                        {
+                            "id": "prettier",
+                            "name": "Web: Prettier",
+                            "types_or":
+                                [
+                                    "css",
+                                    "html",
+                                    "javascript",
+                                    "json",
+                                    "markdown",
+                                    "scss",
+                                    "ts",
+                                    "tsx",
+                                    "yaml",
+                                ],
+                        },
+                    ],
+            },
+            # PYTHON
+            {
+                "repo": "https://github.com/astral-sh/ruff-pre-commit",
+                "rev": "v0.14.14",
+                "hooks":
+                    [
+                        {
+                            "id": "ruff-format",
+                            "name": "Python: Ruff Format (Initial)",
+                            "types": ["python"],
+                        },
+                        {
+                            "id": "ruff",
+                            "name": "Python: Ruff Lint",
+                            "args": ["--fix"],
+                            "types": ["python"],
+                        },
+                        {
+                            "id": "ruff-format",
+                            "name": "Python: Ruff Format (Final)",
+                            "types": ["python"],
+                        },
+                    ],
+            },
+            {
+                "repo": "https://github.com/pre-commit/mirrors-mypy",
+                "rev": "v1.19.1",
+                "hooks":
+                    [
+                        {
+                            "id": "mypy",
+                            "name": "Python: Type Check (mypy)",
+                            "language": "system",
+                            "types": ["python"],
+                        },
+                    ],
+            },
+            # TESTING
+            {
+                "repo": "https://github.com/christophmeissner/pytest-pre-commit",
+                "rev": "1.0.0",
+                "hooks":
+                    [
+                        {
+                            "id": "pytest",
+                            "name": "Test: API Suite",
+                            "entry": 'pytest -m "not ui and not slow"',
+                            "language": "system",
+                            "pass_filenames": false,
+                            "types": ["python"],
+                            "always_run": false,
+                        },
+                        {
+                            "id": "pytest",
+                            "alias": "pytest-full",
+                            "name": "Test: Full Suite",
+                            "entry": "pytest",
+                            "language": "system",
+                            "pass_filenames": false,
+                            "types_or": ["python", "javascript", "html"],
+                            "stages": ["pre-push"],
+                            "always_run": false,
+                        },
+                    ],
+            },
+        ],
+}
