@@ -12,13 +12,12 @@ from common.variables import flex_scripts
 from dotenv import load_dotenv
 from flask import Flask, abort, current_app, jsonify, request
 from flask_cors import CORS
+from scripts.media_server.app import PKG_VERSION
 from scripts.media_server.app.extensions import db
 from scripts.media_server.app.routes.api import bp as api_bp
 from scripts.media_server.app.routes.main import bp as main_bp
 from scripts.media_server.app.utils.database import init_db, seed_db
 from scripts.media_server.app.utils.sse import MessageAnnouncer
-
-__version__ = "3.2.1"
 
 load_dotenv(flex_scripts / "media_server" / ".env")
 
@@ -64,7 +63,7 @@ def handle_404(e):
 @app.context_processor
 def inject_global_vars():
     return {
-        "project_version": __version__,
+        "project_version": PKG_VERSION,
         "github_url": "https://github.com/Zen-Path/flexycon/tree/main/dotfiles/src/scripts/media_server",
         "site_name": "Media Server",
     }
@@ -76,7 +75,7 @@ def main():
 
     setup_logging(logger, logging.DEBUG if debug_mode else logging.WARNING)
 
-    logger.info(f"Version: {__version__}")
+    logger.info(f"Version: {PKG_VERSION}")
 
     # .env value > xdg value > fallback location
     download_dir = Path(
@@ -97,7 +96,7 @@ def main():
     logger.debug(f"Database path: {db_path!r}")
 
     app.config.update(
-        APP_VERSION=__version__,
+        APP_VERSION=PKG_VERSION,
         MEDIA_SERVER_KEY="{{@@ _vars['media_server_key'] @@}}",
         SQLALCHEMY_DATABASE_URI=f"sqlite:///{db_path}",
         SQLALCHEMY_TRACK_MODIFICATIONS=False,
