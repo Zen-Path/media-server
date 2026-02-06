@@ -254,11 +254,6 @@ export class DownloadRow extends BaseDataRow {
         return toLocalStandardTime(value);
     }
 
-    #standardizeDateField(value) {
-        if (value === 0) return 0;
-        return new Date(value).getTime();
-    }
-
     render() {
         this.dom.row = document.createElement("div");
         this.dom.row.classList.add("data-row");
