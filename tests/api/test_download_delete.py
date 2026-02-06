@@ -90,4 +90,4 @@ def test_database_clearing(client, auth_headers, seed, sample_download_row):
     assert data["status"]
 
     history_after = client.get(API_GET_DOWNLOADS, headers=auth_headers).json
-    assert len(history_after) == 0
+    assert len(history_after["data"]) == 0

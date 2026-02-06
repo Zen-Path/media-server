@@ -1,36 +1,29 @@
+from typing import Tuple
+
 from common.logger import logger
-from flask import current_app, jsonify, request
+from flask import Response, current_app, jsonify, request
 from scripts.media_server.routes.api import bp
 from scripts.media_server.src.constants import DownloadStatus, EventType, MediaType
 from scripts.media_server.src.extensions import db
 from scripts.media_server.src.models.download import Download
+from scripts.media_server.src.services import download_service
+from scripts.media_server.src.utils.api_response import api_response
 from scripts.media_server.src.utils.tools import OperationResult
 
 
-@bp.route("/downloads")
-def get_downloads():
-    """
-    Fetch downloads ordered by ID descending
-    """
-    downloads = Download.query.order_by(Download.id.desc()).all()
+@bp.route("/downloads", methods=["GET"])
+def get_all_downloads() -> Tuple[Response, int]:
+    downloads = download_service.get_all_downloads()
+    data = [d.to_dict() for d in downloads]
+    return api_response(data=data)
 
-    return jsonify(
-        [
-            {
-                "id": d.id,
-                "url": d.url,
-                "title": d.title,
-                "mediaType": d.media_type,
-                "orderNumber": d.order_number,
-                "startTime": d.start_time,
-                "endTime": d.end_time,
-                "updateTime": d.update_time,
-                "status": d.status,
-                "statusMessage": d.status_message,
-            }
-            for d in downloads
-        ]
-    )
+
+@bp.route("/downloads/<int:download_id>", methods=["GET"])
+def get_download(download_id: int) -> Tuple[Response, int]:
+    download = download_service.get_download_by_id(download_id)
+    if not download:
+        return api_response(error="Download not found", status_code=404)
+    return api_response(data=download.to_dict())
 
 
 @bp.route("/bulkEdit", methods=["PATCH"])

@@ -27,9 +27,8 @@ def test_simple_download(client, auth_headers):
         assert len(response.json) == 1
 
         history = client.get(API_GET_DOWNLOADS, headers=auth_headers).json
-        print(history)
-        assert len(history) == 1
-        assert history[0]["status"] == DownloadStatus.DONE
+        assert len(history["data"]) == 1
+        assert history["data"][0]["status"] == DownloadStatus.DONE
 
 
 @pytest.mark.slow

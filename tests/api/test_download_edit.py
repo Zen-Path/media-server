@@ -147,9 +147,10 @@ def test_bulk_edit_persistence(
     assert data["data"][0]["status"]
 
     history_after = client.get(API_GET_DOWNLOADS, headers=auth_headers).json
-    assert len(history_after) == 1
+    print(history_after)
+    assert len(history_after["data"]) == 1
 
-    updated_row = history_after[0]
+    updated_row = history_after["data"][0]
     assert updated_row["title"] == new_title
     assert updated_row["mediaType"] == new_media_type
 
