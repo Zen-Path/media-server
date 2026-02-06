@@ -40,22 +40,23 @@ export class BaseDataTable {
         this.dom.container.append(tableWrapper);
     }
 
-    _addEntries(resp, RowClass, tableRef) {
+    _addEntries(entriesData, RowClass, tableRef) {
+        console.log(entriesData);
         const fragment = document.createDocumentFragment();
 
         const isFirstCall = this.entryList.length === 0;
 
-        for (const item of resp.data) {
+        for (const entryData of entriesData) {
             try {
-                const id = item?.id;
+                const id = entryData?.id;
                 if (typeof id !== "number") {
-                    console.error("ID is missing or invalid:", id, item);
+                    console.error("ID is missing or invalid:", id, entryData);
                     continue;
                 }
 
                 if (this.entryMap.has(id)) continue;
 
-                const entry = new RowClass(item, tableRef);
+                const entry = new RowClass(entryData, tableRef);
 
                 this.entryMap.set(id, entry);
                 this.entryList.unshift(entry);
@@ -77,11 +78,11 @@ export class BaseDataTable {
                 if (isFirstCall) {
                     fragment.append(rowEl);
                 } else {
-                    // New items should be added to the top of the table
+                    // New entries should be added to the top of the table
                     fragment.prepend(rowEl);
                 }
             } catch (error) {
-                console.error(`Couldn't add entry ${item?.id}:`, error);
+                console.error(`Couldn't add entry ${entry?.id}:`, error);
             }
         }
 

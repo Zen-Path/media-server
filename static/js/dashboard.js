@@ -127,8 +127,8 @@ document.addEventListener("DOMContentLoaded", () => {
         headers: { "Content-Type": "application/json", "X-API-Key": apiKey },
     })
         .then((response) => response.json())
-        .then((data) => {
-            downloadsTable.add(data);
+        .then((payload) => {
+            downloadsTable.add(payload.data);
         });
 
     // SSE Listener

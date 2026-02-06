@@ -72,8 +72,8 @@ export class DownloadsTable extends BaseDataTable {
         this.init();
     }
 
-    add(data) {
-        this._addEntries(data, DownloadRow, this);
+    add(entries) {
+        this._addEntries(entries, DownloadRow, this);
     }
 
     _createActions() {
