@@ -1,6 +1,13 @@
 import tomllib
 from pathlib import Path
 
+from common.variables import flex_scripts
+from flask import Flask, request
+from flask_cors import CORS
+from scripts.media_server.app.routes.api import bp as api_bp
+from scripts.media_server.app.routes.main import bp as main_bp
+from scripts.media_server.app.utils.api_response import api_response
+
 
 def get_version():
     script_dir = Path(__file__).resolve().parent
@@ -12,3 +19,39 @@ def get_version():
 
 
 PKG_VERSION = get_version()
+
+# APP
+
+app = Flask(
+    __name__,
+    template_folder=Path(flex_scripts / "media_server" / "app" / "templates"),
+    static_folder=Path(flex_scripts / "media_server" / "app" / "static"),
+)
+
+CORS(app)  # Enable CORS for all routes
+
+
+app.register_blueprint(main_bp)
+app.register_blueprint(api_bp, url_prefix="/api")
+
+
+@app.context_processor
+def inject_global_vars():
+    return {
+        "project_version": PKG_VERSION,
+        "github_url": "https://github.com/Zen-Path/flexycon/tree/main/dotfiles/src/scripts/media_server",
+        "site_name": "Media Server",
+    }
+
+
+@app.errorhandler(404)
+def handle_404(e):
+    if request.path.startswith("/api/"):
+        return api_response(
+            error="Not Found",
+            data={"message": f"The requested URL {request.path!r} was not found."},
+            status_code=404,
+        )
+
+    # return render_template("404.html"), 404
+    return e

@@ -57,8 +57,10 @@ def test_api_returns_json_404(client, auth_headers):
 
     data = res.get_json()
     assert data["status"] is False
-    assert "error" in data
-    assert "not found" in data["message"].lower()
+    assert data["error"] == "Not Found"
+
+    assert "message" in data["data"]
+    assert "The requested URL".lower() in data["data"]["message"].lower()
 
 
 def test_database_exception(client, auth_headers, seed):

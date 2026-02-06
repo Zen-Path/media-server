@@ -10,63 +10,12 @@ from pathlib import Path
 from common.logger import logger, setup_logging
 from common.variables import flex_scripts
 from dotenv import load_dotenv
-from flask import Flask, abort, current_app, jsonify, request
-from flask_cors import CORS
-from scripts.media_server.app import PKG_VERSION
+from scripts.media_server.app import PKG_VERSION, app
 from scripts.media_server.app.extensions import db
-from scripts.media_server.app.routes.api import bp as api_bp
-from scripts.media_server.app.routes.main import bp as main_bp
 from scripts.media_server.app.utils.database import init_db, seed_db
 from scripts.media_server.app.utils.sse import MessageAnnouncer
 
 load_dotenv(flex_scripts / "media_server" / ".env")
-
-app = Flask(
-    __name__,
-    template_folder=Path(flex_scripts / "media_server" / "app" / "templates"),
-    static_folder=Path(flex_scripts / "media_server" / "app" / "static"),
-)
-
-app.register_blueprint(main_bp)
-app.register_blueprint(api_bp, url_prefix="/api")
-
-
-@app.before_request
-def check_auth():
-    if request.path.startswith("/api/") and request.path != "/api/health":
-        # Check header OR query string (for SSE)
-        provided_key = request.headers.get("X-API-Key") or request.args.get("apiKey")
-
-        expected_key = current_app.config.get("MEDIA_SERVER_KEY")
-        if not provided_key or provided_key != expected_key:
-            abort(401)
-
-
-@app.errorhandler(404)
-def handle_404(e):
-    # Only return JSON if the request was directed at the API
-    if request.path.startswith("/api/"):
-        return (
-            jsonify(
-                {
-                    "status": False,
-                    "error": "Not Found",
-                    "message": f"The requested URL {request.path!r} was not found.",
-                }
-            ),
-            404,
-        )
-
-    return e
-
-
-@app.context_processor
-def inject_global_vars():
-    return {
-        "project_version": PKG_VERSION,
-        "github_url": "https://github.com/Zen-Path/flexycon/tree/main/dotfiles/src/scripts/media_server",
-        "site_name": "Media Server",
-    }
 
 
 def main():
@@ -103,8 +52,6 @@ def main():
         ANNOUNCER=MessageAnnouncer(),
         DOWNLOAD_DIR=download_dir,
     )
-
-    CORS(app)  # Enable CORS for all routes
 
     db.init_app(app)
 
