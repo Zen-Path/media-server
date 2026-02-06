@@ -237,7 +237,7 @@ export class DownloadRow extends BaseDataRow {
 
         // We multiply by 1000 because JS uses milliseconds
         const date = new Date(value * 1000);
-        if (isNaN(date.getTime())) {
+        if (value < 0 || isNaN(date.getTime())) {
             return 0;
         }
 
