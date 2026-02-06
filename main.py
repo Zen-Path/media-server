@@ -24,8 +24,8 @@ load_dotenv(flex_scripts / "media_server" / ".env")
 
 app = Flask(
     __name__,
-    template_folder=Path(flex_scripts / "media_server" / "templates"),
-    static_folder=Path(flex_scripts / "media_server" / "static"),
+    template_folder=Path(flex_scripts / "media_server" / "app" / "templates"),
+    static_folder=Path(flex_scripts / "media_server" / "app" / "static"),
 )
 
 app.register_blueprint(main_bp)
