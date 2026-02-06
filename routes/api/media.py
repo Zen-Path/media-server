@@ -83,7 +83,7 @@ def complete_download_record(
             return False, f"Download ID {download_id} not found."
 
         record.title = title
-        record.end_time = datetime.now(timezone.utc)
+        record.end_time = int(datetime.now(timezone.utc).timestamp())
         record.status = status
 
         db.session.commit()
