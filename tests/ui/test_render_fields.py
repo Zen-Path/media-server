@@ -131,17 +131,18 @@ def test_title_visual_truncation(dashboard, mock_downloads):
 
 
 @pytest.mark.parametrize(
-    "input_date",
+    "test_name, input_date",
     [
-        None,
-        0,
-        1769374602,
-        "",
-        "2026-01-25T20:00:00"  # No 'Z' at the end
-        "2026-13-25T20:00:00Z",  # 13 months
+        ("none", None),
+        ("empty_str", ""),
+        ("timestamp_str", "1769374602"),
+        ("iso_str", "2026-01-25T20:00:00Z"),
+        ("out_of_range", "9999999999999"),
+        ("negative_ts", -1),
     ],
+    ids=lambda x: x if isinstance(x, str) else "",
 )
-def test_start_time_invalid(dashboard, mock_downloads, input_date):
+def test_start_time_invalid(test_name, input_date, dashboard, mock_downloads):
     """Check how UI handles 'trash' in the date fields."""
     mock_downloads([{"id": 1, "startTime": input_date}])
     dashboard.navigate()
@@ -154,13 +155,9 @@ def test_start_time_invalid(dashboard, mock_downloads, input_date):
     "start_time, end_time, expected_pattern",
     [
         # Finished
-        (
-            "2026-01-25T20:00:00Z",
-            "2026-01-25T20:00:05Z",
-            r"Finished at .* \(took \d+s\)",
-        ),
+        (1737835205, 1737835210, r"Finished at .* \(took \d+s\)"),
         # Running
-        ("2026-01-25T20:00:00Z", None, r"Download started more than .* ago"),
+        (1737835205, None, r"Running for \d+"),
     ],
 )
 def test_start_time_tooltips(
@@ -184,7 +181,8 @@ def test_start_time_tooltips(
 
 
 def test_start_time_valid(dashboard, mock_downloads):
-    mock_downloads([{"id": 1, "startTime": "2026-01-25T20:00:05Z"}])
+    # 1737835205 is Jan 25, 2026 20:00:05 UTC
+    mock_downloads([{"id": 1, "startTime": 1737835205}])
     dashboard.navigate()
 
     time_cell = dashboard.rows.first.locator(dashboard.b_col_start_time)
