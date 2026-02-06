@@ -1,3 +1,5 @@
+from typing import Any, Optional
+
 import pytest
 from playwright.sync_api import Page, expect
 from scripts.media_server.tests.conftest import API_GET_DOWNLOADS
@@ -18,13 +20,22 @@ def dashboard(page):
 def mock_downloads(page: Page):
     """Returns a function that intercepts the GET downloads call."""
 
-    def _mock(data: list):
+    def _mock(
+        data: Any = None,
+        error: Optional[str] = None,
+        status: bool = True,
+    ):
+        response = {
+            "status": status,
+            "data": data,
+            "error": error,
+        }
         page.route(
             f"**{API_GET_DOWNLOADS}",
             lambda route: route.fulfill(
                 status=200,
                 content_type="application/json",
-                json=data,
+                json=response,
             ),
         )
 
