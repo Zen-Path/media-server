@@ -95,8 +95,8 @@ def get_demo_downloads(
         # Long title
         {
             "url": "https://very-long-url-website.com/long-title-test",
-            "title": "This is an extremely long title to test if the CSS truncation"
-            "works correctly in the dashboard table row and does not break the layout"
+            "title": "This is an extremely long title to test if the CSS truncation "
+            "works correctly in the dashboard table row and does not break the layout "
             "of the cell",
             "media_type": MediaType.TEXT,
             "start_time": now - timedelta(minutes=1, seconds=10),
