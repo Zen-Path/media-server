@@ -70,7 +70,7 @@ def test_download_media_invalid_input(client, auth_headers):
     assert res.status_code == 400
 
 
-@patch("scripts.media_server.app.routes.api.media.start_download_record")
+@patch("scripts.media_server.app.routes.api.media.initialize_download")
 def test_initial_recording_deduplication(mock_start, client, auth_headers):
     """Verify that the initial recording phase uses list(set(urls))."""
     mock_start.return_value = (True, 1, None)

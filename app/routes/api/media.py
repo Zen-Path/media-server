@@ -20,42 +20,26 @@ from scripts.media_server.app.utils.scraper import expand_collection_urls
 from scripts.media_server.app.utils.tools import DownloadReportItem
 
 
-def start_download_record(
+def initialize_download(
     url: str, media_type: Optional[int]
 ) -> Tuple[bool, Optional[int], Optional[str]]:
     """
-    Initializes a download entry in the database and notifies the dashboard.
-
-    This function creates a 'shell' record, allowing the system to track that
-    a download is active before the heavy processing begins.
+    Initializes a download record and announces it.
 
     Returns:
         A tuple of (success_status, generated_id, error_message).
     """
     try:
-        new_download = Download(url=url, media_type=media_type)
-
-        db.session.add(new_download)
+        record = Download(url=url, media_type=media_type)
+        db.session.add(record)
         db.session.commit()
 
-        last_id = new_download.id
-
         try:
-            current_app.config["ANNOUNCER"].announce(
-                EventType.CREATE,
-                {
-                    "id": last_id,
-                    "url": url,
-                    "mediaType": media_type,
-                    "startTime": new_download.start_time,
-                    "status": new_download.status,
-                    "statusMessage": new_download.status_message,
-                },
-            )
+            current_app.config["ANNOUNCER"].announce(EventType.CREATE, record.to_dict())
         except Exception as e:
             logger.warning(f"Announcer failed: {e}")
 
-        return True, last_id, None
+        return True, record.id, None
 
     except Exception as e:
         db.session.rollback()
@@ -65,14 +49,11 @@ def start_download_record(
         return False, None, err_msg
 
 
-def complete_download_record(
+def finalize_download(
     download_id: int, title: Optional[str], status: DownloadStatus
 ) -> Tuple[bool, Optional[str]]:
     """
-    Finalizes an existing download record with its metadata and notifies the dashboard.
-
-    Updates the specific row with the final title and the timestamp of
-    completion.
+    Updates a download record with final data and announces it.
 
     Returns:
         A tuple of (success_status, error_message).
@@ -89,26 +70,16 @@ def complete_download_record(
         db.session.commit()
 
         try:
-            current_app.config["ANNOUNCER"].announce(
-                EventType.UPDATE,
-                {
-                    "id": download_id,
-                    "title": title,
-                    "endTime": record.end_time,
-                    "updateTime": record.update_time,
-                    "orderNumber": record.order_number,
-                    "status": record.status,
-                    "statusMessage": record.status_message,
-                },
-            )
+            current_app.config["ANNOUNCER"].announce(EventType.UPDATE, record.to_dict())
         except Exception as e:
             logger.warning(f"Announcer failed: {e}")
 
         return True, None
+
     except Exception as e:
         db.session.rollback()
 
-        err_msg = f"Failed to update download record #{download_id}: {e}"
+        err_msg = f"Failed to finalize download record #{download_id}: {e}"
         logger.error(err_msg)
         return False, err_msg
 
@@ -154,7 +125,7 @@ def download_media():
     # We store the initial batch to ensure we have a "paper trail"
     initial_queue = []
     for url in list(set(urls)):
-        success, download_id, error = start_download_record(url, media_type)
+        success, download_id, error = initialize_download(url, media_type)
         report[url] = DownloadReportItem(url=url, status=success, error=error)
 
         if success:
@@ -180,7 +151,7 @@ def download_media():
                 if child_url in seen_urls:
                     continue
 
-                child_success, child_id, child_error = start_download_record(
+                child_success, child_id, child_error = initialize_download(
                     child_url, media_type
                 )
 
@@ -278,7 +249,7 @@ def download_media():
             logger.warning(f"Announcer failed: {e}")
 
         # Finalize DB record
-        success, error = complete_download_record(
+        success, error = finalize_download(
             download_id,  # type: ignore[arg-type]
             title,
             DownloadStatus.DONE if report[url].status else DownloadStatus.FAILED,
