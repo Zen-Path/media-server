@@ -141,8 +141,8 @@ def sample_download_row():
         "url": "https://www.test.com/image-1.jpg",
         "title": "Test Page",
         "media_type": MediaType.IMAGE,
-        "start_time": datetime.fromisoformat("2025-01-01T10:10:15"),
-        "end_time": datetime.fromisoformat("2025-01-01T10:11:20"),
+        "start_time": datetime.fromisoformat("2025-01-01T10:10:15").timestamp(),
+        "end_time": datetime.fromisoformat("2025-01-01T10:11:20").timestamp(),
         "order_number": 0,
     }
 

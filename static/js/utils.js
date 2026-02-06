@@ -33,29 +33,31 @@ export async function copyToClipboard(data) {
     }
 }
 
-/**
- * Formats an ISO string to YYYY-MM-DD HH:mm:ss
- * Returns "-" if the input is null, undefined, or invalid.
- */
-export function toLocalStandardTime(isoString) {
-    if (!isoString) return "-";
+const DATE_FORMATTER = new Intl.DateTimeFormat("sv-SE", {
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+});
 
-    const date = new Date(isoString);
+/**
+ * Formats a Unix timestamp (seconds) to YYYY-MM-DD HH:mm:ss
+ * Returns "-" if the input is null or invalid.
+ */
+export function toLocalStandardTime(timestamp) {
+    if (typeof timestamp !== "number") return "-";
+
+    // Convert seconds to milliseconds
+    const date = new Date(timestamp * 1000);
 
     if (isNaN(date.getTime())) {
-        console.warn(`Invalid date string provided: "${isoString}"`);
+        console.warn(`Invalid timestamp provided: "${timestamp}"`);
         return "-";
     }
 
-    // 'sv-SE' (Sweden) results in "YYYY-MM-DD HH:mm:ss"
-    return date.toLocaleString("sv-SE", {
-        year: "numeric",
-        month: "2-digit",
-        day: "2-digit",
-        hour: "2-digit",
-        minute: "2-digit",
-        second: "2-digit",
-    });
+    return DATE_FORMATTER.format(date);
 }
 
 export function formatDuration(ms) {

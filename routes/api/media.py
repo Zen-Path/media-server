@@ -95,7 +95,7 @@ def complete_download_record(
                     "id": download_id,
                     "title": title,
                     "endTime": record.end_time,
-                    "updatedTime": record.update_time,
+                    "updateTime": record.update_time,
                     "orderNumber": record.order_number,
                     "status": record.status,
                     "statusMessage": record.status_message,

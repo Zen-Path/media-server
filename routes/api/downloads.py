@@ -24,7 +24,7 @@ def get_downloads():
                 "orderNumber": d.order_number,
                 "startTime": d.start_time,
                 "endTime": d.end_time,
-                "updatedTime": d.update_time,
+                "updateTime": d.update_time,
                 "status": d.status,
                 "statusMessage": d.status_message,
             }

@@ -195,7 +195,7 @@ export class DownloadRow extends BaseDataRow {
 
             startTime: this.#formatDateField(this.data.startTime),
             endTime: this.#formatDateField(this.data.endTime),
-            updatedTime: this.#formatDateField(this.data.updatedTime),
+            updateTime: this.#formatDateField(this.data.updateTime),
         };
 
         this.sortValues = {
@@ -204,9 +204,9 @@ export class DownloadRow extends BaseDataRow {
             url: this.data.url,
             mediaType: this.data.mediaType,
 
-            startTime: this.#standardizeDateField(this.data.startTime),
-            endTime: this.#standardizeDateField(this.data.endTime),
-            updateTime: this.#standardizeDateField(this.data.updateTime),
+            startTime: this.data.startTime,
+            endTime: this.data.endTime,
+            updateTime: this.data.updateTime,
             status: this.data.status,
             isSelected: this.isSelected,
         };
@@ -231,10 +231,17 @@ export class DownloadRow extends BaseDataRow {
     }
 
     #validateDateField(value) {
-        // TODO: update to handle unix timestamps instead
-        const valueText = this.#validateTextField(value);
-        if (valueText.includes("Z")) return valueText;
-        return "";
+        if (typeof value !== "number") {
+            return 0;
+        }
+
+        // We multiply by 1000 because JS uses milliseconds
+        const date = new Date(value * 1000);
+        if (isNaN(date.getTime())) {
+            return 0;
+        }
+
+        return value;
     }
 
     #validateIntOptionsField(value, options) {
@@ -243,7 +250,7 @@ export class DownloadRow extends BaseDataRow {
     }
 
     #formatDateField(value) {
-        if (value === "") return "-";
+        if (value === 0) return "-";
         return toLocalStandardTime(value);
     }
 
@@ -366,15 +373,18 @@ export class DownloadRow extends BaseDataRow {
     }
 
     #generateTimeDiffTooltip() {
-        const start = this.sortValues.startTime;
-        const end = this.data.endTime ? this.sortValues.endTime : Date.now();
+        const startMs = this.sortValues.startTime * 1000;
 
-        const diff = end - start;
+        const endMs =
+            this.data.endTime !== 0 ? this.data.endTime * 1000 : Date.now(); // Date.now() is already in ms
+
+        const diff = endMs - startMs;
         const diffHumanReadable = formatDuration(diff);
 
-        if (this.data.endTime === "") {
-            return `Download started more than ${diffHumanReadable} ago.`;
+        if (this.data.endTime === 0) {
+            return `Running for ${diffHumanReadable}`;
         }
+
         return `Finished at ${toLocalStandardTime(this.data.endTime)} (took ${diffHumanReadable})`;
     }
 

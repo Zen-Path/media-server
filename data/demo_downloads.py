@@ -26,11 +26,12 @@ def resolve_status(
     Ensures end_time is never in the future relative to 'now'.
     """
     # Ensure end_time <= now
-    if item.get("end_time") and item["end_time"] > now:
-        item["end_time"] = now
+    now_ts = now.timestamp()
+    if item.get("end_time") and item["end_time"] > now_ts:
+        item["end_time"] = now_ts
 
     has_end_time = item.get("end_time") is not None
-    current_status = item.get("status")
+    current_status = item.get("status", -1)
 
     # If it has an end_time, it MUST be a terminal state.
     if has_end_time:
@@ -328,18 +329,19 @@ def get_demo_downloads(
         meta_pool = [
             {"u": d["url"], "t": d["title"], "m": d["media_type"]} for d in raw_data
         ]
+
         for _ in range(row_count - len(raw_data)):
             source = rng.choice(meta_pool)
-
             is_finished = rng.random() < config["end_time_probability"]
-            start_time = now - timedelta(
+
+            start_dt = now - timedelta(
                 days=rng.randint(0, config["max_days_offset"]),
                 seconds=rng.randint(0, 86400),
             )
 
-            end_time = None
+            end_dt = None
             if is_finished:
-                end_time = start_time + timedelta(
+                end_dt = start_dt + timedelta(
                     seconds=rng.randint(
                         config["min_duration_seconds"], config["max_duration_seconds"]
                     )
@@ -350,14 +352,19 @@ def get_demo_downloads(
                     "url": source["u"],
                     "title": source["t"],
                     "media_type": source["m"],
-                    "start_time": start_time,
-                    "end_time": end_time,
-                    "status": None,  # Leave it for the resolver
+                    "start_time": start_dt,
+                    "end_time": end_dt,
                 }
             )
 
     processed_data = []
     for item in raw_data:
+        if isinstance(item["start_time"], datetime):
+            item["start_time"] = int(item["start_time"].timestamp())
+
+        if item.get("end_time") and isinstance(item["end_time"], datetime):
+            item["end_time"] = int(item["end_time"].timestamp())
+
         item["status"] = resolve_status(item, rng, config, now)
         processed_data.append(item)
 

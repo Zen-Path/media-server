@@ -1,5 +1,3 @@
-from datetime import datetime
-
 from ..conftest import API_GET_DOWNLOADS
 
 
@@ -22,8 +20,18 @@ def test_valid_scenarios(client, auth_headers, seed, sample_download_row):
     assert row["mediaType"] == sample_download_row["media_type"]
     assert row["orderNumber"] == sample_download_row["order_number"]
 
-    assert "startTime" in row
+    assert "status" in row
+    assert isinstance(row["status"], int)
 
-    actual_start = datetime.fromisoformat(row["startTime"].replace("Z", ""))
-    expected_start = sample_download_row["start_time"]
-    assert actual_start == expected_start
+    assert "statusMessage" in row
+    assert isinstance(row["statusMessage"], str | None)
+
+    assert "startTime" in row
+    assert isinstance(row["startTime"], int)
+    assert row["startTime"] == sample_download_row["start_time"]
+
+    assert "endTime" in row
+    assert isinstance(row["endTime"], int | None)
+
+    assert "updateTime" in row
+    assert isinstance(row["updateTime"], int | None)
