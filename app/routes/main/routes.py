@@ -1,5 +1,5 @@
 from flask import redirect, render_template
-from scripts.media_server.routes.main import bp
+from scripts.media_server.app.routes.main import bp
 
 
 @bp.route("/")

@@ -5,10 +5,10 @@ from flask import Response, current_app, jsonify, request
 from scripts.media_server.app.constants import DownloadStatus, EventType, MediaType
 from scripts.media_server.app.extensions import db
 from scripts.media_server.app.models.download import Download
+from scripts.media_server.app.routes.api import bp
 from scripts.media_server.app.services import download_service
 from scripts.media_server.app.utils.api_response import api_response
 from scripts.media_server.app.utils.tools import OperationResult
-from scripts.media_server.routes.api import bp
 
 
 @bp.route("/downloads", methods=["GET"])

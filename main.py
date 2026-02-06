@@ -13,10 +13,10 @@ from dotenv import load_dotenv
 from flask import Flask, abort, current_app, jsonify, request
 from flask_cors import CORS
 from scripts.media_server.app.extensions import db
+from scripts.media_server.app.routes.api import bp as api_bp
+from scripts.media_server.app.routes.main import bp as main_bp
 from scripts.media_server.app.utils.database import init_db, seed_db
 from scripts.media_server.app.utils.sse import MessageAnnouncer
-from scripts.media_server.routes.api import bp as api_bp
-from scripts.media_server.routes.main import bp as main_bp
 
 __version__ = "3.2.1"
 

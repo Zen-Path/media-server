@@ -70,7 +70,7 @@ def test_download_media_invalid_input(client, auth_headers):
     assert res.status_code == 400
 
 
-@patch("scripts.media_server.routes.api.media.start_download_record")
+@patch("scripts.media_server.app.routes.api.media.start_download_record")
 def test_initial_recording_deduplication(mock_start, client, auth_headers):
     """Verify that the initial recording phase uses list(set(urls))."""
     mock_start.return_value = (True, 1, None)
@@ -86,8 +86,8 @@ def test_initial_recording_deduplication(mock_start, client, auth_headers):
     assert mock_start.call_count == 2
 
 
-@patch("scripts.media_server.routes.api.media.expand_collection_urls")
-@patch("scripts.media_server.routes.api.media.Gallery.download")
+@patch("scripts.media_server.app.routes.api.media.expand_collection_urls")
+@patch("scripts.media_server.app.routes.api.media.Gallery.download")
 @patch("requests.get")
 def test_gallery_expansion_flow(
     mock_get, mock_gallery, mock_expand, client, auth_headers
@@ -122,7 +122,7 @@ def test_gallery_expansion_flow(
 
 
 @patch("requests.get")
-@patch("scripts.media_server.routes.api.media.Gallery.download")
+@patch("scripts.media_server.app.routes.api.media.Gallery.download")
 def test_title_scrape_failure_handling(mock_gallery, mock_get, client, auth_headers):
     """
     Verify that a failed title scrape adds a warning but doesn't fail the
@@ -143,8 +143,8 @@ def test_title_scrape_failure_handling(mock_gallery, mock_get, client, auth_head
     assert any("Title scrape failed" in w for w in data[url]["warnings"])
 
 
-@patch("scripts.media_server.routes.api.media.expand_collection_urls")
-@patch("scripts.media_server.routes.api.media.Gallery.download")
+@patch("scripts.media_server.app.routes.api.media.expand_collection_urls")
+@patch("scripts.media_server.app.routes.api.media.Gallery.download")
 def test_gallery_dl_failure_reporting(mock_gallery, mock_expand, client, auth_headers):
     """Verify that a non-zero return code from gallery-dl marks status as False."""
     mock_gallery.return_value = MockCmdResult(return_code=1, output="403 Forbidden")
@@ -163,8 +163,8 @@ def test_gallery_dl_failure_reporting(mock_gallery, mock_expand, client, auth_he
     assert "Command failed" in data[url]["error"]
 
 
-@patch("scripts.media_server.routes.api.media.expand_collection_urls")
-@patch("scripts.media_server.routes.api.media.Gallery.download")
+@patch("scripts.media_server.app.routes.api.media.expand_collection_urls")
+@patch("scripts.media_server.app.routes.api.media.Gallery.download")
 def test_gallery_dl_failure_patterns(mock_gallery, mock_expand, client, auth_headers):
     """Verify that if failure patterns are matched return status is False."""
     mock_gallery.return_value = MockCmdResult(
@@ -185,8 +185,8 @@ def test_gallery_dl_failure_patterns(mock_gallery, mock_expand, client, auth_hea
     assert "[reddit][info]" in data[url]["output"]
 
 
-@patch("scripts.media_server.routes.api.media.expand_collection_urls")
-@patch("scripts.media_server.routes.api.media.Gallery.download")
+@patch("scripts.media_server.app.routes.api.media.expand_collection_urls")
+@patch("scripts.media_server.app.routes.api.media.Gallery.download")
 def test_return_files(mock_gallery, mock_expand, client, auth_headers):
     """Verify that file paths are return for successful downloads."""
     files = [
