@@ -42,6 +42,7 @@ class Download(db.Model):  # type: ignore[name-defined]
             "url": self.url,
             "title": self.title,
             "mediaType": self.media_type,
+            "orderNumber": self.order_number,
             "startTime": self.start_time,
             "endTime": self.end_time,
             "updateTime": self.update_time,
