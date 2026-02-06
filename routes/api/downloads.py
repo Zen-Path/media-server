@@ -2,13 +2,13 @@ from typing import Tuple
 
 from common.logger import logger
 from flask import Response, current_app, jsonify, request
+from scripts.media_server.app.constants import DownloadStatus, EventType, MediaType
+from scripts.media_server.app.extensions import db
+from scripts.media_server.app.models.download import Download
+from scripts.media_server.app.services import download_service
+from scripts.media_server.app.utils.api_response import api_response
+from scripts.media_server.app.utils.tools import OperationResult
 from scripts.media_server.routes.api import bp
-from scripts.media_server.src.constants import DownloadStatus, EventType, MediaType
-from scripts.media_server.src.extensions import db
-from scripts.media_server.src.models.download import Download
-from scripts.media_server.src.services import download_service
-from scripts.media_server.src.utils.api_response import api_response
-from scripts.media_server.src.utils.tools import OperationResult
 
 
 @bp.route("/downloads", methods=["GET"])

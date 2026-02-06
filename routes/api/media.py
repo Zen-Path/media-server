@@ -6,18 +6,18 @@ import requests
 from bs4 import BeautifulSoup
 from common.logger import logger
 from flask import current_app, jsonify, request
-from scripts.media_server.routes.api import bp
-from scripts.media_server.src.constants import (
+from scripts.media_server.app.constants import (
     DownloadStatus,
     EventType,
     MediaType,
     ScraperConfig,
 )
-from scripts.media_server.src.extensions import db
-from scripts.media_server.src.models.download import Download
-from scripts.media_server.src.utils.downloaders import Gallery
-from scripts.media_server.src.utils.scraper import expand_collection_urls
-from scripts.media_server.src.utils.tools import DownloadReportItem
+from scripts.media_server.app.extensions import db
+from scripts.media_server.app.models.download import Download
+from scripts.media_server.app.utils.downloaders import Gallery
+from scripts.media_server.app.utils.scraper import expand_collection_urls
+from scripts.media_server.app.utils.tools import DownloadReportItem
+from scripts.media_server.routes.api import bp
 
 
 def start_download_record(

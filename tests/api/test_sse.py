@@ -1,7 +1,7 @@
 import json
 from unittest.mock import MagicMock, patch
 
-from scripts.media_server.src.constants import EventType, MediaType
+from scripts.media_server.app.constants import EventType, MediaType
 
 from ..conftest import API_BULK_DELETE, API_DOWNLOAD
 
@@ -23,7 +23,7 @@ def test_download_announcements(client, announcer, auth_headers):
     # Mock the internal download logic
     with (
         patch("requests.get") as mock_get,
-        patch("scripts.media_server.src.utils.downloaders.Gallery.download") as mock_dl,
+        patch("scripts.media_server.app.utils.downloaders.Gallery.download") as mock_dl,
     ):
         # Mock title scrape
         mock_resp = MagicMock()
@@ -70,7 +70,7 @@ def test_system_resilience_to_announcer_failure(client, auth_headers, seed):
     seed([{"url": "test.com", "id": 100}])
 
     with patch(
-        "scripts.media_server.src.utils.sse.MessageAnnouncer.announce"
+        "scripts.media_server.app.utils.sse.MessageAnnouncer.announce"
     ) as mock_announce:
         mock_announce.side_effect = Exception("Socket Connection Lost")
 

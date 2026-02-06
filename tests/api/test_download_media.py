@@ -1,8 +1,8 @@
 from unittest.mock import MagicMock, patch
 
 import pytest
-from scripts.media_server.src.constants import DownloadStatus, MediaType
-from scripts.media_server.src.models.download import Download
+from scripts.media_server.app.constants import DownloadStatus, MediaType
+from scripts.media_server.app.models.download import Download
 
 from ..conftest import API_DOWNLOAD, API_GET_DOWNLOADS
 

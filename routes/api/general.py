@@ -2,9 +2,9 @@ from datetime import datetime, timezone
 from typing import Tuple
 
 from flask import Response, current_app, request
+from scripts.media_server.app.utils.api_response import api_response
+from scripts.media_server.app.utils.sse import event_generator
 from scripts.media_server.routes.api import bp
-from scripts.media_server.src.utils.api_response import api_response
-from scripts.media_server.src.utils.sse import event_generator
 
 # AUTH
 

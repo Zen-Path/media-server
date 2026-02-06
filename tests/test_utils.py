@@ -1,9 +1,9 @@
 import json
 from unittest.mock import patch
 
-from scripts.media_server.src.constants import EventType
-from scripts.media_server.src.utils.scraper import expand_collection_urls
-from scripts.media_server.src.utils.sse import event_generator
+from scripts.media_server.app.constants import EventType
+from scripts.media_server.app.utils.scraper import expand_collection_urls
+from scripts.media_server.app.utils.sse import event_generator
 
 
 def test_stream_generator_logic(announcer):
@@ -32,7 +32,7 @@ def test_stream_generator_logic(announcer):
 
 def test_expand_collection_urls_depth_limit():
     """Ensure recursion stops at depth 3."""
-    with patch("scripts.media_server.src.utils.scraper.run_command") as mock_run:
+    with patch("scripts.media_server.app.utils.scraper.run_command") as mock_run:
         # If it didn't stop, it would call run_command indefinitely
 
         result = expand_collection_urls("http://test.com", depth=4)

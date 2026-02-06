@@ -3,7 +3,7 @@ import queue
 from typing import Any, Dict, Generator, List
 
 from common.logger import logger
-from scripts.media_server.src.constants import EventType
+from scripts.media_server.app.constants import EventType
 
 
 class MessageAnnouncer:

@@ -1,4 +1,4 @@
-from scripts.media_server.src.models.download import Download
+from scripts.media_server.app.models.download import Download
 
 
 def get_all_downloads():

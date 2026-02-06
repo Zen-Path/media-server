@@ -2,7 +2,7 @@ import concurrent.futures
 from unittest.mock import patch
 
 import requests
-from scripts.media_server.src.extensions import db
+from scripts.media_server.app.extensions import db
 from scripts.media_server.tests.conftest import (
     API_BULK_DELETE,
     API_GET_DOWNLOADS,
