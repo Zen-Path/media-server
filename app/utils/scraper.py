@@ -13,6 +13,7 @@ NON_COLLECTION_PATTERNS = [
     re.compile(r"^https?://(?:www\.)?pornpics\.com/galleries/[\w-]+/?"),
     re.compile(r"^https?://(?:www\.)?xnxx\.com/video-.*"),
     re.compile(r"^https?://(?:www\.)?reddit\.com/r/\w+/comments/.*/?"),
+    re.compile(r"^(?:https?://)?(?:www\.)?example\.com.*"),
 ]
 
 # Common direct media extensions
