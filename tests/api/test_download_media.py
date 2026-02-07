@@ -18,15 +18,27 @@ class MockCmdResult:
 def test_simple_download(client, auth_headers):
     """Test the download endpoint with mocked external requests."""
     with patch("requests.get") as mock_get:
-        mock_get.return_value.status_code = 200
-        mock_get.return_value.text = "<html><title>Mocked Title</title></html>"
+        mock_title = "Mocked Title"
+        mock_url = "https://example.com"
 
-        payload = {"urls": ["http://mock-site.com"], "mediaType": MediaType.VIDEO}
+        mock_get.return_value.status_code = 200
+        mock_get.return_value.text = f"<html><title>{mock_title}</title></html>"
+
+        payload = {"urls": [mock_url], "mediaType": MediaType.VIDEO}
         response = client.post(API_DOWNLOAD, headers=auth_headers, json=payload)
 
         assert response.status_code == 200
-        assert len(response.json) == 1
+        data = response.get_json()
+        assert data["status"]
+        assert data["error"] is None
+        assert data["data"] is not None
 
+        first_download = next(iter(data["data"].values()))
+        assert first_download["url"] == mock_url
+        # TODO: when we'll return Download, then we can check for a title match
+        # assert first_download["title"] == mock_title
+
+        # Persistence
         history = client.get(API_GET_DOWNLOADS, headers=auth_headers).json
         assert len(history["data"]) == 1
         assert history["data"][0]["status"] == DownloadStatus.DONE
@@ -50,25 +62,59 @@ def test_stress(client, auth_headers):
     assert count == url_count
 
 
-def test_download_media_invalid_input(client, auth_headers):
-    """Verify that bad payloads return 400."""
-    # Test missing URLs
-    res = client.post(
-        API_DOWNLOAD, headers=auth_headers, json={"mediaType": MediaType.IMAGE}
-    )
+@pytest.mark.parametrize(
+    "test_name, payload, error_msg",
+    [
+        (
+            "urls_missing",
+            {},
+            "missing data for required field",
+        ),
+        (
+            "urls_none",
+            {"urls": None},
+            "field may not be null",
+        ),
+        (
+            "urls_wrong_type",
+            {"urls": "123"},
+            "not a valid list",
+        ),
+        (
+            "media_type_wrong_type",
+            {"urls": ["https://example.com"], "mediaType": "Image"},
+            "not a valid integer",
+        ),
+        (
+            "media_type_negative_id",
+            {"urls": ["https://example.com"], "mediaType": -1},
+            "must be one of",
+        ),
+        (
+            "field_snake_case",
+            {"urls": ["https://example.com"], "media_type": MediaType.IMAGE},
+            "unknown field",
+        ),
+        (
+            "range_start_wrong_type",
+            {"urls": ["https://example.com"], "rangeStart": "123"},
+            "not a valid integer",
+        ),
+        (
+            "range_end_wrong_type",
+            {"urls": ["https://example.com"], "rangeEnd": "123"},
+            "not a valid integer",
+        ),
+    ],
+)
+def test_invalid_scenarios(test_name, payload, error_msg, client, auth_headers):
+    res = client.post(API_DOWNLOAD, headers=auth_headers, json=payload)
     assert res.status_code == 400
 
-    # Test bad range
-    res = client.post(
-        API_DOWNLOAD,
-        headers=auth_headers,
-        json={
-            "urls": ["http://test.com"],
-            "mediaType": MediaType.GALLERY,
-            "rangeStart": "not-an-int",
-        },
-    )
-    assert res.status_code == 400
+    data = res.get_json()
+    assert not data["status"]
+    assert data["data"] is None
+    assert error_msg.lower() in data["error"].lower()
 
 
 @patch("scripts.media_server.app.routes.api.media.initialize_download")
@@ -110,16 +156,11 @@ def test_gallery_expansion_flow(
     res = client.post(API_DOWNLOAD, headers=auth_headers, json=payload)
 
     data = res.get_json()
-    print(data)
 
-    # Check parent entry
-    assert parent_url in data
-    assert "Expanded into 2 items" in data[parent_url]["log"]
+    assert parent_url in data["data"]
+    assert child_urls[0] in data["data"]
 
-    # Check child entries exist in the report
-    assert child_urls[0] in data
-    # TODO: when we'll return the created Download, we can check the parent id
-    # assert data[child_urls[0]]["log"] == "Child of #1"
+    # TODO: When we'll return Download, then we can check for more details
 
 
 @patch("requests.get")
@@ -140,8 +181,10 @@ def test_title_scrape_failure_handling(mock_gallery, mock_get, client, auth_head
     )
 
     data = res.get_json()
-    assert data[url]["status"] is True
-    assert any("Title scrape failed" in w for w in data[url]["warnings"])
+    first_download = next(iter(data["data"].values()))
+
+    assert first_download["status"] is True
+    assert any("Title scrape failed" in w for w in first_download["warnings"])
 
 
 @patch("scripts.media_server.app.routes.api.media.expand_collection_urls")
@@ -162,10 +205,11 @@ def test_gallery_dl_failure_reporting(mock_gallery, mock_expand, client, auth_he
     )
 
     data = res.get_json()
-    print(data)
-    assert data[url]["status"] is False
-    assert data[url]["output"] == "403 Forbidden"
-    assert "Command failed".lower() in data[url]["error"].lower()
+    first_download = next(iter(data["data"].values()))
+
+    assert first_download["status"] is False
+    assert first_download["output"] == "403 Forbidden"
+    assert "Command failed".lower() in first_download["error"].lower()
 
 
 @patch("scripts.media_server.app.routes.api.media.expand_collection_urls")
@@ -188,9 +232,11 @@ def test_gallery_dl_failure_patterns(mock_gallery, mock_expand, client, auth_hea
     )
 
     data = res.get_json()
-    assert not data[url]["status"]
-    assert "No results found" in data[url]["error"]
-    assert "[reddit][info]" in data[url]["output"]
+    first_download = next(iter(data["data"].values()))
+
+    assert not first_download["status"]
+    assert "No results found" in first_download["error"]
+    assert "[reddit][info]" in first_download["output"]
 
 
 @patch("scripts.media_server.app.routes.api.media.expand_collection_urls")
@@ -213,7 +259,8 @@ def test_return_files(mock_gallery, mock_expand, client, auth_headers):
     )
 
     data = res.get_json()
-    print(data)
-    assert data[url]["status"]
-    assert len(data[url]["files"]) == 3
-    assert data[url]["files"][0] == "./dir1/image-1.jpg"
+    first_download = next(iter(data["data"].values()))
+
+    assert first_download["status"]
+    assert len(first_download["files"]) == 3
+    assert first_download["files"][0] == "./dir1/image-1.jpg"

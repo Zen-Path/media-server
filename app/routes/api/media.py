@@ -2,17 +2,20 @@ from typing import Dict
 
 import requests
 from bs4 import BeautifulSoup
-from flask import jsonify, request
+from flask import request
+from marshmallow import ValidationError
 from scripts.media_server.app.constants import (
     DownloadStatus,
     MediaType,
     ScraperConfig,
 )
 from scripts.media_server.app.routes.api import bp
+from scripts.media_server.app.schemas.execution import DownloadRequestSchema
 from scripts.media_server.app.services.download_service import (
     finalize_download,
     initialize_download,
 )
+from scripts.media_server.app.utils.api_response import api_response
 from scripts.media_server.app.utils.downloaders import Gallery
 from scripts.media_server.app.utils.scraper import expand_collection_urls
 from scripts.media_server.app.utils.tools import DownloadReportItem
@@ -20,37 +23,18 @@ from scripts.media_server.app.utils.tools import DownloadReportItem
 
 @bp.route("/media/download", methods=["POST"])
 def download_media():
-    data = request.get_json()
-    urls = data.get("urls")
-    media_type = data.get("mediaType")
-    range_start = data.get("rangeStart")
-    range_end = data.get("rangeEnd")
+    json_data = request.get_json()
 
-    # Validation
+    try:
+        data = DownloadRequestSchema().load(json_data)
+        print(data)
+        urls = data["urls"]
+        media_type = data.get("media_type")
+        range_start = data.get("range_start")
+        range_end = data.get("range_end")
 
-    ## URLs
-    if (
-        not urls
-        or not isinstance(urls, list)
-        or not all(isinstance(url, str) for url in urls)
-    ):
-        return jsonify({"error": "'urls' must be a list of strings."}), 400
-
-    ## Media Type
-    if media_type is not None:
-        if not isinstance(media_type, int):
-            return jsonify({"error": "'mediaType' must be an int."}), 400
-        try:
-            media_type = MediaType(media_type)
-        except ValueError:
-            return jsonify({"error": f"Invalid mediaType value: {media_type}"}), 400
-
-    ## Range Parts
-    if range_start and not isinstance(range_start, int):
-        return jsonify({"error": "'rangeStart' must be an int."}), 400
-
-    if range_end and not isinstance(range_end, int):
-        return jsonify({"error": "'rangeEnd' must be an int."}), 400
+    except ValidationError as err:
+        return api_response(error=str(err.messages), status_code=400)
 
     report: Dict[str, DownloadReportItem] = {}
 
@@ -156,4 +140,4 @@ def download_media():
             report[url].error = error
 
     final_json_report = {url: item.to_dict() for url, item in report.items()}
-    return jsonify(final_json_report), 200
+    return api_response(data=final_json_report)
