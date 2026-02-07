@@ -3,53 +3,32 @@ import pytest
 from ..conftest import API_BULK_DELETE, API_GET_DOWNLOADS
 
 
-def test_invalid_scenarios(client, auth_headers):
-    # No IDs
-    res = client.post(API_BULK_DELETE, headers=auth_headers, json={"ids": []})
+@pytest.mark.parametrize(
+    "delete_ids, error_msg",
+    [
+        (None, "field may not be null."),
+        ([], "Shorter than minimum length"),
+    ],
+)
+def test_invalid_scenarios(delete_ids, error_msg, client, auth_headers):
+    res = client.post(API_BULK_DELETE, headers=auth_headers, json={"ids": delete_ids})
     assert res.status_code == 400
+
     data = res.get_json()
     assert not data["status"]
     assert data["data"] is None
-    assert data["error"] == "Invalid or empty 'ids' list"
-
-    # One invalid ID
-    res = client.post(API_BULK_DELETE, headers=auth_headers, json={"ids": [999]})
-    data = res.get_json()
-    assert res.status_code == 200
-    assert not data["status"]
-    assert data["data"][0]["error"] == "Record ID not found"
+    assert error_msg.lower() in data["error"].lower()
 
 
 @pytest.mark.parametrize(
-    "test_name, seed_ids, delete_ids, expected_overall, expected_items",
+    "test_name, seed_ids, delete_ids, expected_items",
     [
-        ("single_valid", [1], [1], True, [{"id": 1, "status": True}]),
-        (
-            "multiple_valid",
-            [1, 2, 3],
-            [1, 2, 3],
-            True,
-            [
-                {"id": 1, "status": True},
-                {"id": 2, "status": True},
-                {"id": 3, "status": True},
-            ],
-        ),
-        (
-            "mixed_status",
-            [1],
-            [1, 999],
-            True,
-            [{"id": 1, "status": True}, {"id": 999, "status": False}],
-        ),
-        (
-            "all_missing",
-            [],
-            [888, 999],
-            False,
-            [{"id": 888, "status": False}, {"id": 999, "status": False}],
-        ),
-        ("duplicates", [5], [5, 5], True, [{"id": 5, "status": True}]),
+        ("single_valid", [1], [1], [1]),
+        ("all_valid", [1, 2, 3], [1, 2, 3], [1, 2, 3]),
+        ("mixed_status", [1], [1, 999], [1]),
+        ("single_invalid", [], [-1], []),
+        ("all_invalid", [], [888, 999], []),
+        ("duplicates", [5], [5, 5], [5]),
     ],
     ids=lambda x: x if isinstance(x, str) else "",
 )
@@ -57,7 +36,6 @@ def test_valid_scenarios(
     test_name,
     seed_ids,
     delete_ids,
-    expected_overall,
     expected_items,
     client,
     auth_headers,
@@ -67,17 +45,10 @@ def test_valid_scenarios(
 
     res = client.post(API_BULK_DELETE, headers=auth_headers, json={"ids": delete_ids})
     data = res.get_json()
-    print(data)
 
     assert res.status_code == 200
-    assert data["status"] == expected_overall
-    assert len(data["data"]) == len(expected_items)
-
-    for i, expected in enumerate(expected_items):
-        actual = data["data"][i]
-
-        assert actual["data"] == expected["id"]
-        assert actual["status"] == expected["status"]
+    assert data["status"]
+    assert data["data"]["ids"] == expected_items
 
 
 def test_database_clearing(client, auth_headers, seed, sample_download_row):

@@ -2,10 +2,12 @@ from typing import Tuple
 
 from common.logger import logger
 from flask import Response, current_app, jsonify, request
+from marshmallow import ValidationError
 from scripts.media_server.app.constants import DownloadStatus, EventType, MediaType
 from scripts.media_server.app.extensions import db
 from scripts.media_server.app.models.download import Download
 from scripts.media_server.app.routes.api import bp
+from scripts.media_server.app.schemas.download import BulkDeleteSchema
 from scripts.media_server.app.services import download_service
 from scripts.media_server.app.utils.api_response import api_response
 from scripts.media_server.app.utils.tools import OperationResult
@@ -114,51 +116,26 @@ def bulk_edit_entries():
 
 
 @bp.route("/bulkDelete", methods=["POST"])
-def bulk_delete():
-    data = request.get_json()
-    ids = data.get("ids")
-
-    if not ids or not isinstance(ids, list):
-        return (
-            jsonify(
-                OperationResult(False, None, "Invalid or empty 'ids' list").to_dict()
-            ),
-            400,
-        )
-
-    unique_ids = list(set(ids))
+def bulk_delete_downloads() -> Tuple[Response, int]:
+    json_data = request.get_json()
 
     try:
-        # Fetch existing records
-        existing_records = Download.query.filter(Download.id.in_(unique_ids)).all()
-        existing_ids = {d.id for d in existing_records}
+        data = BulkDeleteSchema().load(json_data)
+        deleted_ids = download_service.bulk_delete_downloads(data["ids"])  # type: ignore
 
-        # Identify missing for the report
-        results = []
-        for entry_id in unique_ids:
-            if entry_id in existing_ids:
-                results.append(OperationResult(True, entry_id))
-            else:
-                results.append(OperationResult(False, entry_id, "Record ID not found"))
-
-        # Bulk delete existing ones
-        if existing_ids:
-            Download.query.filter(Download.id.in_(list(existing_ids))).delete(
-                synchronize_session=False
-            )
-            db.session.commit()
-
-            # Even if notification fails, we should still delete the data.
+        if deleted_ids:
             try:
                 current_app.config["ANNOUNCER"].announce(
-                    EventType.DELETE, {"ids": list(existing_ids)}
+                    EventType.DELETE, {"ids": deleted_ids}
                 )
             except Exception as e:
                 logger.warning(f"Announcer failed: {e}")
 
-        master_result = OperationResult(True, results)
-        return jsonify(master_result.to_dict()), 200
+        return api_response(data={"ids": deleted_ids})
+
+    except ValidationError as err:
+        return api_response(error=str(err.messages), status_code=400)
 
     except Exception as e:
-        db.session.rollback()
-        return jsonify(OperationResult(False, None, str(e)).to_dict()), 500
+        logger.error(f"Bulk Delete Error: {e}")
+        return api_response(error=str(e), status_code=500)

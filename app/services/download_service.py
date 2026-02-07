@@ -1,5 +1,5 @@
 from datetime import datetime, timezone
-from typing import Optional, Tuple
+from typing import List, Optional, Tuple
 
 from common.logger import logger
 from flask import current_app
@@ -19,6 +19,28 @@ def get_all_downloads():
 def get_download_by_id(download_id: int) -> Download | None:
     """Fetches a single download."""
     return Download.query.get(download_id)
+
+
+def bulk_delete_downloads(ids: List[int]) -> List[int]:
+    """
+    Deletes downloads by ID.
+    Ignores records that don't exist.
+
+    Returns:
+        List[int]: A list of IDs that were successfully found and deleted.
+    """
+    existing_records = Download.query.filter(Download.id.in_(ids)).all()
+    existing_ids = [d.id for d in existing_records]
+
+    if not existing_ids:
+        return []
+
+    Download.query.filter(Download.id.in_(existing_ids)).delete(
+        synchronize_session=False
+    )
+    db.session.commit()
+
+    return existing_ids
 
 
 def initialize_download(
