@@ -100,14 +100,7 @@ def bulk_edit_entries():
 
             try:
                 current_app.config["ANNOUNCER"].announce(
-                    EventType.UPDATE,
-                    {
-                        "id": entry_id,
-                        "title": target.title,
-                        "mediaType": target.media_type,
-                        "status": target.status,
-                        "statusMessage": target.status_message,
-                    },
+                    EventType.UPDATE, [target.to_dict()]
                 )
             except Exception as e:
                 logger.warning(f"Announcer failed: {e}")

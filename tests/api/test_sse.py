@@ -1,7 +1,7 @@
 import json
 from unittest.mock import MagicMock, patch
 
-from scripts.media_server.app.constants import EventType, MediaType
+from scripts.media_server.app.constants import DownloadStatus, EventType, MediaType
 
 from ..conftest import API_BULK_DELETE, API_DOWNLOAD
 
@@ -16,20 +16,22 @@ def parse_sse(raw_msg: str) -> dict:
 def test_download_announcements(client, announcer, auth_headers):
     """
     Test the full chain of events for a download:
-    create -> progress -> update
+    create -> update (success)
     """
     test_queue = announcer.listen()
 
-    # Mock the internal download logic
+    # Define expected data
+    target_url = "http://gallery.com"
+    mock_title = "SSE Gallery"
+
+    # Mock external dependencies
     with (
         patch("requests.get") as mock_get,
         patch("scripts.media_server.app.utils.downloaders.Gallery.download") as mock_dl,
     ):
         # Mock title scrape
-        mock_resp = MagicMock()
-        mock_resp.status_code = 200
-        mock_resp.text = "<html><title>SSE Gallery</title></html>"
-        mock_get.return_value = mock_resp
+        mock_get.return_value.status_code = 200
+        mock_get.return_value.text = f"<html><title>{mock_title}</title></html>"
 
         # Mock successful download
         mock_result = MagicMock()
@@ -37,23 +39,34 @@ def test_download_announcements(client, announcer, auth_headers):
         mock_result.output = "Successful mock download"
         mock_dl.return_value = mock_result
 
-        payload = {"urls": ["http://gallery.com"], "mediaType": MediaType.GALLERY}
+        payload = {"urls": [target_url], "mediaType": MediaType.GALLERY}
         res = client.post(API_DOWNLOAD, headers=auth_headers, json=payload)
         assert res.status_code == 200
 
     # Expect CREATE
     msg_create = parse_sse(test_queue.get(timeout=2))
     assert msg_create["type"] == EventType.CREATE
-    download_id = msg_create["data"]["id"]
-    assert "mediaType" in msg_create["data"]
-    assert "startTime" in msg_create["data"]
+
+    create_data = msg_create["data"][0]
+    print("Create data: ", create_data)
+
+    assert create_data["id"] is not None
+    assert create_data["url"] == target_url
+    assert create_data["mediaType"] == payload["mediaType"]
+    assert isinstance(create_data["startTime"], int)
 
     # Expect UPDATE
     msg_update = parse_sse(test_queue.get(timeout=2))
     assert msg_update["type"] == EventType.UPDATE
-    assert msg_update["data"]["id"] == download_id
-    assert msg_update["data"]["title"] == "SSE Gallery"
-    assert "endTime" in msg_update["data"]
+
+    update_data = msg_update["data"][0]
+    print("Update data: ", update_data)
+
+    assert update_data["id"] == create_data["id"]
+    assert update_data["title"] == mock_title
+    assert isinstance(update_data["endTime"], int)
+    assert update_data["status"] == DownloadStatus.DONE
+    assert "statusMessage" in update_data
 
 
 def test_system_resilience_to_announcer_failure(client, auth_headers, seed):

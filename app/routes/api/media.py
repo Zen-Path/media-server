@@ -35,7 +35,9 @@ def initialize_download(
         db.session.commit()
 
         try:
-            current_app.config["ANNOUNCER"].announce(EventType.CREATE, record.to_dict())
+            current_app.config["ANNOUNCER"].announce(
+                EventType.CREATE, [record.to_dict()]
+            )
         except Exception as e:
             logger.warning(f"Announcer failed: {e}")
 
@@ -70,7 +72,9 @@ def finalize_download(
         db.session.commit()
 
         try:
-            current_app.config["ANNOUNCER"].announce(EventType.UPDATE, record.to_dict())
+            current_app.config["ANNOUNCER"].announce(
+                EventType.UPDATE, [record.to_dict()]
+            )
         except Exception as e:
             logger.warning(f"Announcer failed: {e}")
 

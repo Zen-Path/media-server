@@ -95,17 +95,18 @@ function handleDeletes(payload) {
 }
 
 function handleUpdates(payload) {
-    const entry = downloadsTable.entryMap.get(payload.id);
-    if (entry === undefined) {
-        console.warn(
-            `Entry ${payload.id} could not be updated. Reason: not found.`
-        );
-        return;
-    }
+    payload.forEach((entryData) => {
+        const entry = downloadsTable.entryMap.get(entryData.id);
+        if (entry === undefined) {
+            console.warn(
+                `Entry ${entryData.id} could not be updated. Reason: not found.`
+            );
+            return;
+        }
 
-    entry.update(payload);
+        entry.update(entryData);
+    });
 }
-
 
 // MAIN
 
