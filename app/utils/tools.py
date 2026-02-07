@@ -4,7 +4,7 @@ from typing import Any, List, Optional
 
 @dataclass
 class DownloadReportItem:
-    url: str
+    url: Optional[str] = None
     status: bool = True
     error: Optional[str] = None
     warnings: List[str] = field(default_factory=list)

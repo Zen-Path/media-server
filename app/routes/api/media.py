@@ -1,4 +1,3 @@
-import re
 from typing import Dict
 
 import requests
@@ -112,11 +111,6 @@ def download_media():
 
     # PROCESSING
 
-    # gallery-dl output patterns
-    no_results_pattern = r"^\[[^\]]+\]\[info\] No results for"
-    larger_than_allowed_pattern = r"^\[[^\]]+\]\[warning\] File size larger"
-    catchall_error_pattern = r"^\[[^\]]+\]\[error\]"
-
     for download_id, url in final_processing_queue:
         # Scrape title
         title = None
@@ -139,36 +133,11 @@ def download_media():
         try:
             match media_type:
                 case MediaType.GALLERY | None:
-                    cmd_result = Gallery.download([url], range_start, range_end)
-                    report[url].output = cmd_result.output
-                    report[url].status = cmd_result.return_code == 0
-
-                    if not report[url].status:
-                        report[
-                            url
-                        ].error = (
-                            f"[gallery-dl] Command failed: {cmd_result.return_code}"
-                        )
-                    else:
-                        for line in report[url].output.splitlines():
-                            if re.search(no_results_pattern, line):
-                                report[url].status = False
-                                report[
-                                    url
-                                ].error = "[gallery-dl] No results found for url."
-                            elif re.search(larger_than_allowed_pattern, line):
-                                report[url].status = False
-                                report[
-                                    url
-                                ].error = "[gallery-dl] File size larger than allowed."
-                            elif re.search(catchall_error_pattern, line):
-                                report[url].status = False
-                                report[url].error = f"[gallery-dl] {line}."
-
-                    if report[url].status:
-                        for line in report[url].output.splitlines():
-                            if line.startswith("./"):
-                                report[url].files.append(line)
+                    report_result = Gallery.download([url], range_start, range_end)
+                    report[url].output = report_result.output
+                    report[url].status = report_result.status
+                    report[url].error = report_result.error
+                    report[url].files = report_result.files
 
         except Exception as e:
             report[url].status = False

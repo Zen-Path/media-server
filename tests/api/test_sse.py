@@ -1,7 +1,8 @@
 import json
-from unittest.mock import MagicMock, patch
+from unittest.mock import patch
 
 from scripts.media_server.app.constants import DownloadStatus, EventType, MediaType
+from scripts.media_server.app.utils.tools import DownloadReportItem
 
 from ..conftest import API_BULK_DELETE, API_DOWNLOAD
 
@@ -34,10 +35,7 @@ def test_download_announcements(client, announcer, auth_headers):
         mock_get.return_value.text = f"<html><title>{mock_title}</title></html>"
 
         # Mock successful download
-        mock_result = MagicMock()
-        mock_result.return_code = 0
-        mock_result.output = "Successful mock download"
-        mock_dl.return_value = mock_result
+        mock_dl.return_value = DownloadReportItem(status=True)
 
         payload = {"urls": [target_url], "mediaType": MediaType.GALLERY}
         res = client.post(API_DOWNLOAD, headers=auth_headers, json=payload)

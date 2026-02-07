@@ -3,6 +3,7 @@ from unittest.mock import MagicMock, patch
 import pytest
 from scripts.media_server.app.constants import DownloadStatus, MediaType
 from scripts.media_server.app.models.download import Download
+from scripts.media_server.app.utils.tools import DownloadReportItem
 
 from ..conftest import API_DOWNLOAD, API_GET_DOWNLOADS
 
@@ -97,7 +98,7 @@ def test_gallery_expansion_flow(
     child_urls = ["http://gallery.com/1", "http://gallery.com/2"]
 
     mock_expand.return_value = child_urls
-    mock_gallery.return_value = MockCmdResult(0)
+    mock_gallery.return_value = DownloadReportItem(status=True)
 
     # Mock title scrape response
     mock_response = MagicMock()
@@ -129,7 +130,7 @@ def test_title_scrape_failure_handling(mock_gallery, mock_get, client, auth_head
     download.
     """
     mock_get.side_effect = Exception("Connection Timeout")
-    mock_gallery.return_value = MockCmdResult(0)
+    mock_gallery.return_value = DownloadReportItem(status=True)
 
     url = "http://slow-site.com/img.jpg"
     res = client.post(
@@ -147,7 +148,10 @@ def test_title_scrape_failure_handling(mock_gallery, mock_get, client, auth_head
 @patch("scripts.media_server.app.routes.api.media.Gallery.download")
 def test_gallery_dl_failure_reporting(mock_gallery, mock_expand, client, auth_headers):
     """Verify that a non-zero return code from gallery-dl marks status as False."""
-    mock_gallery.return_value = MockCmdResult(return_code=1, output="403 Forbidden")
+    # TODO: change when adding unit tests
+    mock_gallery.return_value = DownloadReportItem(
+        status=False, output="403 Forbidden", error="System command failed"
+    )
     mock_expand.return_value = []
 
     url = "http://blocked.com/gallery"
@@ -158,17 +162,21 @@ def test_gallery_dl_failure_reporting(mock_gallery, mock_expand, client, auth_he
     )
 
     data = res.get_json()
+    print(data)
     assert data[url]["status"] is False
     assert data[url]["output"] == "403 Forbidden"
-    assert "Command failed" in data[url]["error"]
+    assert "Command failed".lower() in data[url]["error"].lower()
 
 
 @patch("scripts.media_server.app.routes.api.media.expand_collection_urls")
 @patch("scripts.media_server.app.routes.api.media.Gallery.download")
 def test_gallery_dl_failure_patterns(mock_gallery, mock_expand, client, auth_headers):
     """Verify that if failure patterns are matched return status is False."""
-    mock_gallery.return_value = MockCmdResult(
-        return_code=0, output="[reddit][info] No results for url"
+    # TODO: change when adding unit tests
+    mock_gallery.return_value = DownloadReportItem(
+        status=False,
+        output="[reddit][info] No results for url",
+        error="No results found for url.",
     )
     mock_expand.return_value = []
 
@@ -194,7 +202,7 @@ def test_return_files(mock_gallery, mock_expand, client, auth_headers):
         "./dir1/image-2.jpg",
         "./dir2/image-1.jpg",
     ]
-    mock_gallery.return_value = MockCmdResult(return_code=0, output="\n".join(files))
+    mock_gallery.return_value = DownloadReportItem(status=True, files=files)
     mock_expand.return_value = []
 
     url = "https://test.com/gallery"
@@ -209,4 +217,3 @@ def test_return_files(mock_gallery, mock_expand, client, auth_headers):
     assert data[url]["status"]
     assert len(data[url]["files"]) == 3
     assert data[url]["files"][0] == "./dir1/image-1.jpg"
-    assert "./dir1/image-1.jpg" in data[url]["output"]
