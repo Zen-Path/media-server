@@ -182,8 +182,7 @@ def download_media():
     larger_than_allowed_pattern = r"^\[[^\]]+\]\[warning\] File size larger"
     catchall_error_pattern = r"^\[[^\]]+\]\[error\]"
 
-    final_processing_count = len(final_processing_queue)
-    for i, (download_id, url) in enumerate(final_processing_queue):
+    for download_id, url in final_processing_queue:
         # Scrape title
         title = None
 
@@ -239,14 +238,6 @@ def download_media():
         except Exception as e:
             report[url].status = False
             report[url].error = str(e)
-
-        try:
-            current_app.config["ANNOUNCER"].announce(
-                EventType.PROGRESS,
-                {"id": download_id, "current": i, "total": final_processing_count},
-            )
-        except Exception as e:
-            logger.warning(f"Announcer failed: {e}")
 
         # Finalize DB record
         success, error = finalize_download(

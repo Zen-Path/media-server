@@ -106,11 +106,6 @@ function handleUpdates(payload) {
     entry.update(payload);
 }
 
-function handleProgress(payload) {
-    const percentage = Math.round((payload.current / payload.total) * 100);
-    payload.percentage = percentage;
-    console.log("Progress update: ", payload);
-}
 
 // MAIN
 
@@ -141,10 +136,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
             case EVENT_TYPE.UPDATE:
                 handleUpdates(data);
-                break;
-
-            case EVENT_TYPE.PROGRESS:
-                handleProgress(data);
                 break;
 
             case EVENT_TYPE.DELETE:

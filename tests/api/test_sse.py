@@ -48,13 +48,6 @@ def test_download_announcements(client, announcer, auth_headers):
     assert "mediaType" in msg_create["data"]
     assert "startTime" in msg_create["data"]
 
-    # Expect PROGRESS
-    msg_progress = parse_sse(test_queue.get(timeout=2))
-    assert msg_progress["type"] == EventType.PROGRESS
-    assert msg_progress["data"]["id"] == download_id
-    assert "current" in msg_progress["data"]
-    assert "total" in msg_progress["data"]
-
     # Expect UPDATE
     msg_update = parse_sse(test_queue.get(timeout=2))
     assert msg_update["type"] == EventType.UPDATE
