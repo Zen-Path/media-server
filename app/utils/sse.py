@@ -1,6 +1,6 @@
 import json
 import queue
-from typing import Any, Dict, Generator, List
+from typing import Any, Dict, List
 
 from common.logger import logger
 from scripts.media_server.app.constants import EventType
@@ -40,13 +40,3 @@ class MessageAnnouncer:
                 self.listeners[i].put_nowait(msg_fmt)
             except queue.Full:
                 del self.listeners[i]
-
-
-def event_generator(messages: queue.Queue) -> Generator[str, None, None]:
-    """
-    Yields SSE from the provided message queue.
-    """
-    while True:
-        # Blocks here until a new message arrives in the queue
-        msg = messages.get()
-        yield msg

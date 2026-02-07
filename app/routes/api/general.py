@@ -4,7 +4,6 @@ from typing import Tuple
 from flask import Response, current_app, request
 from scripts.media_server.app.routes.api import bp
 from scripts.media_server.app.utils.api_response import api_response
-from scripts.media_server.app.utils.sse import event_generator
 
 # AUTH
 
@@ -45,11 +44,31 @@ def health_check() -> Tuple[Response, int]:
 
 
 @bp.route("/events")
-def sse_events() -> Response:
-    """
-    Server-Sent Events (SSE) endpoint.
-    """
+def events():
     announcer = current_app.config["ANNOUNCER"]
-    messages = announcer.listen()
 
-    return Response(event_generator(messages), mimetype="text/event-stream")
+    def stream():
+        messages = announcer.listen()
+
+        # Yield initial connection as BYTES to flush headers
+        yield b": connected\n\n"
+
+        try:
+            while True:
+                msg = messages.get()
+
+                # Yield subsequent messages as BYTES
+                if isinstance(msg, str):
+                    yield msg.encode("utf-8")
+                else:
+                    yield msg
+        except GeneratorExit:
+            pass
+
+    response = Response(stream(), mimetype="text/event-stream")
+    response.headers["Cache-Control"] = "no-cache"
+    response.headers["X-Accel-Buffering"] = "no"
+    response.headers["Connection"] = "keep-alive"
+    response.direct_passthrough = True
+
+    return response
