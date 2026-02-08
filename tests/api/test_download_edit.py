@@ -4,39 +4,57 @@ from scripts.media_server.app.constants import MediaType
 from ..conftest import API_BULK_EDIT, API_GET_DOWNLOADS
 
 
-def test_invalid_scenarios(client, auth_headers, seed):
+@pytest.mark.parametrize(
+    "payload, error_msg",
+    [
+        (
+            {"id": 1},
+            "Invalid input type",
+        ),
+        (
+            [{"title": "Test"}],
+            "missing data for required field",
+        ),
+        (
+            [{"id": None}],
+            "field may not be null",
+        ),
+        (
+            [{"id": "123"}],
+            "not a valid integer",
+        ),
+        (
+            [{"id": 1, "title": 123}],
+            "not a valid string",
+        ),
+        (
+            [{"id": 1, "mediaType": "123"}],
+            "not a valid integer",
+        ),
+        (
+            [{"id": 1, "status": "123"}],
+            "not a valid integer",
+        ),
+    ],
+    ids=[
+        "not_a_list",
+        "missing_id",
+        "id_none",
+        "id_wrong_type",
+        "title_wrong_type",
+        "media_type_wrong_type",
+        "status_wrong_type",
+    ],
+)
+def test_invalid_scenarios(payload, error_msg, client, auth_headers, seed):
     seed([{"id": 1}])
 
-    # Wrong data type
-    res = client.patch(
-        API_BULK_EDIT, headers=auth_headers, json={"id": 1, "title": "Not a list"}
-    )
+    res = client.patch(API_BULK_EDIT, headers=auth_headers, json=payload)
     assert res.status_code == 400
-    data = res.get_json()
-    assert not data["status"]
-    assert "Payload must be a list" in data["error"]
 
-    # Invalid ID
-    res = client.patch(
-        API_BULK_EDIT, headers=auth_headers, json=[{"title": "No ID here"}]
-    )
     data = res.get_json()
     assert not data["status"]
-    assert data["data"][0]["error"] == "Missing 'id' field"
-
-    # Invalid media type
-    res = client.patch(
-        API_BULK_EDIT, headers=auth_headers, json=[{"id": 1, "mediaType": -1}]
-    )
-    data = res.get_json()
-    assert not data["status"]
-    assert "Invalid mediaType" in data["data"][0]["error"]
-
-    # No field passed
-    res = client.patch(API_BULK_EDIT, headers=auth_headers, json=[{"id": 1}])
-    data = res.get_json()
-    assert not data["status"]
-    assert data["data"][0]["error"] == "No fields to update"
+    assert error_msg.lower() in data["error"].lower()
 
 
 @pytest.mark.parametrize(
@@ -44,8 +62,8 @@ def test_invalid_scenarios(client, auth_headers, seed):
     [
         (
             [{"id": 1, "title": "Old"}],
-            [{"id": 1, "title": "Updated"}],
-            [{"id": 1, "status": True}],
+            [{"id": 1, "title": "New"}],
+            [{"id": 1, "status": True, "updates": {"title": "New"}}],
         ),
         (
             [{"id": 1}, {"id": 2}, {"id": 3}],
@@ -55,9 +73,13 @@ def test_invalid_scenarios(client, auth_headers, seed):
                 {"id": 3, "title": "Three", "mediaType": MediaType.GALLERY},
             ],
             [
-                {"id": 1, "status": True},
-                {"id": 2, "status": True},
-                {"id": 3, "status": True},
+                {"id": 1, "status": True, "updates": {"title": "One"}},
+                {"id": 2, "status": True, "updates": {"mediaType": MediaType.VIDEO}},
+                {
+                    "id": 3,
+                    "status": True,
+                    "updates": {"title": "Three", "mediaType": MediaType.GALLERY},
+                },
             ],
         ),
         (
@@ -68,16 +90,28 @@ def test_invalid_scenarios(client, auth_headers, seed):
                 {"id": 99, "title": "I don't exist"},
             ],
             [
-                {"id": 1, "status": True},
-                {"id": 2, "status": True},
-                {"id": 99, "status": False, "error": "not found"},
+                {"id": 1, "status": True, "updates": {"title": "Ok"}},
+                {"id": 2, "status": True, "updates": {"title": "Ok Too"}},
+                {"id": 99, "status": False, "updates": None, "error": "not found"},
             ],
+        ),
+        (
+            [{"id": 1}],
+            [{"id": 1}],
+            [{"id": 1, "status": True, "error": None, "updates": {}}],
+        ),
+        (
+            [{"id": 1}],
+            [{"id": 1, "mediaType": 1}],
+            [{"id": 1, "status": True, "error": None, "updates": {"mediaType": 1}}],
         ),
     ],
     ids=[
         "single_valid",
         "multiple_valid",
         "mixed_status",
+        "no_field_to_update",
+        "media_type_none",
     ],
 )
 def test_valid_scenarios(
@@ -86,20 +120,23 @@ def test_valid_scenarios(
     seed(seed_data)
 
     res = client.patch(API_BULK_EDIT, headers=auth_headers, json=payload)
-    data = res.get_json()
-
     assert res.status_code == 200
-    assert data["status"] is True
+
+    data = res.get_json()
+    assert data["status"]
     assert len(data["data"]) == len(expected_results)
 
     for i, expected in enumerate(expected_results):
         actual = data["data"][i]
 
-        assert actual["data"] == expected["id"]
+        assert actual["id"] == expected["id"]
         assert actual["status"] == expected["status"]
 
         if not expected["status"]:
             assert expected["error"].lower() in actual["error"].lower()
+
+        if "updates" in actual:
+            assert actual["updates"] == expected["updates"]
 
 
 @pytest.mark.parametrize(

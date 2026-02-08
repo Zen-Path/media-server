@@ -1,5 +1,5 @@
 from datetime import datetime, timezone
-from typing import List, Optional, Tuple
+from typing import Any, Dict, List, Optional, Tuple
 
 from common.logger import logger
 from flask import current_app
@@ -19,6 +19,69 @@ def get_all_downloads():
 def get_download_by_id(download_id: int) -> Download | None:
     """Fetches a single download."""
     return Download.query.get(download_id)
+
+
+def bulk_edit_downloads(updates: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    """
+    Process bulk updates.
+    Returns a list of results with {id, status, error, updates}.
+    """
+    updates_map = {item["id"]: item for item in updates}
+    existing_records = Download.query.filter(Download.id.in_(updates_map.keys())).all()
+
+    results = []
+    session_dirty = False
+
+    for record in existing_records:
+        new_data = updates_map[record.id]
+        applied_updates = {}
+
+        for key, new_value in new_data.items():
+            if key == "id":
+                continue
+
+            # Ensure model actually has this column
+            if not hasattr(record, key):
+                continue
+
+            current_value = getattr(record, key)
+
+            is_different = False
+
+            if hasattr(current_value, "value") and not hasattr(new_value, "value"):
+                # Current is Enum, new is primitive
+                if current_value.value != new_value:
+                    is_different = True
+            elif current_value != new_value:
+                is_different = True
+
+            if is_different:
+                setattr(record, key, new_value)
+                applied_updates[key] = new_value
+                session_dirty = True
+
+        results.append(
+            {"id": record.id, "status": True, "updates": applied_updates, "error": None}
+        )
+
+    # Handle Missing IDs
+    found_ids = {r.id for r in existing_records}
+    missing_ids = set(updates_map.keys()) - found_ids
+
+    for missing_id in missing_ids:
+        results.append(
+            {
+                "id": missing_id,
+                "status": False,
+                "updates": None,
+                "error": "ID not found",
+            }
+        )
+
+    if session_dirty:
+        db.session.commit()
+
+    return results
 
 
 def bulk_delete_downloads(ids: List[int]) -> List[int]:
