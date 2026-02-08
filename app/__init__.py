@@ -34,6 +34,8 @@ CORS(app)  # Enable CORS for all routes
 app.register_blueprint(main_bp)
 app.register_blueprint(api_bp, url_prefix="/api")
 
+app.config["APP_VERSION"] = PKG_VERSION
+
 
 @app.context_processor
 def inject_global_vars():

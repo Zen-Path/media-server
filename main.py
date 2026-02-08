@@ -10,7 +10,7 @@ from pathlib import Path
 from common.logger import logger, setup_logging
 from common.variables import flex_scripts
 from dotenv import load_dotenv
-from scripts.media_server.app import PKG_VERSION, app
+from scripts.media_server.app import app
 from scripts.media_server.app.extensions import db
 from scripts.media_server.app.utils.database import init_db, seed_db
 from scripts.media_server.app.utils.sse import MessageAnnouncer
@@ -24,7 +24,7 @@ def main():
 
     setup_logging(logger, logging.DEBUG if debug_mode else logging.WARNING)
 
-    logger.info(f"Version: {PKG_VERSION}")
+    logger.info(f"Version: {app.config.get('APP_VERSION')}")
 
     # .env value > xdg value > fallback location
     download_dir = Path(
@@ -45,7 +45,6 @@ def main():
     logger.debug(f"Database path: {db_path!r}")
 
     app.config.update(
-        APP_VERSION=PKG_VERSION,
         MEDIA_SERVER_KEY="{{@@ _vars['media_server_key'] @@}}",
         SQLALCHEMY_DATABASE_URI=f"sqlite:///{db_path}",
         SQLALCHEMY_TRACK_MODIFICATIONS=False,
