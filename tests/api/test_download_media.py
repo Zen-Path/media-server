@@ -168,7 +168,6 @@ def test_title_scrape_failure_handling(mock_gallery, mock_get, client, auth_head
     first_download = next(iter(data["data"].values()))
 
     assert first_download["status"] is True
-    assert any("Title scrape failed" in w for w in first_download["warnings"])
 
 
 @patch("scripts.media_server.app.routes.api.media.expand_collection_urls")

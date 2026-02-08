@@ -1,3 +1,4 @@
+import re
 from enum import IntEnum
 
 
@@ -37,6 +38,28 @@ class ScraperConfig:
         "AppleWebKit/537.36 (KHTML, like Gecko) "
         "Chrome/120.0.0.0 Safari/537.36"
     )
+    MAX_BYTES_TO_READ = 20 * 1024  # Search for a title within this range
 
 
 MAX_TITLE_LENGTH = 255
+
+
+# Common direct media extensions
+# fmt: off
+MEDIA_EXTENSIONS = {
+    ".jpg", ".jpeg", ".png", ".gif", ".webp", ".svg",
+    ".mp4", ".mkv", ".mov", ".avi", ".webm",
+    ".mp3", ".wav", ".flac", ".ogg",
+    ".zip", ".rar", ".7z", ".tar", ".gz", ".pdf"
+}
+# fmt: on
+
+# These patterns represent single-item URLs that gallery-dl would
+# otherwise parse but we KNOW aren't collections we want to recurse.
+NON_COLLECTION_PATTERNS = [
+    re.compile(r"^https?://(?:www\.)?x\.com/\w+/status/\d+"),
+    re.compile(r"^https?://(?:www\.)?pornpics\.com/galleries/[\w-]+/?"),
+    re.compile(r"^https?://(?:www\.)?xnxx\.com/video-.*"),
+    re.compile(r"^https?://(?:www\.)?reddit\.com/r/\w+/comments/.*/?"),
+    re.compile(r"^(?:https?://)?(?:www\.)?example\.com.*"),
+]

@@ -25,21 +25,19 @@ def test_download_announcements(client, announcer, auth_headers):
     target_url = "http://gallery.com"
     mock_title = "SSE Gallery"
 
-    # Mock external dependencies
-    with (
-        patch("requests.get") as mock_get,
-        patch("scripts.media_server.app.utils.downloaders.Gallery.download") as mock_dl,
-    ):
-        # Mock title scrape
-        mock_get.return_value.status_code = 200
-        mock_get.return_value.text = f"<html><title>{mock_title}</title></html>"
+    with patch("scripts.media_server.app.routes.api.media.scrape_title") as mock_scrape:
+        mock_scrape.return_value = mock_title
 
-        # Mock successful download
-        mock_dl.return_value = DownloadReportItem(status=True)
+        with patch(
+            "scripts.media_server.app.utils.downloaders.Gallery.download"
+        ) as mock_dl:
+            mock_dl.return_value = DownloadReportItem(status=True)
 
-        payload = {"urls": [target_url], "mediaType": MediaType.GALLERY}
-        res = client.post(API_DOWNLOAD, headers=auth_headers, json=payload)
-        assert res.status_code == 200
+            payload = {"urls": [target_url], "mediaType": MediaType.GALLERY}
+            res = client.post(API_DOWNLOAD, headers=auth_headers, json=payload)
+            assert res.status_code == 200
+
+            mock_scrape.assert_called_once_with(target_url)
 
     # Expect CREATE
     msg_create = parse_sse(test_queue.get(timeout=2))

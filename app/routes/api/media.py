@@ -1,13 +1,10 @@
 from typing import Dict
 
-import requests
-from bs4 import BeautifulSoup
 from flask import request
 from marshmallow import ValidationError
 from scripts.media_server.app.constants import (
     DownloadStatus,
     MediaType,
-    ScraperConfig,
 )
 from scripts.media_server.app.routes.api import bp
 from scripts.media_server.app.schemas.execution import DownloadRequestSchema
@@ -17,7 +14,7 @@ from scripts.media_server.app.services.download_service import (
 )
 from scripts.media_server.app.utils.api_response import api_response
 from scripts.media_server.app.utils.downloaders import Gallery
-from scripts.media_server.app.utils.scraper import expand_collection_urls
+from scripts.media_server.app.utils.scraper import expand_collection_urls, scrape_title
 from scripts.media_server.app.utils.tools import DownloadReportItem
 
 
@@ -27,7 +24,6 @@ def download_media():
 
     try:
         data = DownloadRequestSchema().load(json_data)
-        print(data)
         urls = data["urls"]
         media_type = data.get("media_type")
         range_start = data.get("range_start")
@@ -96,22 +92,7 @@ def download_media():
     # PROCESSING
 
     for download_id, url in final_processing_queue:
-        # Scrape title
-        title = None
-
-        try:
-            headers = {"User-Agent": ScraperConfig.USER_AGENT}
-            response = requests.get(url, headers=headers, timeout=ScraperConfig.TIMEOUT)
-
-            if response.status_code == 200:
-                soup = BeautifulSoup(response.text, "html.parser")
-                if soup.title and soup.title.string:
-                    title = soup.title.string.strip()
-            else:
-                report[url].warnings.append(f"Title scrape HTTP {response.status_code}")
-
-        except Exception as e:
-            report[url].warnings.append(f"Title scrape failed: {str(e)}")
+        title = scrape_title(url)
 
         # Download
         try:
