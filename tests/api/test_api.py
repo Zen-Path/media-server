@@ -1,6 +1,8 @@
 import concurrent.futures
+from datetime import datetime
 from unittest.mock import patch
 
+import pytest
 import requests
 from scripts.media_server.app.extensions import db
 from scripts.media_server.tests.conftest import (
@@ -16,8 +18,21 @@ def test_health_check(client):
     response = client.get(API_HEALTH)
     assert response.status_code == 200
 
-    data = response.json
-    assert data["status"] == "ok"
+    payload = response.json
+
+    assert payload["status"] == "ok"
+    assert payload["error"] is None
+
+    assert "data" in payload
+    assert isinstance(payload["data"], dict)
+
+    expected_version = client.application.config.get("APP_VERSION")
+    assert payload["data"]["version"] == expected_version
+
+    try:
+        datetime.fromisoformat(payload["data"]["timestamp"])
+    except ValueError:
+        pytest.fail("Timestamp format is invalid")
 
 
 def test_auth(client, auth_headers, seed):
