@@ -127,7 +127,7 @@
                         {
                             "id": "pytest",
                             "name": "Test: API Suite",
-                            "entry": 'pytest -m "not ui and not slow"',
+                            "entry": 'pytest -m "not ui and not slow" --exitfirst --verbose',
                             "language": "system",
                             "pass_filenames": false,
                             "types": ["python"],
@@ -137,7 +137,7 @@
                             "id": "pytest",
                             "alias": "pytest-full",
                             "name": "Test: Full Suite",
-                            "entry": "pytest",
+                            "entry": "pytest --exitfirst --verbose",
                             "language": "system",
                             "pass_filenames": false,
                             "types_or": ["python", "javascript", "html"],
