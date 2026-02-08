@@ -8,6 +8,8 @@ from ..conftest import API_BULK_DELETE, API_GET_DOWNLOADS
     [
         (None, "field may not be null."),
         ([], "Shorter than minimum length"),
+        ("123", "Not a valid list"),
+        (["123"], "Not a valid integer"),
     ],
 )
 def test_invalid_scenarios(delete_ids, error_msg, client, auth_headers):

@@ -21,4 +21,6 @@ class DownloadUpdateSchema(Schema):
 
 
 class BulkDeleteSchema(Schema):
-    ids = fields.List(fields.Int(), required=True, validate=validate.Length(min=1))
+    ids = fields.List(
+        fields.Int(strict=True), required=True, validate=validate.Length(min=1)
+    )
