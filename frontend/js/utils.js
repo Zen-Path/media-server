@@ -1,3 +1,5 @@
+import Swal from "sweetalert2";
+
 /**
  * Copies text to clipboard with fallback and returns success status.
  * @param {any} data
@@ -172,4 +174,31 @@ export class StreamManager {
             console.log("Stream disconnected.");
         }
     }
+}
+
+const Toast = Swal.mixin({
+    toast: true,
+    position: "top-end", // top right
+    showConfirmButton: false,
+    timer: 2500,
+    timerProgressBar: true,
+
+    showClass: {
+        popup: "swal2-slide-in",
+    },
+    hideClass: {
+        popup: "swal2-slide-out",
+    },
+
+    didOpen: (toast) => {
+        toast.addEventListener("mouseenter", Swal.stopTimer);
+        toast.addEventListener("mouseleave", Swal.resumeTimer);
+    },
+});
+
+export function showToast(message, icon = "success") {
+    Toast.fire({
+        icon: icon,
+        title: message,
+    });
 }

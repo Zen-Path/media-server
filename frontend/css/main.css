@@ -202,3 +202,38 @@ footer .version {
 .flip {
     transform: rotate(180deg);
 }
+
+/* SweetAlert2 */
+
+/* The entrance: smooth slide in from the right */
+@keyframes slideInRight {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+/* The exit: smooth slide out to the right */
+@keyframes slideOutRight {
+    from {
+        transform: translateX(0);
+        opacity: 1;
+    }
+    to {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+}
+
+/* Define classes to use in SweetAlert */
+.swal2-slide-in {
+    animation: slideInRight 0.5s forwards;
+}
+
+.swal2-slide-out {
+    animation: slideOutRight 0.5s forwards;
+}

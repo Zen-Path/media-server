@@ -1,4 +1,5 @@
 import { MEDIA_TYPE_CONFIG, STATUS_CONFIG } from "./constants.js";
+import { showToast } from "./utils.js";
 
 export const ModalManager = {
     dom: {},
@@ -8,7 +9,10 @@ export const ModalManager = {
      */
     openEdit(entries) {
         const items = Array.isArray(entries) ? entries : [entries];
-        if (items.length === 0) return;
+        if (items.length === 0) {
+            showToast("No entries selected or visible to edit.", "warning");
+            return;
+        }
 
         const isBulk = items.length > 1;
         this._ensureModalExists();

@@ -10,6 +10,7 @@ import { toLocalStandardTime, formatDuration } from "./utils.js";
 import { createMenuTrigger } from "./dropdownHelper.js";
 import { ModalManager } from "./modalManager.js";
 import { copyToClipboard, createIconLabelPair } from "./utils.js";
+import { showToast } from "./utils.js";
 
 export class DownloadsTable extends BaseDataTable {
     constructor(container) {
@@ -89,14 +90,22 @@ export class DownloadsTable extends BaseDataTable {
                 label: "Copy Selected URLs",
                 icon: "fa-link",
                 onClick: async () => {
-                    return await this.copyFields("url", true);
+                    const result = await this.copyFields("url", true);
+                    if (result) {
+                        showToast(`URLs copied to clipboard!`);
+                    }
+                    return result;
                 },
             },
             {
                 label: "Copy Selected Titles",
                 icon: "fa-quote-left",
                 onClick: async () => {
-                    return await this.copyFields("title", true);
+                    const result = await this.copyFields("title", true);
+                    if (result) {
+                        showToast(`Titles copied to clipboard!`);
+                    }
+                    return result;
                 },
             },
             {
