@@ -1,3 +1,4 @@
+import secrets
 from datetime import datetime, timezone
 from typing import Tuple
 
@@ -11,17 +12,25 @@ from scripts.media_server.app.utils.api_response import api_response
 @bp.before_request
 def require_api_key() -> None | Tuple[Response, int]:
     """
-    Global authorization middleware for the API blueprint.
+    Global authorization middleware for the API endpoints.
     """
-    if request.endpoint and "health_check" in request.endpoint:
+    # Bypass health checks
+    if request.endpoint and request.endpoint.endswith("health_check"):
         return None
 
-    # Check header (standard) or query string (for SSE)
     provided_key = request.headers.get("X-API-Key") or request.args.get("apiKey")
-    expected_key = current_app.config.get("MEDIA_SERVER_KEY")
 
-    if not provided_key or provided_key != expected_key:
-        return api_response(error="Invalid or missing API Key", status_code=401)
+    # Ensure the server is actually configured
+    expected_key = current_app.config.get("MEDIA_SERVER_KEY")
+    if not expected_key:
+        return api_response(error="Server Config: No API Key set", status_code=500)
+
+    if not provided_key:
+        return api_response(error="Missing API Key", status_code=401)
+
+    # Use compare_digest to prevent timing attacks
+    if not secrets.compare_digest(provided_key, expected_key):
+        return api_response(error="Invalid API Key", status_code=401)
 
     return None
 

@@ -14,6 +14,39 @@ from scripts.media_server.tests.conftest import (
 from sqlalchemy.exc import SQLAlchemyError
 
 
+def test_auth_valid(client, auth_headers):
+    """
+    Verify that API endpoints accept valid credentials via header and query string.
+    """
+    resp = client.get(API_GET_DOWNLOADS, headers=auth_headers)
+    assert resp.status_code == 200
+
+    valid_key = auth_headers["X-API-Key"]
+    resp = client.get(API_GET_DOWNLOADS, query_string={"apiKey": valid_key})
+    assert resp.status_code == 200
+
+
+INVALID_KEY = "abc123_invalid"
+
+
+@pytest.mark.parametrize(
+    "request_kwargs",
+    [
+        {},
+        {"headers": {"X-API-Key": INVALID_KEY}},
+        {"query_string": {"apiKey": INVALID_KEY}},
+    ],
+    ids=["missing_both", "bad_header", "bad_query"],
+)
+def test_auth_invalid(client, request_kwargs):
+    """
+    Verify that API endpoints reject missing or invalid credentials via headers or
+    query args.
+    """
+    resp = client.get(API_GET_DOWNLOADS, **request_kwargs)
+    assert resp.status_code == 401
+
+
 def test_health_check(client):
     response = client.get(API_HEALTH)
     assert response.status_code == 200
@@ -33,20 +66,6 @@ def test_health_check(client):
         datetime.fromisoformat(payload["data"]["timestamp"])
     except ValueError:
         pytest.fail("Timestamp format is invalid")
-
-
-def test_auth(client, auth_headers, seed):
-    """Verify that API endpoints require a key."""
-    no_key_response = client.get(API_GET_DOWNLOADS)
-    assert no_key_response.status_code == 401
-
-    invalid_key_response = client.get(
-        API_GET_DOWNLOADS, headers={"X-API-Key": "abc123"}
-    )
-    assert invalid_key_response.status_code == 401
-
-    valid_key_response = client.get(API_GET_DOWNLOADS, headers=auth_headers)
-    assert valid_key_response.status_code == 200
 
 
 def test_wrong_method(client, auth_headers):
