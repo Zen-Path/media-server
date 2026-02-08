@@ -2,6 +2,9 @@ import { EVENT_TYPE } from "./constants.js";
 import { handleColorScheme, debounce, StreamManager } from "./utils.js";
 import { DownloadsTable } from "./downloadsTable.js";
 
+import "../css/main.css";
+import "../css/dashboard.css";
+
 const debouncedFilter = debounce((searchValue) => {
     requestAnimationFrame(() => {
         downloadsTable.filter(searchValue);

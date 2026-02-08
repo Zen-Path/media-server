@@ -1,21 +1,6 @@
-// Mirror of EventType Enum
-// prettier-ignore
-export const EVENT_TYPE = Object.freeze({
-    CREATE:     0,
-    UPDATE:     1,
-    DELETE:     2,
-    PROGRESS:   3,
-});
+import { MEDIA_TYPE, DOWNLOAD_STATUS } from "./shared_constants.js";
 
-// Mirror of MediaType Enum
-// prettier-ignore
-export const MEDIA_TYPE = Object.freeze({
-    GALLERY:    0,
-    IMAGE:      1,
-    VIDEO:      2,
-    AUDIO:      3,
-    TEXT:       4,
-});
+export * from "./shared_constants.js";
 
 export const VALID_MEDIA_TYPES = Object.values(MEDIA_TYPE);
 
@@ -50,14 +35,6 @@ export const MEDIA_TYPE_CONFIG = Object.freeze({
         className: "type-unknown",
         label: "Unknown",
     },
-});
-
-export const DOWNLOAD_STATUS = Object.freeze({
-    PENDING: 0,
-    IN_PROGRESS: 1,
-    DONE: 2,
-    FAILED: 3,
-    MIXED: 4,
 });
 
 export const STATUS_CONFIG = Object.freeze({

@@ -1,9 +1,5 @@
 {% extends 'base.html' %} {% block title %}Downloads{% endblock %} {% block
-extra_css %}
-<link
-    rel="stylesheet"
-    href="{{ url_for('static', filename='css/dashboard.css') }}" />
-{% endblock %} {% block content %}
+extra_css %} {% endblock %} {% block content %}
 <div class="actions-header">
     <div class="search-container">
         <input
@@ -31,8 +27,4 @@ extra_css %}
     // Inject config variables here
     window.MEDIA_SERVER_KEY = "{{ config.get('MEDIA_SERVER_KEY', '') }}";
 </script>
-
-<script
-    type="module"
-    src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
 {% endblock %}
