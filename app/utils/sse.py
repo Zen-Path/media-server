@@ -4,6 +4,7 @@ from typing import Any, Dict, List
 
 from common.logger import logger
 from scripts.media_server.app.constants import EventType
+from scripts.media_server.app.utils.tools import recursive_camelize
 
 
 class MessageAnnouncer:
@@ -28,11 +29,13 @@ class MessageAnnouncer:
         Broadcasts a message to all active listeners.
         Removes listeners that are full (stale or disconnected).
         """
-        msg = {"type": event_type.value, "data": payload}
-        logger.debug(f"Announcement: {msg}")
+        raw_msg = {"type": event_type.value, "data": payload}
+        camel_msg = recursive_camelize(raw_msg)
+
+        logger.debug(f"Announcement: {camel_msg}")
 
         # SSE Standard format: "data: <json>\n\n"
-        msg_fmt = f"data: {json.dumps(msg)}\n\n"
+        msg_fmt = f"data: {json.dumps(camel_msg)}\n\n"
 
         # Iterate backwards to safely delete while looping
         for i in reversed(range(len(self.listeners))):
