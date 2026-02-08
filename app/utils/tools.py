@@ -50,3 +50,32 @@ class OperationResult:
             "error": self.error,
             "data": data_serialized,
         }
+
+
+def to_camel_case(snake_str):
+    if not snake_str:
+        return snake_str
+
+    leading_count = len(snake_str) - len(snake_str.lstrip("_"))
+    trailing_count = len(snake_str) - len(snake_str.rstrip("_"))
+
+    if leading_count == len(snake_str):
+        return snake_str
+
+    # Note: We use None in the slice if trailing_count is 0,
+    # because slicing [x:-0] returns an empty string in Python.
+    middle = snake_str[leading_count : -trailing_count if trailing_count else None]
+
+    # This logic collapses multiple underscores (user__name -> userName)
+    components = middle.split("_")
+    camel_middle = components[0] + "".join(x.title() for x in components[1:])
+
+    return ("_" * leading_count) + camel_middle + ("_" * trailing_count)
+
+
+def recursive_camelize(data):
+    if isinstance(data, dict):
+        return {to_camel_case(k): recursive_camelize(v) for k, v in data.items()}
+    if isinstance(data, list):
+        return [recursive_camelize(i) for i in data]
+    return data
