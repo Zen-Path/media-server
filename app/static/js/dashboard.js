@@ -33,7 +33,7 @@ function clearSearch() {
 
 function bulkDelete(ids) {
     if (ids.length === 0) {
-        alert("No items selected or visible to delete.");
+        alert("No entries selected or visible to delete.");
         return false;
     }
 
@@ -41,44 +41,38 @@ function bulkDelete(ids) {
         return false;
     }
 
+    const unique_ids = [...new Set(ids)];
+
     fetch("/api/bulkDelete", {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
             "X-API-Key": apiKey,
         },
-        body: JSON.stringify({ ids: ids }),
+        body: JSON.stringify({ ids: unique_ids }),
     })
         .then((res) => res.json())
-        .then((envelope) => {
-            if (!envelope.status) {
-                console.error("Bulk delete failed entirely:", envelope);
+        .then((payload) => {
+            if (!payload.status) {
+                console.error("Bulk delete failed entirely:", payload);
                 alert(
-                    `Could not delete items: ${envelope.error || "Unknown error"}`
+                    `Could not delete entries: ${payload.error || "Unknown error"}`
                 );
                 return false;
             }
 
-            envelope.data
-                .filter((item) => item.status === true)
-                .map((item) => item.data) // 'data' holds the ID
-                .forEach((id) => downloadsTable.deleteEntries(id));
+            downloadsTable.deleteEntries(payload.data.ids);
 
-            const failedCount = envelope.data.filter(
-                (item) => item.status === false
-            ).length;
-
-            if (failedCount > 0) {
-                alert(`Could not delete ${failedCount} items.`);
-                console.error("Deletion Response:", envelope);
+            const countDiff = unique_ids.length - payload.data.ids.length;
+            if (countDiff > 0) {
+                console.warn(`Failed to delete ${countDiff} entries.`);
+                alert(`Could not delete ${countDiff} entries.`);
             }
 
-            downloadsTable.isSelected = false;
-
-            return failedCount === 0;
+            return true;
         })
         .catch((err) => {
-            alert(`Could not delete items: ${err}.`);
+            alert(`Could not delete entries: ${err}.`);
             console.error("Network or server error:", err);
             return false;
         });
