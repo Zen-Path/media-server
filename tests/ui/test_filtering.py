@@ -59,18 +59,21 @@ def test_filter_clear_flow(dashboard, filter_items):
 
 
 @pytest.mark.parametrize(
-    "test_name, query, expected_row_count",
+    "query, expected_row_count",
     [
-        ("case_insensitive", "MOVIE", 1),
-        ("special_chars", "!!!??###🐍", 0),
-        ("untrimmed", "   Beta   ", 1),
-        ("spaces_only", "   ", 3),
+        ("MOVIE", 1),
+        ("!!!??###🐍", 0),
+        ("   Beta   ", 1),
+        ("   ", 3),
     ],
-    ids=lambda x: x if isinstance(x, str) else "",
+    ids=[
+        "case_insensitive",
+        "special_chars",
+        "untrimmed",
+        "spaces_only",
+    ],
 )
-def test_filter_query_variants(
-    test_name, query, expected_row_count, dashboard, filter_items
-):
+def test_filter_query_variants(query, expected_row_count, dashboard, filter_items):
     dashboard.navigate()
     dashboard.filter_for(query)
 

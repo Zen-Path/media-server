@@ -40,16 +40,14 @@ def test_invalid_scenarios(client, auth_headers, seed):
 
 
 @pytest.mark.parametrize(
-    "test_name, seed_data, payload, expected_results",
+    "seed_data, payload, expected_results",
     [
         (
-            "single_valid",
             [{"id": 1, "title": "Old"}],
             [{"id": 1, "title": "Updated"}],
             [{"id": 1, "status": True}],
         ),
         (
-            "multiple_valid",
             [{"id": 1}, {"id": 2}, {"id": 3}],
             [
                 {"id": 1, "title": "One"},
@@ -63,7 +61,6 @@ def test_invalid_scenarios(client, auth_headers, seed):
             ],
         ),
         (
-            "mixed_status",
             [{"id": 1}, {"id": 2}],
             [
                 {"id": 1, "title": "Ok"},
@@ -77,10 +74,14 @@ def test_invalid_scenarios(client, auth_headers, seed):
             ],
         ),
     ],
-    ids=lambda x: x if isinstance(x, str) else "",
+    ids=[
+        "single_valid",
+        "multiple_valid",
+        "mixed_status",
+    ],
 )
 def test_valid_scenarios(
-    test_name, seed_data, payload, expected_results, client, auth_headers, seed
+    seed_data, payload, expected_results, client, auth_headers, seed
 ):
     seed(seed_data)
 
@@ -102,31 +103,35 @@ def test_valid_scenarios(
 
 
 @pytest.mark.parametrize(
-    "test_name, payload, new_title, new_media_type",
+    "payload, new_title, new_media_type",
     [
         (
-            "update_both",
             {"title": "New Title", "mediaType": MediaType.GALLERY},
             "New Title",
             MediaType.GALLERY,
         ),
         # Partial updates
-        ("update_title", {"title": "New Title"}, "New Title", MediaType.IMAGE),
+        ({"title": "New Title"}, "New Title", MediaType.IMAGE),
         (
-            "update_media_type",
             {"mediaType": MediaType.VIDEO},
             "Test Page",
             MediaType.VIDEO,
         ),
         # Resetting
-        ("reset_both", {"title": None, "mediaType": None}, None, None),
-        ("reset_title", {"title": None}, None, MediaType.IMAGE),
-        ("reset_media_type", {"mediaType": None}, "Test Page", None),
+        ({"title": None, "mediaType": None}, None, None),
+        ({"title": None}, None, MediaType.IMAGE),
+        ({"mediaType": None}, "Test Page", None),
     ],
-    ids=lambda x: x if isinstance(x, str) else "",
+    ids=[
+        "update_both",
+        "update_title",
+        "update_media_type",
+        "reset_both",
+        "reset_title",
+        "reset_media_type",
+    ],
 )
 def test_bulk_edit_persistence(
-    test_name,
     payload,
     new_title,
     new_media_type,

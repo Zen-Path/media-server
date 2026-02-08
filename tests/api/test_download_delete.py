@@ -21,19 +21,25 @@ def test_invalid_scenarios(delete_ids, error_msg, client, auth_headers):
 
 
 @pytest.mark.parametrize(
-    "test_name, seed_ids, delete_ids, expected_items",
+    "seed_ids, delete_ids, expected_items",
     [
-        ("single_valid", [1], [1], [1]),
-        ("all_valid", [1, 2, 3], [1, 2, 3], [1, 2, 3]),
-        ("mixed_status", [1], [1, 999], [1]),
-        ("single_invalid", [], [-1], []),
-        ("all_invalid", [], [888, 999], []),
-        ("duplicates", [5], [5, 5], [5]),
+        ([1], [1], [1]),
+        ([1, 2, 3], [1, 2, 3], [1, 2, 3]),
+        ([1], [1, 999], [1]),
+        ([], [-1], []),
+        ([], [888, 999], []),
+        ([5], [5, 5], [5]),
     ],
-    ids=lambda x: x if isinstance(x, str) else "",
+    ids=[
+        "single_valid",
+        "all_valid",
+        "mixed_status",
+        "single_invalid",
+        "all_invalid",
+        "duplicates",
+    ],
 )
 def test_valid_scenarios(
-    test_name,
     seed_ids,
     delete_ids,
     expected_items,

@@ -63,51 +63,35 @@ def test_stress(client, auth_headers):
 
 
 @pytest.mark.parametrize(
-    "test_name, payload, error_msg",
+    "payload, error_msg",
     [
+        ({}, "missing data for required field"),
+        ({"urls": None}, "field may not be null"),
+        ({"urls": "123"}, "not a valid list"),
         (
-            "urls_missing",
-            {},
-            "missing data for required field",
-        ),
-        (
-            "urls_none",
-            {"urls": None},
-            "field may not be null",
-        ),
-        (
-            "urls_wrong_type",
-            {"urls": "123"},
-            "not a valid list",
-        ),
-        (
-            "media_type_wrong_type",
             {"urls": ["https://example.com"], "mediaType": "Image"},
             "not a valid integer",
         ),
+        ({"urls": ["https://example.com"], "mediaType": -1}, "must be one of"),
         (
-            "media_type_negative_id",
-            {"urls": ["https://example.com"], "mediaType": -1},
-            "must be one of",
-        ),
-        (
-            "field_snake_case",
             {"urls": ["https://example.com"], "media_type": MediaType.IMAGE},
             "unknown field",
         ),
-        (
-            "range_start_wrong_type",
-            {"urls": ["https://example.com"], "rangeStart": "123"},
-            "not a valid integer",
-        ),
-        (
-            "range_end_wrong_type",
-            {"urls": ["https://example.com"], "rangeEnd": "123"},
-            "not a valid integer",
-        ),
+        ({"urls": ["https://example.com"], "rangeStart": "123"}, "not a valid integer"),
+        ({"urls": ["https://example.com"], "rangeEnd": "123"}, "not a valid integer"),
+    ],
+    ids=[
+        "urls_missing",
+        "urls_none",
+        "urls_wrong_type",
+        "media_type_wrong_type",
+        "media_type_negative_id",
+        "field_snake_case",
+        "range_start_wrong_type",
+        "range_end_wrong_type",
     ],
 )
-def test_invalid_scenarios(test_name, payload, error_msg, client, auth_headers):
+def test_invalid_scenarios(payload, error_msg, client, auth_headers):
     res = client.post(API_DOWNLOAD, headers=auth_headers, json=payload)
     assert res.status_code == 400
 

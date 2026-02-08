@@ -97,13 +97,22 @@ def test_title_invalid(dashboard, mock_downloads, input_title):
 @pytest.mark.parametrize(
     "input_title",
     [
-        "Standard Title",
+        "Simple Title",
         "0",
         "123",
         "Title with 'quotes' and \"double\"",
         "Rocket 🚀 & Unicode ℵ",
         "عنوان باللغة العربية",
         "A" * 300,
+    ],
+    ids=[
+        "simple",
+        "zero_str",
+        "number_str",
+        "quotes",
+        "unicode",
+        "right_to_left",
+        "very_long",
     ],
 )
 def test_title_valid(dashboard, mock_downloads, input_title):
@@ -131,18 +140,25 @@ def test_title_visual_truncation(dashboard, mock_downloads):
 
 
 @pytest.mark.parametrize(
-    "test_name, input_date",
+    "input_date",
     [
-        ("none", None),
-        ("empty_str", ""),
-        ("timestamp_str", "1769374602"),
-        ("iso_str", "2026-01-25T20:00:00Z"),
-        ("out_of_range", "9999999999999"),
-        ("negative_ts", -1),
+        None,
+        "",
+        "1769374602",
+        "2026-01-25T20:00:00Z",
+        "9999999999999",
+        -1,
     ],
-    ids=lambda x: x if isinstance(x, str) else "",
+    ids=[
+        "none",
+        "empty_str",
+        "timestamp_str",
+        "iso_str",
+        "out_of_range",
+        "negative_ts",
+    ],
 )
-def test_start_time_invalid(test_name, input_date, dashboard, mock_downloads):
+def test_start_time_invalid(input_date, dashboard, mock_downloads):
     """Check how UI handles 'trash' in the date fields."""
     mock_downloads([{"id": 1, "startTime": input_date}])
     dashboard.navigate()
