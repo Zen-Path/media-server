@@ -5,24 +5,37 @@ from scripts.media_server.app.utils.tools import recursive_camelize, to_camel_ca
 @pytest.mark.parametrize(
     "input_str, expected",
     [
+        ("word", "word"),
         ("my_variable", "myVariable"),
-        ("user_id", "userId"),
-        # Preserving leading underscores
-        ("_private_var", "_privateVar"),
-        ("__very_private", "__veryPrivate"),
-        # Preserving trailing underscores
-        ("class_", "class_"),
-        ("from_", "from_"),
-        # Preserving both
-        ("__init__", "__init__"),
-        ("__str__", "__str__"),
-        # Collapse multiple underscores in the middle
-        ("user__name", "userName"),
+        ("my_long_var", "myLongVar"),
+        ("camelCase", "camelCase"),
+        ("wEird_UsEr_ID", "weirdUserId"),
+        # Keep as-is for idempotency (for already camelCase str)
+        ("wEirdUsErID", "wEirdUsErID"),
         ("long___variable", "longVariable"),
-        # Edge Cases: Only underscores
+        # Preserving leading & trailing underscores
+        ("_private_var", "_privateVar"),
+        ("class_", "class_"),
+        ("__init__", "__init__"),
+        # Edge cases
         ("_", "_"),
         ("__", "__"),
         ("", ""),
+    ],
+    ids=[
+        "one_word",
+        "two_words",
+        "three_words",
+        "alreadyCamelCase",
+        "mixed_case",
+        "mixed_case_no_underscores",
+        "collapse_underscores",
+        "leading_underscore",
+        "trailing_underscore",
+        "lead_and_trail_underscores",
+        "one_underscore",
+        "multiple_underscores",
+        "empty",
     ],
 )
 def test_to_camel_case(input_str, expected):
