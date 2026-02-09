@@ -92,7 +92,9 @@ export class DownloadsTable extends BaseDataTable {
                 onClick: async () => {
                     const result = await this.copyFields("url", true);
                     if (result) {
-                        showToast(`URLs copied to clipboard!`);
+                        showToast("URLs copied to clipboard!", "success");
+                    } else {
+                        showToast("Could not copy URLs.", "error");
                     }
                     return result;
                 },
@@ -103,7 +105,9 @@ export class DownloadsTable extends BaseDataTable {
                 onClick: async () => {
                     const result = await this.copyFields("title", true);
                     if (result) {
-                        showToast(`Titles copied to clipboard!`);
+                        showToast("Titles copied to clipboard!");
+                    } else {
+                        showToast("Could not copy titles.", "error");
                     }
                     return result;
                 },
@@ -416,14 +420,24 @@ export class DownloadRow extends BaseDataRow {
                 label: "Copy Title",
                 icon: "fa-quote-left",
                 onClick: async () => {
-                    return await copyToClipboard(this.data.title);
+                    const result = copyToClipboard(this.data.title);
+                    if (result) {
+                        showToast("Title copied to clipboard!", "success");
+                    } else {
+                        showToast("Could not copy the title.", "error");
+                    }
                 },
             },
             {
                 label: "Copy URL",
                 icon: "fa-link",
                 onClick: async () => {
-                    return await copyToClipboard(this.data.url);
+                    const result = copyToClipboard(this.data.url);
+                    if (result) {
+                        showToast("URL copied to clipboard!", "success");
+                    } else {
+                        showToast("Could not copy the URL.", "error");
+                    }
                 },
             },
             {
