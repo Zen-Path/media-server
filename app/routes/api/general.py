@@ -21,7 +21,7 @@ def require_api_key() -> None | Tuple[Response, int]:
     provided_key = request.headers.get("X-API-Key") or request.args.get("apiKey")
 
     # Ensure the server is actually configured
-    expected_key = current_app.config.get("MEDIA_SERVER_KEY")
+    expected_key = current_app.config.get("API_SECRET_KEY")
     if not expected_key:
         return api_response(error="Server Config: No API Key set", status_code=500)
 

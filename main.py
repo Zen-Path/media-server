@@ -4,6 +4,7 @@
 
 import logging
 import os
+import secrets
 import tempfile
 from pathlib import Path
 
@@ -15,7 +16,9 @@ from scripts.media_server.app.extensions import db
 from scripts.media_server.app.utils.database import init_db, seed_db
 from scripts.media_server.app.utils.sse import MessageAnnouncer
 
-load_dotenv(flex_scripts / "media_server" / ".env")
+ENV_PATH = flex_scripts / "media_server" / ".env"
+
+load_dotenv(dotenv_path=ENV_PATH)
 
 
 def main():
@@ -39,13 +42,24 @@ def main():
     else:
         db_path = str(
             Path(
-                os.getenv("DB_PATH") or flex_scripts / "media_server" / "media.db"
+                os.getenv("DATABASE_PATH") or flex_scripts / "media_server" / "media.db"
             ).absolute()
         )
     logger.debug(f"Database path: {db_path!r}")
 
+    api_secret_key = os.getenv("API_SECRET_KEY")
+    if not api_secret_key:
+        api_secret_key = secrets.token_urlsafe(32)
+        with open(ENV_PATH, "a") as f:
+            f.write(f"\nAPI_SECRET_KEY={api_secret_key}")
+
+        logger.warning(
+            f"API_SECRET_KEY not found in environment. Generated val and saved "
+            f"to {ENV_PATH!r}"
+        )
+
     app.config.update(
-        MEDIA_SERVER_KEY="{{@@ _vars['media_server_key'] @@}}",
+        API_SECRET_KEY=api_secret_key,
         SQLALCHEMY_DATABASE_URI=f"sqlite:///{db_path}",
         SQLALCHEMY_TRACK_MODIFICATIONS=False,
         ANNOUNCER=MessageAnnouncer(),
@@ -64,8 +78,23 @@ def main():
             logger.info(f"Seeding database with {row_count} rows...")
             seed_db(row_count=row_count)
 
+    raw_port = os.getenv("SERVER_PORT", "5001")
+
+    try:
+        server_port = int(raw_port)
+    except ValueError:
+        server_port = 5001
+        logger.warning(
+            f"Invalid SERVER_PORT '{raw_port}'. Defaulting to {server_port}."
+        )
+
+    if not os.getenv("SERVER_PORT"):
+        with open(ENV_PATH, "a") as f:
+            f.write(f"\nSERVER_PORT={server_port}")
+        logger.warning(f"SERVER_PORT not found. Saved {server_port} to {ENV_PATH!r}")
+
     app.run(
-        port=int("{{@@ _vars['media_server_port'] @@}}"),
+        port=server_port,
         debug=debug_mode,
         threaded=True,
     )

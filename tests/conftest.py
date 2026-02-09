@@ -35,7 +35,7 @@ def db_instance():
             "SQLALCHEMY_DATABASE_URI": db_uri,
             "SQLALCHEMY_TRACK_MODIFICATIONS": False,
             "SQLALCHEMY_ENGINE_OPTIONS": {"connect_args": {"timeout": 10}},
-            "MEDIA_SERVER_KEY": "test-secret-key",
+            "API_SECRET_KEY": "test-secret-key",
             "TESTING": True,
             "ANNOUNCER": announcer,
         }
