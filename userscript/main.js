@@ -42,19 +42,23 @@ function downloadMedia(urls, mediaType, rangeStart, rangeEnd) {
             }
 
             try {
-                const report = JSON.parse(response.responseText);
-                const entries = Object.entries(report);
-                console.log(":: Download response", report);
+                const responseData = JSON.parse(response.responseText);
+                const entries = responseData.data || [];
 
-                if (entries.length === 0) {
-                    console.error("Empty response from server");
+                console.log(":: Download response", responseData);
+
+                if (!responseData.status || entries.length === 0) {
+                    console.error(
+                        "Download failed or empty response:",
+                        responseData.error
+                    );
                     showDownloadStatus(DOWNLOAD_STATUS.FAILED);
                     return;
                 }
 
                 const totalItems = entries.length;
                 const successCount = entries.filter(
-                    ([_, data]) => data.status === true
+                    (data) => data.status === true
                 ).length;
 
                 let overallStatus;
@@ -70,10 +74,10 @@ function downloadMedia(urls, mediaType, rangeStart, rangeEnd) {
 
                 // Log failures for debugging
                 if (successCount < totalItems) {
-                    entries.forEach(([url, data]) => {
+                    entries.forEach((data) => {
                         if (!data.status) {
                             console.error(
-                                `Error for ${url}:`,
+                                `Error for ${data.url}:`,
                                 data.error || "Unknown error"
                             );
                         }
