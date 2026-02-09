@@ -64,28 +64,8 @@ function renderDropdownMenu(actions, anchorBtn) {
         btn.onclick = async (e) => {
             e.stopPropagation();
 
-            const result = await action.onClick();
-
-            // Handle the Success/Failure Icon Swap
-            if (typeof result === "boolean") {
-                const originalClass = action.icon;
-                const feedbackClass = result ? "fa-check" : "fa-xmark";
-                const feedbackColor = result ? "text-success" : "text-danger";
-
-                iconEl.classList.replace(originalClass, feedbackClass);
-                iconEl.classList.add(feedbackColor);
-
-                // After delay, revert icon and close menu
-                setTimeout(() => {
-                    if (menu.parentElement) {
-                        iconEl.classList.replace(feedbackClass, originalClass);
-                        iconEl.classList.remove(feedbackColor);
-                        menu.hidePopover();
-                    }
-                }, 2000);
-            } else {
-                menu.hidePopover();
-            }
+            await action.onClick();
+            menu.hidePopover();
         };
 
         menu.appendChild(btn);
