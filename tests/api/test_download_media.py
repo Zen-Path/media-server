@@ -26,14 +26,17 @@ def test_simple_download(client, auth_headers):
 
         payload = {"urls": [mock_url], "mediaType": MediaType.VIDEO}
         response = client.post(API_DOWNLOAD, headers=auth_headers, json=payload)
-
         assert response.status_code == 200
-        data = response.get_json()
-        assert data["status"]
-        assert data["error"] is None
-        assert data["data"] is not None
 
-        first_download = next(iter(data["data"].values()))
+        resp_data = response.get_json()
+        assert resp_data["status"]
+        assert resp_data["error"] is None
+
+        assert isinstance(resp_data["data"], list)
+        assert len(resp_data["data"]) == 1
+        assert isinstance(resp_data["data"][0], dict)
+
+        first_download = resp_data["data"][0]
         assert first_download["url"] == mock_url
         # TODO: when we'll return Download, then we can check for a title match
         # assert first_download["title"] == mock_title
@@ -137,12 +140,11 @@ def test_gallery_expansion_flow(
     mock_get.return_value = mock_response
 
     payload = {"urls": [parent_url], "mediaType": MediaType.GALLERY}
-    res = client.post(API_DOWNLOAD, headers=auth_headers, json=payload)
+    resp_data = client.post(API_DOWNLOAD, headers=auth_headers, json=payload)
 
-    data = res.get_json()
-
-    assert parent_url in data["data"]
-    assert child_urls[0] in data["data"]
+    data = resp_data.get_json()
+    assert any(parent_url == download_data["url"] for download_data in data["data"])
+    assert any(child_urls[0] == download_data["url"] for download_data in data["data"])
 
     # TODO: When we'll return Download, then we can check for more details
 
@@ -165,39 +167,36 @@ def test_title_scrape_failure_handling(mock_gallery, mock_get, client, auth_head
     )
 
     data = res.get_json()
-    first_download = next(iter(data["data"].values()))
+    first_download = data["data"][0]
 
     assert first_download["status"] is True
 
 
-@patch("scripts.media_server.app.routes.api.media.expand_collection_urls")
 @patch("scripts.media_server.app.routes.api.media.Gallery.download")
-def test_gallery_dl_failure_reporting(mock_gallery, mock_expand, client, auth_headers):
+def test_gallery_dl_failure_reporting(mock_gallery, client, auth_headers):
     """Verify that a non-zero return code from gallery-dl marks status as False."""
     # TODO: change when adding unit tests
     mock_gallery.return_value = DownloadReportItem(
         status=False, output="403 Forbidden", error="System command failed"
     )
-    mock_expand.return_value = []
 
-    url = "http://blocked.com/gallery"
-    res = client.post(
+    url = "https://example.com"
+    resp_data = client.post(
         API_DOWNLOAD,
         headers=auth_headers,
         json={"urls": [url], "mediaType": MediaType.GALLERY},
     )
 
-    data = res.get_json()
-    first_download = next(iter(data["data"].values()))
+    data = resp_data.get_json()
+    first_download = data["data"][0]
 
     assert first_download["status"] is False
     assert first_download["output"] == "403 Forbidden"
     assert "Command failed".lower() in first_download["error"].lower()
 
 
-@patch("scripts.media_server.app.routes.api.media.expand_collection_urls")
 @patch("scripts.media_server.app.routes.api.media.Gallery.download")
-def test_gallery_dl_failure_patterns(mock_gallery, mock_expand, client, auth_headers):
+def test_gallery_dl_failure_patterns(mock_gallery, client, auth_headers):
     """Verify that if failure patterns are matched return status is False."""
     # TODO: change when adding unit tests
     mock_gallery.return_value = DownloadReportItem(
@@ -205,26 +204,24 @@ def test_gallery_dl_failure_patterns(mock_gallery, mock_expand, client, auth_hea
         output="[reddit][info] No results for url",
         error="No results found for url.",
     )
-    mock_expand.return_value = []
 
-    url = "http://fail.com/gallery"
-    res = client.post(
+    url = "https://example.com"
+    resp_data = client.post(
         API_DOWNLOAD,
         headers=auth_headers,
         json={"urls": [url], "mediaType": MediaType.GALLERY},
     )
 
-    data = res.get_json()
-    first_download = next(iter(data["data"].values()))
+    data = resp_data.get_json()
+    first_download = data["data"][0]
 
     assert not first_download["status"]
     assert "No results found" in first_download["error"]
     assert "[reddit][info]" in first_download["output"]
 
 
-@patch("scripts.media_server.app.routes.api.media.expand_collection_urls")
 @patch("scripts.media_server.app.routes.api.media.Gallery.download")
-def test_return_files(mock_gallery, mock_expand, client, auth_headers):
+def test_return_files(mock_gallery, client, auth_headers):
     """Verify that file paths are return for successful downloads."""
     files = [
         "./dir1/image-1.jpg",
@@ -232,9 +229,8 @@ def test_return_files(mock_gallery, mock_expand, client, auth_headers):
         "./dir2/image-1.jpg",
     ]
     mock_gallery.return_value = DownloadReportItem(status=True, files=files)
-    mock_expand.return_value = []
 
-    url = "https://test.com/gallery"
+    url = "https://example.com"
     res = client.post(
         API_DOWNLOAD,
         headers=auth_headers,
@@ -242,7 +238,7 @@ def test_return_files(mock_gallery, mock_expand, client, auth_headers):
     )
 
     data = res.get_json()
-    first_download = next(iter(data["data"].values()))
+    first_download = data["data"][0]
 
     assert first_download["status"]
     assert len(first_download["files"]) == 3

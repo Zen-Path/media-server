@@ -120,5 +120,5 @@ def download_media():
         if error:
             report[url].error = error
 
-    final_json_report = {url: item.to_dict() for url, item in report.items()}
+    final_json_report = [item.to_dict() for item in report.values()]
     return api_response(data=final_json_report)
