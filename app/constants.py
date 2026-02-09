@@ -4,30 +4,30 @@ from enum import IntEnum
 
 # fmt: off
 class DownloadStatus(IntEnum):
-    PENDING     = 0
-    IN_PROGRESS = 1
-    DONE        = 2
-    FAILED      = 3
-    MIXED       = 4
+    PENDING     = 1
+    IN_PROGRESS = 2
+    DONE        = 3
+    FAILED      = 4
+    MIXED       = 5
 # fmt: on
 
 
 # fmt: off
 class MediaType(IntEnum):
-    GALLERY     = 0
-    IMAGE       = 1
-    VIDEO       = 2
-    AUDIO       = 3
-    TEXT        = 4
+    GALLERY     = 1
+    IMAGE       = 2
+    VIDEO       = 3
+    AUDIO       = 4
+    TEXT        = 5
 # fmt: on
 
 
 # fmt: off
 class EventType(IntEnum):
-    CREATE      = 0
-    UPDATE      = 1
-    DELETE      = 2
-    PROGRESS    = 3
+    CREATE      = 1
+    UPDATE      = 2
+    DELETE      = 3
+    PROGRESS    = 4
 # fmt: on
 
 

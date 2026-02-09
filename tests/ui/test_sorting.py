@@ -2,6 +2,7 @@ import re
 
 import pytest
 from playwright.sync_api import expect
+from scripts.media_server.app.constants import DownloadStatus
 
 pytestmark = pytest.mark.ui
 
@@ -13,21 +14,21 @@ def sort_data(mock_downloads):
             "id": 10,
             "mediaType": 2,
             "title": "Zebra",
-            "status": 0,
+            "status": DownloadStatus.PENDING,
             "startTime": "2026-01-01T10:00:00Z",
         },
         {
             "id": 1,
             "mediaType": 0,
             "title": "Apple",
-            "status": 2,
+            "status": DownloadStatus.IN_PROGRESS,
             "startTime": "2026-01-01T12:00:00Z",
         },
         {
             "id": 5,
             "mediaType": 1,
             "title": "Mango",
-            "status": 1,
+            "status": DownloadStatus.DONE,
             "startTime": "2026-01-01T11:00:00Z",
         },
     ]
