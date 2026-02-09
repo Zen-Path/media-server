@@ -24,8 +24,8 @@ PKG_VERSION = get_version()
 
 app = Flask(
     __name__,
-    template_folder=Path(flex_scripts / "media_server" / "app" / "templates"),
-    static_folder=Path(flex_scripts / "media_server" / "app" / "static"),
+    template_folder=Path(flex_scripts / "media_server" / "frontend" / "templates"),
+    static_folder=Path(flex_scripts / "media_server" / "frontend" / "static"),
 )
 
 CORS(app)  # Enable CORS for all routes

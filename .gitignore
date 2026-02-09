@@ -1,4 +1,4 @@
-app/static/
+frontend/static/
 shared/constants.js
 
 # MacOS files

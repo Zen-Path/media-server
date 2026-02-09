@@ -6,7 +6,7 @@ export default defineConfig({
     root: path.resolve(__dirname, "frontend"),
 
     build: {
-        outDir: path.resolve(__dirname, "app/static"),
+        outDir: path.resolve(__dirname, "frontend/static"),
 
         // Clear the destination folder before building
         emptyOutDir: true,
