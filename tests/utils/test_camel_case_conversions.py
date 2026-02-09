@@ -1,5 +1,6 @@
 import pytest
-from scripts.media_server.app.utils.tools import recursive_camelize, to_camel_case
+
+from app.utils.tools import recursive_camelize, to_camel_case
 
 
 @pytest.mark.parametrize(

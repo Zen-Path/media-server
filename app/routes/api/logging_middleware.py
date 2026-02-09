@@ -3,9 +3,10 @@ import time
 from functools import wraps
 
 from colorama import Fore, Style
-from common.logger import logger
 from flask import current_app, g, request
-from scripts.media_server.app.routes.api import bp
+
+from app.routes.api import bp
+from app.utils.logger import logger
 
 
 def skip_logging(f):

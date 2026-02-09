@@ -1,5 +1,9 @@
+import secrets
+import subprocess
 from dataclasses import asdict, dataclass, field
 from typing import List, Optional
+
+from app.utils.logger import logger
 
 
 @dataclass
@@ -46,3 +50,44 @@ def recursive_camelize(data):
     if isinstance(data, list):
         return [recursive_camelize(i) for i in data]
     return data
+
+
+@dataclass
+class CommandResult:
+    return_code: int
+    output: str
+
+    @property
+    def success(self) -> bool:
+        return self.return_code == 0
+
+    def __str__(self) -> str:
+        return self.output
+
+
+def run_command(command: List[str]) -> CommandResult:
+    """Run a shell command and return its result."""
+    cmd_identifier = secrets.token_hex(5)  # 8 hex chars
+
+    logger.debug(f"Running {command} with id '{cmd_identifier}'")
+
+    output = []
+    with subprocess.Popen(
+        command,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.STDOUT,
+        universal_newlines=True,
+        bufsize=1,
+    ) as process:
+        if process.stdout is not None:
+            for line in process.stdout:
+                output.append(line)
+                logger.debug(line.strip())
+
+        return_code = process.wait()
+
+    logger.debug(
+        f"Command with id '{cmd_identifier}' finished with return code {return_code}"
+    )
+
+    return CommandResult(return_code=return_code, output="\n".join(output))

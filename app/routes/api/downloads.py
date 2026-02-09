@@ -1,16 +1,17 @@
 from typing import Tuple
 
-from common.logger import logger
 from flask import Response, current_app, request
 from marshmallow import ValidationError
-from scripts.media_server.app.constants import EventType
-from scripts.media_server.app.routes.api import bp
-from scripts.media_server.app.schemas.download import (
+
+from app.constants import EventType
+from app.routes.api import bp
+from app.schemas.download import (
     BulkDeleteSchema,
     DownloadUpdateSchema,
 )
-from scripts.media_server.app.services import download_service
-from scripts.media_server.app.utils.api_response import api_response
+from app.services import download_service
+from app.utils.api_response import api_response
+from app.utils.logger import logger
 
 
 @bp.route("/downloads", methods=["GET"])

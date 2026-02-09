@@ -4,14 +4,15 @@ from unittest.mock import patch
 
 import pytest
 import requests
-from scripts.media_server.app.extensions import db
-from scripts.media_server.tests.conftest import (
+from sqlalchemy.exc import SQLAlchemyError
+
+from app.extensions import db
+from tests.conftest import (
     API_BULK_DELETE,
     API_GET_DOWNLOADS,
     API_HEALTH,
     BASE_URL,
 )
-from sqlalchemy.exc import SQLAlchemyError
 
 
 def test_auth_valid(client, auth_headers):

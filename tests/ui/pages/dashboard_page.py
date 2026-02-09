@@ -1,5 +1,6 @@
 from playwright.sync_api import Page
-from scripts.media_server.tests.conftest import BASE_URL
+
+from tests.conftest import BASE_URL
 
 
 class DashboardPage:

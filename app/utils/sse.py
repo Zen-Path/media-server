@@ -2,9 +2,9 @@ import json
 import queue
 from typing import Any, Dict, List
 
-from common.logger import logger
-from scripts.media_server.app.constants import EventType
-from scripts.media_server.app.utils.tools import recursive_camelize
+from app.constants import EventType
+from app.utils.logger import logger
+from app.utils.tools import recursive_camelize
 
 
 class MessageAnnouncer:

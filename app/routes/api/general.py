@@ -3,8 +3,9 @@ from datetime import datetime, timezone
 from typing import Tuple
 
 from flask import Response, current_app, request
-from scripts.media_server.app.routes.api import bp
-from scripts.media_server.app.utils.api_response import api_response
+
+from app.routes.api import bp
+from app.utils.api_response import api_response
 
 # AUTH
 

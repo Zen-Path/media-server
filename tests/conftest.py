@@ -6,13 +6,14 @@ from datetime import datetime
 from unittest.mock import MagicMock
 
 import pytest
-from scripts.media_server.app import app
-from scripts.media_server.app.constants import MediaType
-from scripts.media_server.app.extensions import db
-from scripts.media_server.app.models.download import Download
-from scripts.media_server.app.utils.database import seed_db
-from scripts.media_server.app.utils.sse import MessageAnnouncer
 from werkzeug.serving import make_server
+
+from app import app
+from app.constants import MediaType
+from app.extensions import db
+from app.models.download import Download
+from app.utils.database import seed_db
+from app.utils.sse import MessageAnnouncer
 
 # --- CONFIGURATION ---
 TEST_PORT = 5002

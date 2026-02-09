@@ -3,7 +3,7 @@ from datetime import datetime, timedelta
 from functools import lru_cache
 from typing import Any, Dict, List, Optional
 
-from scripts.media_server.app.constants import DownloadStatus, MediaType
+from app.constants import DownloadStatus, MediaType
 
 DEFAULT_OPTIONS = {
     "end_time_probability": 0.9,

@@ -5,7 +5,8 @@ from enum import Enum
 from pathlib import Path
 
 from dotenv import load_dotenv
-from scripts.media_server.app.constants import DownloadStatus, EventType, MediaType
+
+from app.constants import DownloadStatus, EventType, MediaType
 
 BASE_DIR = Path(__file__).resolve().parent
 ENV_PATH = BASE_DIR / ".." / ".env"

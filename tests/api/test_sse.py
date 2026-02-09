@@ -1,8 +1,8 @@
 import json
 from unittest.mock import patch
 
-from scripts.media_server.app.constants import DownloadStatus, EventType, MediaType
-from scripts.media_server.app.utils.tools import DownloadReportItem
+from app.constants import DownloadStatus, EventType, MediaType
+from app.utils.tools import DownloadReportItem
 
 from ..conftest import API_BULK_DELETE, API_DOWNLOAD
 
@@ -25,12 +25,10 @@ def test_download_announcements(client, announcer, auth_headers):
     target_url = "http://gallery.com"
     mock_title = "SSE Gallery"
 
-    with patch("scripts.media_server.app.routes.api.media.scrape_title") as mock_scrape:
+    with patch("app.routes.api.media.scrape_title") as mock_scrape:
         mock_scrape.return_value = mock_title
 
-        with patch(
-            "scripts.media_server.app.utils.downloaders.Gallery.download"
-        ) as mock_dl:
+        with patch("app.utils.downloaders.Gallery.download") as mock_dl:
             mock_dl.return_value = DownloadReportItem(status=True)
 
             payload = {"urls": [target_url], "mediaType": MediaType.GALLERY}
@@ -71,9 +69,7 @@ def test_system_resilience_to_announcer_failure(client, auth_headers, seed):
     """
     seed([{"url": "test.com", "id": 100}])
 
-    with patch(
-        "scripts.media_server.app.utils.sse.MessageAnnouncer.announce"
-    ) as mock_announce:
+    with patch("app.utils.sse.MessageAnnouncer.announce") as mock_announce:
         mock_announce.side_effect = Exception("Socket Connection Lost")
 
         # Try to delete. Even if the dashboard notification fails, the DB delete

@@ -2,7 +2,8 @@ import re
 
 import pytest
 from playwright.sync_api import expect
-from scripts.media_server.app.constants import DownloadStatus
+
+from app.constants import DownloadStatus
 
 pytestmark = pytest.mark.ui
 

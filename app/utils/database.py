@@ -1,10 +1,10 @@
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
-from common.logger import logger
-from scripts.media_server.app.extensions import db
-from scripts.media_server.app.models.download import Download
-from scripts.media_server.scripts.demo_downloads import get_demo_downloads
+from app.extensions import db
+from app.models.download import Download
+from app.utils.logger import logger
+from scripts.demo_downloads import get_demo_downloads
 
 
 def init_db(app):

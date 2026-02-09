@@ -1,5 +1,6 @@
 from marshmallow import Schema, fields, validate
-from scripts.media_server.app.constants import MediaType
+
+from app.constants import MediaType
 
 
 class DownloadRequestSchema(Schema):

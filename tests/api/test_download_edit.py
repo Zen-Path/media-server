@@ -1,5 +1,6 @@
 import pytest
-from scripts.media_server.app.constants import MediaType
+
+from app.constants import MediaType
 
 from ..conftest import API_BULK_EDIT, API_GET_DOWNLOADS
 

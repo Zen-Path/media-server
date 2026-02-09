@@ -1,7 +1,7 @@
 from datetime import datetime, timezone
 
-from scripts.media_server.app.constants import DownloadStatus
-from scripts.media_server.app.extensions import db
+from app.constants import DownloadStatus
+from app.extensions import db
 
 
 class Download(db.Model):  # type: ignore[name-defined]

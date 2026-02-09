@@ -2,9 +2,9 @@ import re
 from abc import ABC, abstractmethod
 from typing import List, Optional
 
-from common.helpers import run_command
 from flask import current_app
-from scripts.media_server.app.utils.tools import DownloadReportItem
+
+from app.utils.tools import DownloadReportItem, run_command
 
 
 class Media(ABC):
@@ -91,7 +91,7 @@ class Gallery(Media):
                     if callable(handler):
                         report.error = str(handler(line))  # str for mypy
                     else:
-                        report.error = handler
+                        report.error = str(handler)
 
                     return report
 

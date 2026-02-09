@@ -1,22 +1,18 @@
-#!{{@@ env['FLEXYCON_HOME'] @@}}/{{@@ d_venv_bin @@}}/python
-
-# {{@@ header() @@}}
-
 import logging
 import os
 import secrets
 import tempfile
 from pathlib import Path
 
-from common.logger import logger, setup_logging
-from common.variables import flex_scripts
 from dotenv import load_dotenv
-from scripts.media_server.app import app
-from scripts.media_server.app.extensions import db
-from scripts.media_server.app.utils.database import init_db, seed_db
-from scripts.media_server.app.utils.sse import MessageAnnouncer
 
-ENV_PATH = flex_scripts / "media_server" / ".env"
+from app import app
+from app.extensions import db
+from app.utils.database import init_db, seed_db
+from app.utils.logger import logger, setup_logging
+from app.utils.sse import MessageAnnouncer
+
+ENV_PATH = ".env"
 
 load_dotenv(dotenv_path=ENV_PATH)
 
@@ -41,9 +37,7 @@ def main():
         os.close(db_fd)
     else:
         db_path = str(
-            Path(
-                os.getenv("DATABASE_PATH") or flex_scripts / "media_server" / "media.db"
-            ).absolute()
+            Path(os.getenv("DATABASE_PATH") or Path("instance") / "media.db").absolute()
         )
     logger.debug(f"Database path: {db_path!r}")
 

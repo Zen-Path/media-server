@@ -1,14 +1,15 @@
 from datetime import datetime, timezone
 from typing import Any, Dict, List, Optional, Tuple
 
-from common.logger import logger
 from flask import current_app
-from scripts.media_server.app.constants import (
+
+from app.constants import (
     DownloadStatus,
     EventType,
 )
-from scripts.media_server.app.extensions import db
-from scripts.media_server.app.models.download import Download
+from app.extensions import db
+from app.models.download import Download
+from app.utils.logger import logger
 
 
 def get_all_downloads():

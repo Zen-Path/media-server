@@ -1,7 +1,8 @@
 from typing import Any, Optional, Tuple, Union
 
 from flask import Response, jsonify
-from scripts.media_server.app.utils.tools import recursive_camelize
+
+from app.utils.tools import recursive_camelize
 
 
 def api_response(

@@ -2,20 +2,21 @@ from typing import Dict
 
 from flask import request
 from marshmallow import ValidationError
-from scripts.media_server.app.constants import (
+
+from app.constants import (
     DownloadStatus,
     MediaType,
 )
-from scripts.media_server.app.routes.api import bp
-from scripts.media_server.app.schemas.execution import DownloadRequestSchema
-from scripts.media_server.app.services.download_service import (
+from app.routes.api import bp
+from app.schemas.execution import DownloadRequestSchema
+from app.services.download_service import (
     finalize_download,
     initialize_download,
 )
-from scripts.media_server.app.utils.api_response import api_response
-from scripts.media_server.app.utils.downloaders import Gallery
-from scripts.media_server.app.utils.scraper import expand_collection_urls, scrape_title
-from scripts.media_server.app.utils.tools import DownloadReportItem
+from app.utils.api_response import api_response
+from app.utils.downloaders import Gallery
+from app.utils.scraper import expand_collection_urls, scrape_title
+from app.utils.tools import DownloadReportItem
 
 
 @bp.route("/media/download", methods=["POST"])

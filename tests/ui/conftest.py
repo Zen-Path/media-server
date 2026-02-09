@@ -2,8 +2,9 @@ from typing import Any, Optional
 
 import pytest
 from playwright.sync_api import Page, expect
-from scripts.media_server.tests.conftest import API_GET_DOWNLOADS
-from scripts.media_server.tests.ui.pages.dashboard_page import DashboardPage
+
+from tests.conftest import API_GET_DOWNLOADS
+from tests.ui.pages.dashboard_page import DashboardPage
 
 
 @pytest.fixture(scope="session", autouse=True)

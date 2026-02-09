@@ -1,12 +1,12 @@
 import tomllib
 from pathlib import Path
 
-from common.variables import flex_scripts
 from flask import Flask, request
 from flask_cors import CORS
-from scripts.media_server.app.routes.api import bp as api_bp
-from scripts.media_server.app.routes.main import bp as main_bp
-from scripts.media_server.app.utils.api_response import api_response
+
+from app.routes.api import bp as api_bp
+from app.routes.main import bp as main_bp
+from app.utils.api_response import api_response
 
 
 def get_version():
@@ -24,8 +24,8 @@ PKG_VERSION = get_version()
 
 app = Flask(
     __name__,
-    template_folder=Path(flex_scripts / "media_server" / "frontend" / "templates"),
-    static_folder=Path(flex_scripts / "media_server" / "frontend" / "static"),
+    template_folder=Path("../frontend") / "templates",
+    static_folder=Path("../frontend") / "static",
 )
 
 CORS(app)  # Enable CORS for all routes

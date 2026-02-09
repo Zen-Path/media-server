@@ -1,5 +1,6 @@
 import pytest
-from scripts.media_server.app.utils.api_response import api_response
+
+from app.utils.api_response import api_response
 
 
 @pytest.mark.parametrize(
