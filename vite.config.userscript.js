@@ -1,5 +1,11 @@
 import { defineConfig } from "vite";
 import monkey from "vite-plugin-monkey";
+import fs from "node:fs";
+
+// Extract project version from pyproject.toml (whilst not using a separate toml lib)
+const pyprojectContent = fs.readFileSync("./pyproject.toml", "utf8");
+const versionMatch = pyprojectContent.match(/version\s*=\s*["']([^"']+)["']/);
+const version = versionMatch ? versionMatch[1] : "0.0.0";
 
 export default defineConfig({
     plugins: [
@@ -9,7 +15,7 @@ export default defineConfig({
                 name: "File Downloader",
                 namespace: "Flexycon",
                 match: ["*://*/*"],
-                version: "2.2.1",
+                version: version,
                 author: "Zen-Path",
                 description:
                     "Send a download request for a URL to a local media server.",
