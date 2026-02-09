@@ -282,7 +282,7 @@ def get_demo_downloads(
         {
             "url": "https://example.com/very/deeply/nested/url/structure/that/goes/on/forever/and/ever/to/test/wrapping",
             "title": "Deeply Nested URL Test",
-            "media_type": MediaType.TEXT,
+            "media_type": None,
             "start_time": now - timedelta(days=10, hours=1, minutes=5, seconds=10),
             "end_time": now - timedelta(days=10, hours=1, minutes=5, seconds=5),
         },
