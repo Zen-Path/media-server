@@ -83,7 +83,7 @@ export class DownloadsTable extends BaseDataTable {
                 label: "Edit Selected",
                 icon: "fa-pen",
                 onClick: () => {
-                    ModalManager.openEdit(this.getSelectedEntries());
+                    ModalManager.openEdit(this.getProcessableEntries());
                 },
             },
             {
@@ -113,7 +113,7 @@ export class DownloadsTable extends BaseDataTable {
                 icon: "fa-trash",
                 className: "text-danger",
                 onClick: () => {
-                    const ids = this.getSelectedEntries().map(
+                    const ids = this.getProcessableEntries().map(
                         (item) => item.data.id
                     );
                     window.bulkDelete(ids);

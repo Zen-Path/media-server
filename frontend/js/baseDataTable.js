@@ -166,6 +166,11 @@ export class BaseDataTable {
         return this.entryList.filter((entry) => entry.isSelected);
     }
 
+    getProcessableEntries() {
+        const selectedEntries = this.getSelectedEntries();
+        return selectedEntries.length === 0 ? this.entryList : selectedEntries;
+    }
+
     #updateSortIndicators() {
         const { field, direction } = this.lastSort;
 
@@ -275,10 +280,10 @@ export class BaseDataTable {
     }
 
     async copyFields(field, unique = true) {
-        const processableItems = this.getSelectedEntries();
-        if (processableItems.length === 0) return false;
+        const processableEntries = this.getProcessableEntries();
+        if (processableEntries.length === 0) return false;
 
-        const data = processableItems.map((entry) => entry.data[field]);
+        const data = processableEntries.map((entry) => entry.data[field]);
         const finalData = unique ? [...new Set(data)] : data;
         const finalDataStr = finalData.join("\n");
 
