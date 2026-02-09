@@ -1,4 +1,4 @@
-import { EVENT_TYPE } from "./constants.js";
+import { EVENT_TYPE, API_SECRET_KEY } from "./constants.js";
 import { handleColorScheme, debounce, StreamManager } from "./utils.js";
 import { DownloadsTable } from "./downloadsTable.js";
 import { showToast } from "./utils.js";
@@ -60,7 +60,7 @@ async function bulkDelete(ids) {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
-            "X-API-Key": apiKey,
+            "X-API-Key": API_SECRET_KEY,
         },
         body: JSON.stringify({ ids: unique_ids }),
     })
@@ -122,8 +122,6 @@ function handleUpdates(payload) {
 
 // MAIN
 
-const apiKey = window.MEDIA_SERVER_KEY;
-
 const downloadsTableContainer = document.getElementById("downloadsTable");
 const downloadsTable = new DownloadsTable(downloadsTableContainer);
 window.downloadsTable = downloadsTable;
@@ -132,7 +130,10 @@ document.addEventListener("DOMContentLoaded", () => {
     handleColorScheme();
 
     fetch("/api/downloads", {
-        headers: { "Content-Type": "application/json", "X-API-Key": apiKey },
+        headers: {
+            "Content-Type": "application/json",
+            "X-API-Key": API_SECRET_KEY,
+        },
     })
         .then((response) => response.json())
         .then((payload) => {
@@ -140,7 +141,7 @@ document.addEventListener("DOMContentLoaded", () => {
         });
 
     // SSE Listener
-    const stream = new StreamManager(`/api/events?apiKey=${apiKey}`);
+    const stream = new StreamManager(`/api/events?apiKey=${API_SECRET_KEY}`);
     stream.connect(({ type, data }) => {
         switch (type) {
             case EVENT_TYPE.CREATE:

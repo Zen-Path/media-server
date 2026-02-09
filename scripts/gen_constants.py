@@ -4,15 +4,23 @@ import sys
 from enum import Enum
 from pathlib import Path
 
+from dotenv import load_dotenv
 from scripts.media_server.app.constants import DownloadStatus, EventType, MediaType
 
-OUTPUT_FILE = Path("frontend") / "js" / "shared_constants.js"
+BASE_DIR = Path(__file__).resolve().parent
+ENV_PATH = BASE_DIR / ".." / ".env"
+OUTPUT_FILE = BASE_DIR.parent / "shared" / "constants.js"
+
+load_dotenv(dotenv_path=ENV_PATH)
+
 
 # Map the Python object to the desired JavaScript variable name
 CONSTANTS_TO_EXPORT = {
     "DOWNLOAD_STATUS": DownloadStatus,
     "MEDIA_TYPE": MediaType,
     "EVENT_TYPE": EventType,
+    "SERVER_PORT": os.getenv("SERVER_PORT"),
+    "API_SECRET_KEY": os.getenv("API_SECRET_KEY"),
 }
 
 # GENERATOR

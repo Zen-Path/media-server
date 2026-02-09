@@ -1,4 +1,8 @@
-import { MEDIA_TYPE_CONFIG, STATUS_CONFIG } from "./constants.js";
+import {
+    MEDIA_TYPE_CONFIG,
+    STATUS_CONFIG,
+    API_SECRET_KEY,
+} from "./constants.js";
 import { showToast } from "./utils.js";
 
 export const ModalManager = {
@@ -89,7 +93,7 @@ export const ModalManager = {
                 method: "PATCH",
                 headers: {
                     "Content-Type": "application/json",
-                    "X-API-Key": window.MEDIA_SERVER_KEY,
+                    "X-API-Key": API_SECRET_KEY,
                 },
                 body: JSON.stringify(payload),
             });

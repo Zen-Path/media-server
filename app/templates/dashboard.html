@@ -22,9 +22,4 @@ extra_css %} {% endblock %} {% block content %}
 </div>
 
 <div id="downloadsTable"></div>
-{% endblock %} {% block extra_js %}
-<script>
-    // Inject config variables here
-    window.MEDIA_SERVER_KEY = "{{ config.get('MEDIA_SERVER_KEY', '') }}";
-</script>
 {% endblock %}
