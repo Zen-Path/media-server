@@ -16,7 +16,23 @@ const API_DOWNLOAD = `${BASE_URL}/api/media/download`;
 function downloadMedia(urls, mediaType, rangeStart, rangeEnd) {
     showDownloadStatus(DOWNLOAD_STATUS.IN_PROGRESS, false);
 
-    const payload = { urls, mediaType };
+    if (typeof urls !== "object") {
+        alert(`URLs are not valid.`, urls);
+        return;
+    }
+    if (urls.length === 0) {
+        alert(`No URLs were passed.`, urls);
+        return;
+    }
+    if (!urls.every((url) => typeof url === "string")) {
+        alert(`Some passed URLs are invalid`, urls);
+        return;
+    }
+
+    const payload = { urls };
+    if (Number.isInteger(mediaType)) {
+        payload.mediaType = mediaType;
+    }
     if (Number.isInteger(rangeStart)) {
         payload.rangeStart = rangeStart;
     }
@@ -98,7 +114,7 @@ function downloadMedia(urls, mediaType, rangeStart, rangeEnd) {
 function main() {
     GM_registerMenuCommand("Download Media", () => {
         const currentUrl = window.location.href;
-        downloadMedia([currentUrl], null);
+        downloadMedia([currentUrl]);
     });
 
     GM_registerMenuCommand("Open Download Form", async () => {
