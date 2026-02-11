@@ -3,6 +3,7 @@ import { handleColorScheme, debounce, StreamManager } from "./utils.js";
 import { DownloadsTable } from "./downloadsTable.js";
 import { showToast } from "./utils.js";
 import Swal from "sweetalert2";
+import { fetchDownloads } from "./apiService.js";
 
 import "../css/main.css";
 import "../css/dashboard.css";
@@ -100,6 +101,13 @@ function showTableInfo() {
     console.log(downloadsTable.getStatsString());
 }
 
+async function loadTableData() {
+    try {
+        const payload = await fetchDownloads();
+        downloadsTable.add(payload.data);
+    } catch (error) {}
+}
+
 // SSE handles
 
 function handleDeletes(payload) {
@@ -129,16 +137,7 @@ window.downloadsTable = downloadsTable;
 document.addEventListener("DOMContentLoaded", () => {
     handleColorScheme();
 
-    fetch("/api/downloads", {
-        headers: {
-            "Content-Type": "application/json",
-            "X-API-Key": API_SECRET_KEY,
-        },
-    })
-        .then((response) => response.json())
-        .then((payload) => {
-            downloadsTable.add(payload.data);
-        });
+    loadTableData();
 
     // SSE Listener
     const stream = new StreamManager(`/api/events?apiKey=${API_SECRET_KEY}`);
