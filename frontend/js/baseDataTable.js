@@ -247,6 +247,8 @@ export class BaseDataTable {
         const idList = Array.isArray(ids) ? ids : [ids];
         if (idList.length === 0) return;
 
+        let deletedCount = 0;
+
         requestAnimationFrame(() => {
             let selectionChanged = false;
 
@@ -269,6 +271,8 @@ export class BaseDataTable {
                 entry.remove();
 
                 this.entryMap.delete(id);
+
+                deletedCount += 1;
             });
 
             this.entryList = this.entryList.filter((entry) =>
@@ -277,6 +281,8 @@ export class BaseDataTable {
 
             this.updateHeaderCheckbox();
         });
+
+        return deletedCount;
     }
 
     async copyFields(field, unique = true) {
