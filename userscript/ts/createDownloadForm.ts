@@ -1,6 +1,6 @@
 import { MEDIA_TYPE } from "../../shared/constants";
 
-export function createDownloadForm(cssStyleStr) {
+export function createDownloadForm(cssStyleStr: string) {
     const OVERLAY_ID = "gm-url-extractor-overlay";
 
     // Prevent multiple overlays
@@ -27,7 +27,7 @@ export function createDownloadForm(cssStyleStr) {
 
     // HTML
 
-    function generateMediaSelect(targetId) {
+    function generateMediaSelect(targetId: number) {
         const options = Object.entries(MEDIA_TYPE).map(([name, value]) => {
             const isSelected = value === targetId ? "selected" : "";
             // Convert "GALLERY" to "Gallery"
@@ -80,13 +80,21 @@ export function createDownloadForm(cssStyleStr) {
 </div>
 `;
 
-    const urlInput = document.getElementById("gm-url-input");
+    const urlInput = document.getElementById(
+        "gm-url-input"
+    ) as HTMLInputElement;
     const urlLog = document.getElementById("gm-url-log");
-    const rangeStart = document.getElementById("gm-range-start");
-    const rangeEnd = document.getElementById("gm-range-end");
+    const rangeStart = document.getElementById(
+        "gm-range-start"
+    ) as HTMLInputElement;
+    const rangeEnd = document.getElementById(
+        "gm-range-end"
+    ) as HTMLInputElement;
     const btnCancel = document.getElementById("gm-btn-cancel");
     const btnSubmit = document.getElementById("gm-btn-submit");
-    const mediaSelect = document.getElementById("gm-media-select");
+    const mediaSelect = document.getElementById(
+        "gm-media-select"
+    ) as HTMLSelectElement;
 
     // Live URL Counter
     urlInput.addEventListener("input", () => {

@@ -15,10 +15,10 @@ let statusFlashTimer = null;
  * Updates the document title with a status icon and optional flashing effect.
  *
  * After a short timer, the icon remains static.
- * @param {number} statusId - The ID from DOWNLOAD_STATUS
- * @param {boolean} [flash=false] - If true, the icon will flash to grab attention
+ * @param statusId - The ID from DOWNLOAD_STATUS
+ * @param flash - If true, the icon will flash to grab attention
  */
-export function showDownloadStatus(statusId, flash = true) {
+export function showDownloadStatus(statusId: number, flash: boolean = true) {
     // Clear existing flashers
     if (statusFlashTimer) {
         clearInterval(statusFlashTimer);
