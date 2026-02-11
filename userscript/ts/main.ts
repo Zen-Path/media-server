@@ -6,9 +6,9 @@ import {
     DOWNLOAD_STATUS,
     SERVER_PORT,
     API_SECRET_KEY,
-} from "../shared/constants";
+} from "../../shared/constants";
 
-import STYLES from "./style.css?inline";
+import STYLES from "../css/style.css?inline";
 
 const BASE_URL = `http://localhost:${SERVER_PORT}`;
 const API_DOWNLOAD = `${BASE_URL}/api/media/download`;

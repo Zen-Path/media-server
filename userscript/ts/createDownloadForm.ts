@@ -1,4 +1,4 @@
-import { MEDIA_TYPE } from "../shared/constants";
+import { MEDIA_TYPE } from "../../shared/constants";
 
 export function createDownloadForm(cssStyleStr) {
     const OVERLAY_ID = "gm-url-extractor-overlay";

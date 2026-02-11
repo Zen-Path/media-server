@@ -10,7 +10,7 @@ const version = versionMatch ? versionMatch[1] : "0.0.0";
 export default defineConfig({
     plugins: [
         monkey({
-            entry: "userscript/main.ts",
+            entry: "userscript/ts/main.ts",
             userscript: {
                 name: "File Downloader",
                 namespace: "Flexycon",
