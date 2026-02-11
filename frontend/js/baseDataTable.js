@@ -247,50 +247,48 @@ export class BaseDataTable {
         const idList = Array.isArray(ids) ? ids : [ids];
         if (idList.length === 0) return;
 
-        let deletedCount = 0;
+        let deletedIds = [];
+        let selectedCount = 0;
 
-        requestAnimationFrame(() => {
-            let selectedCount = 0;
+        idList.forEach((id) => {
+            const entry = this.entryMap.get(id);
 
-            idList.forEach((id) => {
-                const entry = this.entryMap.get(id);
-
-                if (!entry) {
-                    console.warn(
-                        `Item #${id} could not be deleted: not found.`
-                    );
-                    return;
-                }
-
-                if (entry.isSelected) {
-                    selectedCount += 1;
-                }
-
-                entry.remove();
-                this.entryMap.delete(id);
-
-                deletedCount += 1;
-            });
-
-            this.entryList = this.entryList.filter((entry) =>
-                this.entryMap.has(entry.data.id)
-            );
-
-            // Needed for the following scenario:
-            // - we have 2 rows, one checked, one unchecked
-            // - we delete the unchecked one
-            // Now, all of the rows are checked, which means the header checkbox should
-            // also be checked.
-            if (selectedCount > 0) {
-                this.selectedCount = Math.max(
-                    0,
-                    this.selectedCount - selectedCount
-                );
-                this.updateHeaderCheckbox();
+            if (!entry) {
+                console.warn(`Item #${id} could not be deleted: not found.`);
+                return;
             }
+
+            if (entry.isSelected) {
+                selectedCount += 1;
+            }
+
+            entry.remove();
+            this.entryMap.delete(id);
+
+            deletedIds.push(id);
         });
 
-        return deletedCount;
+        if (deletedIds.length === 0) return [];
+
+        // Sync entryList and entryMap
+        this.entryList = this.entryList.filter((entry) =>
+            this.entryMap.has(entry.data.id)
+        );
+
+        // Needed for the following scenario:
+        // - we have 2 rows, one checked, one unchecked
+        // - we delete the unchecked one
+        // Now, all of the rows are checked, which means the header checkbox should
+        // also be checked.
+        if (selectedCount > 0) {
+            this.selectedCount = Math.max(
+                0,
+                this.selectedCount - selectedCount
+            );
+            this.updateHeaderCheckbox();
+        }
+
+        return deletedIds;
     }
 
     async copyFields(field, unique = true) {
