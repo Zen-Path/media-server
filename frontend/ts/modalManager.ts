@@ -1,9 +1,5 @@
-import {
-    MEDIA_TYPE_CONFIG,
-    STATUS_CONFIG,
-    API_SECRET_KEY,
-} from "./constants.js";
-import { showToast } from "./utils.js";
+import { MEDIA_TYPE_CONFIG, STATUS_CONFIG, API_SECRET_KEY } from "./constants";
+import { showToast } from "./utils";
 
 export const ModalManager = {
     dom: {},

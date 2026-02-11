@@ -1,6 +1,6 @@
-import { MEDIA_TYPE, DOWNLOAD_STATUS } from "../../shared/constants.js";
+import { MEDIA_TYPE, DOWNLOAD_STATUS } from "../../shared/constants";
 
-export * from "../../shared/constants.js";
+export * from "../../shared/constants";
 
 export const VALID_MEDIA_TYPES = Object.values(MEDIA_TYPE);
 

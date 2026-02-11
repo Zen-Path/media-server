@@ -1,7 +1,7 @@
-import { EVENT_TYPE, API_SECRET_KEY } from "./constants.js";
-import { handleColorScheme, debounce, StreamManager } from "./utils.js";
-import { DownloadsTable } from "./downloadsTable.js";
-import { fetchDownloads } from "./apiService.js";
+import { EVENT_TYPE, API_SECRET_KEY } from "./constants";
+import { handleColorScheme, debounce, StreamManager } from "./utils";
+import { DownloadsTable } from "./downloadsTable";
+import { fetchDownloads } from "./apiService";
 
 import "../css/main.css";
 import "../css/dashboard.css";

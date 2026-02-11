@@ -1,4 +1,4 @@
-import { DOWNLOAD_STATUS } from "../shared/constants.js";
+import { DOWNLOAD_STATUS } from "../shared/constants";
 
 // prettier-ignore
 const STATUS_ICONS = Object.freeze({

@@ -1,4 +1,4 @@
-import { copyToClipboard, createIconLabelPair } from "./utils.js";
+import { copyToClipboard, createIconLabelPair } from "./utils";
 
 export class BaseDataTable {
     constructor(container) {

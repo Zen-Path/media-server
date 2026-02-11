@@ -1,5 +1,5 @@
 frontend/static/
-shared/constants.js
+shared/constants.ts
 
 # MacOS files
 .DS_Store

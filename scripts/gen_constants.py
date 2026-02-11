@@ -10,7 +10,7 @@ from app.constants import DownloadStatus, EventType, MediaType
 
 BASE_DIR = Path(__file__).resolve().parent
 ENV_PATH = BASE_DIR / ".." / ".env"
-OUTPUT_FILE = BASE_DIR.parent / "shared" / "constants.js"
+OUTPUT_FILE = BASE_DIR.parent / "shared" / "constants.ts"
 
 load_dotenv(dotenv_path=ENV_PATH)
 

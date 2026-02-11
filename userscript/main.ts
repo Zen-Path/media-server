@@ -1,12 +1,12 @@
 "use strict";
 
-import { createDownloadForm } from "./createDownloadForm.js";
-import { showDownloadStatus } from "./utils.js";
+import { createDownloadForm } from "./createDownloadForm";
+import { showDownloadStatus } from "./utils";
 import {
     DOWNLOAD_STATUS,
     SERVER_PORT,
     API_SECRET_KEY,
-} from "../shared/constants.js";
+} from "../shared/constants";
 
 import STYLES from "./style.css?inline";
 

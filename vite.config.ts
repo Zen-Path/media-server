@@ -13,7 +13,7 @@ export default defineConfig({
 
         // Do not randomize filenames (no hashing)
         rollupOptions: {
-            input: path.resolve(__dirname, "frontend/js/main.js"),
+            input: path.resolve(__dirname, "frontend/ts/main.ts"),
             output: {
                 entryFileNames: "bundle.js",
                 assetFileNames: (assetInfo) => {

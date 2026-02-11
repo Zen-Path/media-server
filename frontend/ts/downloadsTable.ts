@@ -1,17 +1,17 @@
-import { BaseDataRow, BaseDataTable } from "./baseDataTable.js";
+import { BaseDataRow, BaseDataTable } from "./baseDataTable";
 import {
     VALID_MEDIA_TYPES,
     MEDIA_TYPE_CONFIG,
     ColumnData,
     STATUS_CONFIG,
     DOWNLOAD_STATUS,
-} from "./constants.js";
-import { toLocalStandardTime, formatDuration } from "./utils.js";
-import { createMenuTrigger } from "./dropdownHelper.js";
-import { ModalManager } from "./modalManager.js";
-import { copyToClipboard, createIconLabelPair } from "./utils.js";
-import { showToast } from "./utils.js";
-import { handleBulkDelete } from "./controllers.js";
+} from "./constants";
+import { toLocalStandardTime, formatDuration } from "./utils";
+import { createMenuTrigger } from "./dropdownHelper";
+import { ModalManager } from "./modalManager";
+import { copyToClipboard, createIconLabelPair } from "./utils";
+import { showToast } from "./utils";
+import { handleBulkDelete } from "./controllers";
 
 export class DownloadsTable extends BaseDataTable {
     constructor(container) {

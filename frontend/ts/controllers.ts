@@ -1,5 +1,5 @@
-import { deleteDownloads } from "./apiService.js";
-import { showToast } from "./utils.js";
+import { deleteDownloads } from "./apiService";
+import { showToast } from "./utils";
 import Swal from "sweetalert2";
 
 export async function handleBulkDelete(ids) {

@@ -1,4 +1,4 @@
-import { API_SECRET_KEY } from "./constants.js";
+import { API_SECRET_KEY } from "./constants";
 
 /**
  * Fetches the list of downloads from the API.

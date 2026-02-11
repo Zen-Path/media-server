@@ -1,0 +1,15 @@
+{
+    "compilerOptions": {
+        "allowJs": true, // temp
+        "checkJs": false,
+        "esModuleInterop": true,
+        "forceConsistentCasingInFileNames": true,
+        "module": "ESNext",
+        "moduleResolution": "Node",
+        "skipLibCheck": true,
+        "strict": false, // temp
+        "target": "ESNext",
+        "types": ["tampermonkey"] // Tells VS Code about GM_ functions
+    },
+    "include": ["frontend", "userscript", "vite.config.*"]
+}
