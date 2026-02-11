@@ -1,8 +1,6 @@
 import { EVENT_TYPE, API_SECRET_KEY } from "./constants.js";
 import { handleColorScheme, debounce, StreamManager } from "./utils.js";
 import { DownloadsTable } from "./downloadsTable.js";
-import { showToast } from "./utils.js";
-import Swal from "sweetalert2";
 import { fetchDownloads } from "./apiService.js";
 
 import "../css/main.css";
@@ -37,66 +35,6 @@ function clearSearch() {
     input.focus();
 }
 
-async function bulkDelete(ids) {
-    if (ids.length === 0) {
-        showToast("No entries selected or visible to delete.", "warning");
-        return false;
-    }
-
-    const result = await Swal.fire({
-        title: "Are you sure?",
-        text: `You are about to delete ${ids.length} entries. This cannot be undone.`,
-        icon: "warning",
-        showCancelButton: true,
-        confirmButtonText: "Yes, delete them!",
-    });
-
-    if (!result.isConfirmed) {
-        return false;
-    }
-
-    const unique_ids = [...new Set(ids)];
-
-    fetch("/api/bulkDelete", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-            "X-API-Key": API_SECRET_KEY,
-        },
-        body: JSON.stringify({ ids: unique_ids }),
-    })
-        .then((res) => res.json())
-        .then((payload) => {
-            if (!payload.status) {
-                console.error("Bulk delete failed entirely:", payload);
-                showToast(
-                    `Could not delete entries: ${payload.error || "Unknown error"}`,
-                    "error"
-                );
-                return false;
-            }
-
-            downloadsTable.deleteEntries(payload.data.ids);
-            showToast(
-                `Successfully deleted ${payload.data.ids.length} entries.`,
-                "success"
-            );
-
-            const countDiff = unique_ids.length - payload.data.ids.length;
-            if (countDiff > 0) {
-                console.warn(`Failed to delete ${countDiff} entries.`);
-                showToast(`Could not delete ${countDiff} entries.`, "warning");
-            }
-
-            return true;
-        })
-        .catch((err) => {
-            showToast(`Could not delete entries: ${err}.`, "error");
-            console.error("Network or server error:", err);
-            return false;
-        });
-}
-
 function showTableInfo() {
     console.log(downloadsTable.getStatsString());
 }
@@ -109,10 +47,6 @@ async function loadTableData() {
 }
 
 // SSE handles
-
-function handleDeletes(payload) {
-    downloadsTable.deleteEntries(payload.ids);
-}
 
 function handleUpdates(payload) {
     payload.forEach((entryData) => {
@@ -152,7 +86,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 break;
 
             case EVENT_TYPE.DELETE:
-                handleDeletes(data);
+                downloadsTable.deleteEntries(data.ids);
                 break;
 
             default:
@@ -160,7 +94,6 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 
-    window.bulkDelete = bulkDelete;
     window.filterTable = filterTable;
     window.clearSearch = clearSearch;
     window.showTableInfo = showTableInfo;

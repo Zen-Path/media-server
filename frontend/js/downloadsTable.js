@@ -11,6 +11,7 @@ import { createMenuTrigger } from "./dropdownHelper.js";
 import { ModalManager } from "./modalManager.js";
 import { copyToClipboard, createIconLabelPair } from "./utils.js";
 import { showToast } from "./utils.js";
+import { handleBulkDelete } from "./controllers.js";
 
 export class DownloadsTable extends BaseDataTable {
     constructor(container) {
@@ -120,7 +121,7 @@ export class DownloadsTable extends BaseDataTable {
                     const ids = this.getProcessableEntries().map(
                         (item) => item.data.id
                     );
-                    window.bulkDelete(ids);
+                    handleBulkDelete(ids);
                 },
             },
         ];
@@ -445,7 +446,7 @@ export class DownloadRow extends BaseDataRow {
                 icon: "fa-trash",
                 className: "text-danger",
                 onClick: () => {
-                    window.bulkDelete([this.data.id]);
+                    handleBulkDelete([this.data.id]);
                 },
             },
         ];
