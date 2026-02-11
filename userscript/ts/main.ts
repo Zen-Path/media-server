@@ -13,34 +13,33 @@ import STYLES from "../css/style.css?inline";
 const BASE_URL = `http://localhost:${SERVER_PORT}`;
 const API_DOWNLOAD = `${BASE_URL}/api/media/download`;
 
-function downloadMedia(urls, mediaType, rangeStart, rangeEnd) {
+interface DownloadPayload {
+    urls: string[];
+    mediaType?: number;
+    rangeStart?: number;
+    rangeEnd?: number;
+}
+
+interface MediaEntry {
+    status: boolean;
+    [key: string]: any; // Allows any other fields
+}
+
+function downloadMedia(
+    urls: string[],
+    mediaType?: number,
+    rangeStart?: number,
+    rangeEnd?: number
+) {
     showDownloadStatus(DOWNLOAD_STATUS.IN_PROGRESS, false);
 
-    if (typeof urls !== "object") {
-        alert(`URLs are not valid.`, urls);
-        return;
-    }
-    if (urls.length === 0) {
-        alert(`No URLs were passed.`, urls);
-        return;
-    }
-    if (!urls.every((url) => typeof url === "string")) {
-        alert(`Some passed URLs are invalid`, urls);
+    if (!Array.isArray(urls) || urls.length === 0) {
+        alert("Invalid or empty URLs array provided.");
+        console.error("Invalid URLs: ", urls);
         return;
     }
 
-    const payload = { urls };
-    if (Number.isInteger(mediaType)) {
-        payload.mediaType = mediaType;
-    }
-    if (Number.isInteger(rangeStart)) {
-        payload.rangeStart = rangeStart;
-    }
-    if (Number.isInteger(rangeEnd)) {
-        payload.rangeEnd = rangeEnd;
-    }
-
-    const requestData = JSON.stringify(payload);
+    const payload: DownloadPayload = { urls, mediaType, rangeStart, rangeEnd };
 
     GM_xmlhttpRequest({
         method: "POST",
@@ -49,7 +48,7 @@ function downloadMedia(urls, mediaType, rangeStart, rangeEnd) {
             "Content-Type": "application/json",
             "X-API-Key": API_SECRET_KEY,
         },
-        data: requestData,
+        data: JSON.stringify(payload),
         onload: function (response) {
             if (response.status < 200 || response.status > 300) {
                 console.warn(":: Response info", response);
@@ -59,7 +58,7 @@ function downloadMedia(urls, mediaType, rangeStart, rangeEnd) {
 
             try {
                 const responseData = JSON.parse(response.responseText);
-                const entries = responseData.data || [];
+                const entries = (responseData.data as MediaEntry[]) || [];
 
                 console.log(":: Download response", responseData);
 
