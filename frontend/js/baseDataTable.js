@@ -250,7 +250,7 @@ export class BaseDataTable {
         let deletedCount = 0;
 
         requestAnimationFrame(() => {
-            let selectionChanged = false;
+            let selectedCount = 0;
 
             idList.forEach((id) => {
                 const entry = this.entryMap.get(id);
@@ -262,14 +262,11 @@ export class BaseDataTable {
                     return;
                 }
 
-                // Update selection count if necessary
                 if (entry.isSelected) {
-                    this.selectedCount = Math.max(0, this.selectedCount - 1);
-                    selectionChanged = true;
+                    selectedCount += 1;
                 }
 
                 entry.remove();
-
                 this.entryMap.delete(id);
 
                 deletedCount += 1;
@@ -279,7 +276,18 @@ export class BaseDataTable {
                 this.entryMap.has(entry.data.id)
             );
 
-            this.updateHeaderCheckbox();
+            // Needed for the following scenario:
+            // - we have 2 rows, one checked, one unchecked
+            // - we delete the unchecked one
+            // Now, all of the rows are checked, which means the header checkbox should
+            // also be checked.
+            if (selectedCount > 0) {
+                this.selectedCount = Math.max(
+                    0,
+                    this.selectedCount - selectedCount
+                );
+                this.updateHeaderCheckbox();
+            }
         });
 
         return deletedCount;
