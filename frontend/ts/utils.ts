@@ -1,13 +1,12 @@
 import Swal from "sweetalert2";
+import { SweetAlertIcon } from "sweetalert2";
 
 /**
  * Copies text to clipboard with fallback and returns success status.
- * @param {any} data
- * @returns {Promise<boolean>}
  */
-export async function copyToClipboard(data) {
+export async function copyToClipboard(data: any): Promise<boolean> {
     // Convert everything to a string
-    let text;
+    let text: string;
 
     // Handle Object/Array serialization
     if (typeof data === "object" && data !== null) {
@@ -48,7 +47,7 @@ const DATE_FORMATTER = new Intl.DateTimeFormat("sv-SE", {
  * Formats a Unix timestamp (seconds) to YYYY-MM-DD HH:mm:ss
  * Returns "-" if the input is null or invalid.
  */
-export function toLocalStandardTime(timestamp) {
+export function toLocalStandardTime(timestamp: number) {
     if (typeof timestamp !== "number") return "-";
 
     // Convert seconds to milliseconds
@@ -62,7 +61,7 @@ export function toLocalStandardTime(timestamp) {
     return DATE_FORMATTER.format(date);
 }
 
-export function formatDuration(ms) {
+export function formatDuration(ms: number) {
     if (!ms || isNaN(ms)) return "0s";
 
     const seconds = Math.floor(ms / 1000);
@@ -121,19 +120,23 @@ export function handleColorScheme() {
 
 /**
  * Generates a standardized Icon + Label container.
- * @param {Object} options - Configuration for the pair.
- * @param {string} options.icon - Space-separated FontAwesome classes (e.g., "fa-clock").
- * @param {string} options.label - The text to display.
- * @param {Array<string>} [options.extraClasses] - Additional classes for the container.
- * @param {string} [options.title] - Optional tooltip.
- * @returns {HTMLElement}
+ * @param options - Configuration for the pair.
+ * @param options.icon - Space-separated FontAwesome classes (e.g., "fa-clock").
+ * @param options.label - The text to display.
+ * @param [options.extraClasses] - Additional classes for the container.
+ * @param [options.title] - Optional tooltip.
  */
 export function createIconLabelPair({
     icon,
     label,
     extraClasses = [],
     title = "",
-}) {
+}: {
+    icon: string;
+    label: string;
+    extraClasses?: Array<string>;
+    title?: string;
+}): HTMLElement {
     const container = document.createElement("div");
     container.classList.add("icon-label-group", ...extraClasses);
     if (title) container.title = title;
@@ -151,7 +154,10 @@ export function createIconLabelPair({
 }
 
 export class StreamManager {
-    constructor(url) {
+    url: string;
+    source: EventSource;
+
+    constructor(url: string) {
         this.url = url;
         this.source = null;
     }
@@ -196,7 +202,7 @@ const Toast = Swal.mixin({
     },
 });
 
-export function showToast(message, icon = "success") {
+export function showToast(message: string, icon: SweetAlertIcon = "success") {
     Toast.fire({
         icon: icon,
         title: message,
