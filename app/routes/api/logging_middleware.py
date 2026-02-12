@@ -68,23 +68,24 @@ def log_response(response):
 
     duration = time.time() - g.get("start_time", time.time())
 
-    max_response_length = 1000
     try:
         if response.is_json:
             json_data = response.get_json()
-            json_fmt = json.dumps(json_data, indent=4, ensure_ascii=False)
+            data_fmt = json.dumps(json_data, indent=4, ensure_ascii=False)
         else:
-            json_fmt = response.get_data(as_text=True)
-            if len(json_fmt) > max_response_length:
-                json_fmt = json_fmt[:max_response_length] + "... (truncated)"
+            data_fmt = response.get_data(as_text=True)
 
     except Exception:
-        json_fmt = "<Unreadable Response>"
+        data_fmt = "<Unreadable Response>"
+
+    max_response_length = 1000
+    if len(data_fmt) > max_response_length:
+        data_fmt = data_fmt[:max_response_length] + "\n... (truncated)"
 
     logger.info(
         f"{Fore.LIGHTYELLOW_EX}RESPONSE{Fore.LIGHTBLACK_EX}: "
         f"{request.method} {request.path} (duration: {duration:.4f}s):\n"
-        f"{json_fmt}{Style.RESET_ALL}\n"
+        f"{data_fmt}{Style.RESET_ALL}"
     )
 
     return response
