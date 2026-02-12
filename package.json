@@ -5,13 +5,16 @@
         "prettier-plugin-sort-json": "^4.2.0",
         "typescript": "^5.9.3",
         "vite": "^7.3.1",
-        "vite-plugin-monkey": "^7.1.9"
+        "vite-plugin-monkey": "^7.1.9",
+        "vitest": "^4.0.18"
     },
     "scripts": {
         "gen": "python scripts/gen_constants.py",
         "build:frontend": "npm run gen && vite build",
         "build:userscript": "npm run gen && vite build --config vite.config.userscript.ts",
-        "watch": "npm run gen && vite build --watch"
+        "watch": "npm run gen && vite build --watch",
+        "tests": "vitest --root .",
+        "tests:run": "vitest run --root ."
     },
     "dependencies": {
         "sweetalert2": "^11.26.18"
