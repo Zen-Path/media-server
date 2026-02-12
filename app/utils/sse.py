@@ -2,6 +2,8 @@ import json
 import queue
 from typing import Any, Dict, List
 
+from colorama import Fore, Style
+
 from app.constants import EventType
 from app.utils.logger import logger
 from app.utils.tools import recursive_camelize
@@ -32,7 +34,10 @@ class MessageAnnouncer:
         raw_msg = {"type": event_type.value, "data": payload}
         camel_msg = recursive_camelize(raw_msg)
 
-        logger.debug(f"Announcement: {camel_msg}")
+        logger.info(
+            f"{Fore.LIGHTBLUE_EX}ANNOUNCEMENT:\n{Fore.LIGHTBLACK_EX}"
+            f"{json.dumps(camel_msg, indent=4)}{Style.RESET_ALL}"
+        )
 
         # SSE Standard format: "data: <json>\n\n"
         msg_fmt = f"data: {json.dumps(camel_msg)}\n\n"
