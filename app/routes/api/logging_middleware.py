@@ -48,7 +48,9 @@ def log_request():
     except Exception:
         body = "<Unparseable Body>"
 
-    output_lines = [f"{Fore.LIGHTBLUE_EX}REQUEST{Fore.LIGHTBLACK_EX}:"]
+    # TODO: add helper that will trim to length and apply consistent trimmed style
+
+    output_lines = []
     if params:
         output_lines.append(f"params: {json.dumps(params, indent=4)}")
 
@@ -56,9 +58,13 @@ def log_request():
         data_fmt = (
             json.dumps(body, indent=4) if isinstance(body, (dict, list)) else body
         )
-        output_lines.append(f"body: {data_fmt}{Style.RESET_ALL}")
+        output_lines.append(f"body: {data_fmt}")
 
-    logger.info("\n".join(output_lines))
+    if output_lines:
+        logger.info(
+            f"{Fore.LIGHTBLUE_EX}REQUEST:{Fore.LIGHTBLACK_EX}\n"
+            f"{'\n'.join(output_lines)}{Style.RESET_ALL}"
+        )
 
 
 @bp.after_request
@@ -83,7 +89,7 @@ def log_response(response):
         data_fmt = data_fmt[:max_response_length] + "\n... (truncated)"
 
     logger.info(
-        f"{Fore.LIGHTYELLOW_EX}RESPONSE{Fore.LIGHTBLACK_EX}: "
+        f"{Fore.LIGHTYELLOW_EX}RESPONSE: {Fore.LIGHTBLACK_EX}"
         f"{request.method} {request.path} (duration: {duration:.4f}s):\n"
         f"{data_fmt}{Style.RESET_ALL}"
     )
