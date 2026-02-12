@@ -100,6 +100,8 @@
     gap: 10px;
 }
 
+/* TODO: Apply style to all buttons in the button group */
+#refreshData,
 #tableInfo,
 #themeToggle {
     cursor: pointer;
@@ -116,6 +118,7 @@
     transition: all 0.2s;
 }
 
+#refreshData:hover,
 #tableInfo:hover,
 #themeToggle:hover {
     background-color: var(--bg-hover);

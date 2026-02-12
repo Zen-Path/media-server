@@ -1,5 +1,5 @@
 import { EVENT_TYPE, API_SECRET_KEY } from "./constants";
-import { handleColorScheme, debounce, StreamManager } from "./utils";
+import { handleColorScheme, debounce, StreamManager, showToast } from "./utils";
 import { DownloadsTable } from "./downloadsTable";
 import { fetchDownloads } from "./apiService";
 
@@ -44,6 +44,12 @@ async function loadTableData() {
         const payload = await fetchDownloads();
         downloadsTable.add(payload.data);
     } catch (error) {}
+}
+
+function refreshData() {
+    // TODO: add a refreshData method to the data table
+    loadTableData();
+    showToast("Table data refreshed!", "success");
 }
 
 // SSE handles
@@ -96,5 +102,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
     window.filterTable = filterTable;
     window.clearSearch = clearSearch;
+    window.refreshData = refreshData;
     window.showTableInfo = showTableInfo;
 });
