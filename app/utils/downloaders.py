@@ -61,38 +61,43 @@ class Gallery(Media):
         cmd_result = run_command(command)
 
         report = DownloadReportItem()
-        report.output = cmd_result.output
+
+        lines = cmd_result.output.splitlines()
+        filtered_output = []
+
+        # Extract files & clean output
+        for line in lines:
+            line = line.strip()
+            if not line:
+                continue
+
+            if line.startswith(("/", "./", "# ")):
+                clean_path = line.lstrip("# ").strip()
+                report.files.append(clean_path)
+            else:
+                # Keep non-file lines for the log
+                filtered_output.append(line)
+
+        report.output = "\n".join(filtered_output)
 
         if cmd_result.return_code != 0:
             report.status = False
             report.error = (
                 f"[gallery-dl] System command failed (Code {cmd_result.return_code})"
             )
-            return report
 
-        report.status = True
-
-        for line in report.output.splitlines():
-            line = line.strip()
-            if not line:
-                continue
-
-            # CHeck for downloaded files
-            if line.startswith(("/", "./", "# ")):
-                clean_path = line.lstrip("# ").strip()
-                report.files.append(clean_path)
-                continue
-
-            # Check for known error patterns
+        # Known error patterns should override the generic "system failed" error
+        for line in lines:
             for pattern, handler in cls.ERROR_PATTERNS:
                 if re.search(pattern, line):
                     report.status = False
 
                     if callable(handler):
-                        report.error = str(handler(line))  # str for mypy
+                        report.error = str(handler(line))
                     else:
                         report.error = str(handler)
 
+                    # If we matched a specific error, return immediately
                     return report
 
         return report
