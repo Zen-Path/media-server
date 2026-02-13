@@ -1,13 +1,13 @@
 from marshmallow import Schema, fields, validate
 
-from app.schemas import DownloadStatusField, MediaTypeField
+from app.schemas import DownloadStatusField, MediaTypeField, TitleField
 
 
 class DownloadUpdateSchema(Schema):
     """Validates a single update entry."""
 
     id = fields.Int(required=True, strict=True)
-    title = fields.Str(allow_none=True)
+    title = TitleField()
     media_type = MediaTypeField()
     status = DownloadStatusField()
 

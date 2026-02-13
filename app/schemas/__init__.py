@@ -3,6 +3,14 @@ from marshmallow import fields, validate
 from app.constants import DownloadStatus, MediaType
 
 
+class TitleField(fields.Str):
+    """A reusable field for title validation."""
+
+    def __init__(self, **kwargs):
+        kwargs.setdefault("allow_none", True)
+        super().__init__(**kwargs)
+
+
 class MediaTypeField(fields.Int):
     """A reusable field for MediaType validation and formatting."""
 
