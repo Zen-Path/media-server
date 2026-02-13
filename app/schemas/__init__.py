@@ -30,3 +30,12 @@ class DownloadStatusField(fields.Int):
         kwargs.setdefault("validate", validate.OneOf([e.value for e in DownloadStatus]))
         kwargs.setdefault("strict", True)
         super().__init__(**kwargs)
+
+
+class RangeField(fields.Int):
+    """A reusable field for range validation."""
+
+    def __init__(self, **kwargs):
+        kwargs.setdefault("load_default", None)
+        kwargs.setdefault("strict", True)
+        super().__init__(**kwargs)

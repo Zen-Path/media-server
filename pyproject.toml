@@ -42,7 +42,7 @@ description = "A script that handles download requests for URLs."
 name = "media_server"
 readme = "README.md"
 requires-python = ">=3.12"
-version = "5.2.0"
+version = "5.3.0"
 
 [tool.setuptools.packages.find]
 where = ["."]

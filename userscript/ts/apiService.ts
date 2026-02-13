@@ -34,7 +34,13 @@ export function downloadMedia(
         return;
     }
 
-    const payload: DownloadPayload = { urls, mediaType, rangeStart, rangeEnd };
+    const payload = {
+        items: urls.map((url) => {
+            return { url, mediaType };
+        }),
+        rangeStart,
+        rangeEnd,
+    };
 
     GM_xmlhttpRequest({
         method: "POST",

@@ -25,7 +25,7 @@ def test_simple_download(client, auth_headers):
         mock_get.return_value.status_code = 200
         mock_get.return_value.text = f"<html><title>{mock_title}</title></html>"
 
-        payload = {"urls": [mock_url], "mediaType": MediaType.VIDEO}
+        payload = {"items": [{"url": mock_url, "mediaType": MediaType.VIDEO}]}
         response = client.post(API_DOWNLOAD, headers=auth_headers, json=payload)
         assert response.status_code == 200
 
@@ -58,7 +58,7 @@ def test_stress(client, auth_headers):
         res = client.post(
             API_DOWNLOAD,
             headers=auth_headers,
-            json={"urls": [unique_url], "mediaType": MediaType.IMAGE},
+            json={"items": [{"url": unique_url, "mediaType": MediaType.IMAGE}]},
         )
         assert res.status_code == 200
 
@@ -69,25 +69,36 @@ def test_stress(client, auth_headers):
 @pytest.mark.parametrize(
     "payload, error_msg",
     [
-        ({}, "missing data for required field"),
-        ({"urls": None}, "field may not be null"),
-        ({"urls": "123"}, "not a valid list"),
+        ({}, "missing json payload"),
+        ({"items": []}, "shorter than minimum length"),
+        ({"items": [{"url": None}]}, "field may not be null"),
+        ({"items": [{"url": "123"}]}, "not a valid url"),
         (
-            {"urls": ["https://example.com"], "mediaType": "Image"},
+            {"items": [{"url": "https://example.com", "mediaType": "Image"}]},
             "not a valid integer",
         ),
-        ({"urls": ["https://example.com"], "mediaType": -1}, "must be one of"),
         (
-            {"urls": ["https://example.com"], "media_type": MediaType.IMAGE},
+            {"items": [{"url": "https://example.com", "mediaType": -1}]},
+            "must be one of",
+        ),
+        (
+            {"items": [{"url": "https://example.com", "media_type": MediaType.IMAGE}]},
             "unknown field",
         ),
-        ({"urls": ["https://example.com"], "rangeStart": "123"}, "not a valid integer"),
-        ({"urls": ["https://example.com"], "rangeEnd": "123"}, "not a valid integer"),
+        (
+            {"items": [{"url": "https://example.com"}], "rangeStart": "123"},
+            "not a valid integer",
+        ),
+        (
+            {"items": [{"url": "https://example.com"}], "rangeEnd": "123"},
+            "not a valid integer",
+        ),
     ],
     ids=[
-        "urls_missing",
-        "urls_none",
-        "urls_wrong_type",
+        "items_missing",
+        "items_empty",
+        "url_none",
+        "url_wrong_type",
         "media_type_wrong_type",
         "media_type_negative_id",
         "field_snake_case",
@@ -111,10 +122,12 @@ def test_initial_recording_deduplication(mock_start, client, auth_headers):
     mock_start.return_value = (True, 1, None)
     urls = ["http://dup.com", "http://dup.com", "http://unique.com"]
 
+    items_data = [{"url": url, "mediaType": MediaType.IMAGE} for url in urls]
+
     client.post(
         API_DOWNLOAD,
         headers=auth_headers,
-        json={"urls": urls, "mediaType": MediaType.IMAGE},
+        json={"items": items_data},
     )
 
     # Should only be called twice because of the set()
@@ -140,7 +153,7 @@ def test_gallery_expansion_flow(
     mock_response.text = "<html><title>Test Page</title></html>"
     mock_get.return_value = mock_response
 
-    payload = {"urls": [parent_url], "mediaType": MediaType.GALLERY}
+    payload = {"items": [{"url": parent_url, "mediaType": MediaType.GALLERY}]}
     resp_data = client.post(API_DOWNLOAD, headers=auth_headers, json=payload)
 
     data = resp_data.get_json()
@@ -164,7 +177,7 @@ def test_title_scrape_failure_handling(mock_gallery, mock_get, client, auth_head
     res = client.post(
         API_DOWNLOAD,
         headers=auth_headers,
-        json={"urls": [url], "mediaType": MediaType.IMAGE},
+        json={"items": [{"url": url, "mediaType": MediaType.IMAGE}]},
     )
 
     data = res.get_json()
@@ -185,7 +198,7 @@ def test_gallery_dl_failure_reporting(mock_gallery, client, auth_headers):
     resp_data = client.post(
         API_DOWNLOAD,
         headers=auth_headers,
-        json={"urls": [url], "mediaType": MediaType.GALLERY},
+        json={"items": [{"url": url, "mediaType": MediaType.GALLERY}]},
     )
 
     data = resp_data.get_json()
@@ -210,7 +223,7 @@ def test_gallery_dl_failure_patterns(mock_gallery, client, auth_headers):
     resp_data = client.post(
         API_DOWNLOAD,
         headers=auth_headers,
-        json={"urls": [url], "mediaType": MediaType.GALLERY},
+        json={"items": [{"url": url, "mediaType": MediaType.GALLERY}]},
     )
 
     data = resp_data.get_json()
@@ -235,7 +248,7 @@ def test_return_files(mock_gallery, client, auth_headers):
     res = client.post(
         API_DOWNLOAD,
         headers=auth_headers,
-        json={"urls": [url], "mediaType": MediaType.GALLERY},
+        json={"items": [{"url": url, "mediaType": MediaType.GALLERY}]},
     )
 
     data = res.get_json()

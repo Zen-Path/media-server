@@ -15,18 +15,20 @@ from app.services.download_service import (
 )
 from app.utils.api_response import api_response
 from app.utils.downloaders import Gallery
+from app.utils.logger import logger
 from app.utils.scraper import expand_collection_urls, scrape_title
 from app.utils.tools import DownloadReportItem
 
 
 @bp.route("/media/download", methods=["POST"])
 def download_media():
-    json_data = request.get_json()
+    json_data = request.get_json(silent=True)
+    if not json_data:
+        return api_response(error="Missing JSON payload", status_code=400)
 
     try:
         data = DownloadRequestSchema().load(json_data)
-        urls = data["urls"]
-        media_type = data.get("media_type")
+        items = data["items"]
         range_start = data.get("range_start")
         range_end = data.get("range_end")
 
@@ -35,69 +37,86 @@ def download_media():
 
     report: Dict[str, DownloadReportItem] = {}
 
+    # DEDUPLICATION
+
+    # First URL seen wins. Any subsequent duplicates are ignored.
+    unique_items = {}
+    for item in items:
+        url = item["url"]
+        if url not in unique_items:
+            unique_items[url] = item
+
     # INITIAL RECORDING
 
     # We store the initial batch to ensure we have a "paper trail"
     initial_queue = []
-    for url in list(set(urls)):
-        success, download_id, error = initialize_download(url, media_type)
+    for url, item_data in unique_items.items():
+        item_media_type = item_data.get("media_type")
+        provided_title = item_data.get("title")
+
+        success, download_id, error = initialize_download(url, item_media_type)
         report[url] = DownloadReportItem(url=url, status=success, error=error)
 
         if success:
-            initial_queue.append((download_id, url))
+            initial_queue.append((download_id, url, item_media_type, provided_title))
 
     # EXPANSION
 
     final_processing_queue = []
-    seen_urls = set()
+    seen_urls = set(unique_items.keys())
 
-    if not media_type or media_type == MediaType.GALLERY:
-        for parent_id, parent_url in initial_queue:
-            seen_urls.add(parent_url)
-            expanded_urls = expand_collection_urls(parent_url)
+    for parent_id, parent_url, item_media_type, item_title in initial_queue:
+        if item_media_type and item_media_type != MediaType.GALLERY:
+            # Non-gallery types will never expand
+            final_processing_queue.append(
+                (parent_id, parent_url, item_media_type, item_title)
+            )
+            continue
 
-            if not expanded_urls:
-                final_processing_queue.append((parent_id, parent_url))
+        expanded_urls = expand_collection_urls(parent_url)
+
+        if not expanded_urls:
+            final_processing_queue.append(
+                (parent_id, parent_url, item_media_type, item_title)
+            )
+            continue
+
+        report[parent_url].log += f" Expanded into {len(expanded_urls)} items."
+
+        for child_url in expanded_urls:
+            if child_url in seen_urls:
                 continue
 
-            report[parent_url].log += f" Expanded into {len(expanded_urls)} items."
+            child_success, child_id, child_error = initialize_download(
+                child_url, item_media_type
+            )
 
-            for child_url in expanded_urls:
-                if child_url in seen_urls:
-                    continue
+            # Regardless of success status, we want to keep track of the url,
+            # since if it fails and multiple parents expand into lists containing
+            # this url, we would keep re-trying to add it to the db. Retries should
+            # be a user initiated action.
+            seen_urls.add(child_url)
 
-                child_success, child_id, child_error = initialize_download(
-                    child_url, media_type
+            report[child_url] = DownloadReportItem(
+                url=child_url,
+                status=child_success,
+                error=child_error,
+                log=f"Child of #{parent_id}",
+            )
+
+            if child_success:
+                final_processing_queue.append(
+                    (child_id, child_url, item_media_type, None)
                 )
-
-                # Regardless of success status, we want to keep track of the url,
-                # since if it fails and multiple parents expand into lists containing
-                # this url, we would keep re-trying to add it to the db. Retries should
-                # be a user initiated action.
-                seen_urls.add(child_url)
-
-                report[child_url] = DownloadReportItem(
-                    url=child_url,
-                    status=child_success,
-                    error=child_error,
-                    log=f"Child of #{parent_id}",
-                )
-
-                if child_success:
-                    final_processing_queue.append((child_id, child_url))
-
-    else:
-        # Non-gallery types will never expand
-        final_processing_queue = initial_queue
 
     # PROCESSING
 
-    for download_id, url in final_processing_queue:
-        title = scrape_title(url)
+    for download_id, url, item_media_type, provided_title in final_processing_queue:
+        title = provided_title if provided_title else scrape_title(url)
 
         # Download
         try:
-            match media_type:
+            match item_media_type:
                 case MediaType.GALLERY | None:
                     report_result = Gallery.download([url], range_start, range_end)
                     report[url].output = report_result.output
@@ -106,6 +125,8 @@ def download_media():
                     report[url].files = report_result.files
 
         except Exception as e:
+            logger.exception(e)
+
             report[url].status = False
             report[url].error = str(e)
 

@@ -32,7 +32,7 @@ def test_download_announcements(client, announcer, auth_headers):
         with patch("app.utils.downloaders.Gallery.download") as mock_dl:
             mock_dl.return_value = DownloadReportItem(status=True)
 
-            payload = {"urls": [target_url], "mediaType": target_media_type}
+            payload = {"items": [{"url": target_url, "mediaType": target_media_type}]}
             res = client.post(API_DOWNLOAD, headers=auth_headers, json=payload)
             assert res.status_code == 200
 
