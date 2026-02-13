@@ -156,6 +156,6 @@ def expand_collection_urls(url: str, depth: int = 0) -> List[str]:
 
         return list(dict.fromkeys(child_urls))
 
-    except Exception as e:
-        logger.warning(f"Expansion error for {url}: {e}")
+    except Exception:
+        logger.exception(f"Expansion error for {url}")
         return []
