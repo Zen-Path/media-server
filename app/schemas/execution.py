@@ -1,16 +1,11 @@
 from marshmallow import Schema, fields, validate
 
-from app.constants import MediaType
+from app.schemas import MediaTypeField
 
 
 class DownloadRequestSchema(Schema):
     urls = fields.List(fields.Str(), required=True, validate=validate.Length(min=1))
-    media_type = fields.Int(
-        data_key="mediaType",
-        allow_none=True,
-        validate=validate.OneOf([e.value for e in MediaType]),
-        strict=True,
-    )
+    media_type = MediaTypeField()
     range_start = fields.Int(
         data_key="rangeStart",
         load_default=None,

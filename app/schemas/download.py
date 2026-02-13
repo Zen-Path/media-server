@@ -1,27 +1,15 @@
 from marshmallow import Schema, fields, validate
 
-from app.constants import DownloadStatus, MediaType
+from app.schemas import DownloadStatusField, MediaTypeField
 
 
 class DownloadUpdateSchema(Schema):
-    """
-    Validates a single update entry.
-    """
+    """Validates a single update entry."""
 
     id = fields.Int(required=True, strict=True)
     title = fields.Str(allow_none=True)
-
-    media_type = fields.Int(
-        data_key="mediaType",
-        allow_none=True,
-        validate=validate.OneOf([e.value for e in MediaType]),
-        strict=True,
-    )
-    status = fields.Int(
-        allow_none=True,
-        validate=validate.OneOf([e.value for e in DownloadStatus]),
-        strict=True,
-    )
+    media_type = MediaTypeField()
+    status = DownloadStatusField()
 
 
 class BulkDeleteSchema(Schema):
