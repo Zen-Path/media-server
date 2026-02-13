@@ -23,6 +23,7 @@ def test_download_announcements(client, announcer, auth_headers):
 
     # Define expected data
     target_url = "http://gallery.com"
+    target_media_type = MediaType.GALLERY
     mock_title = "SSE Gallery"
 
     with patch("app.routes.api.media.scrape_title") as mock_scrape:
@@ -31,7 +32,7 @@ def test_download_announcements(client, announcer, auth_headers):
         with patch("app.utils.downloaders.Gallery.download") as mock_dl:
             mock_dl.return_value = DownloadReportItem(status=True)
 
-            payload = {"urls": [target_url], "mediaType": MediaType.GALLERY}
+            payload = {"urls": [target_url], "mediaType": target_media_type}
             res = client.post(API_DOWNLOAD, headers=auth_headers, json=payload)
             assert res.status_code == 200
 
@@ -46,7 +47,7 @@ def test_download_announcements(client, announcer, auth_headers):
 
     assert create_data["id"] is not None
     assert create_data["url"] == target_url
-    assert create_data["mediaType"] == payload["mediaType"]
+    assert create_data["mediaType"] == target_media_type
     assert isinstance(create_data["startTime"], int)
 
     # Expect UPDATE
