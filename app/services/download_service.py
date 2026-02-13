@@ -109,48 +109,48 @@ def bulk_delete_downloads(ids: List[int]) -> List[int]:
 
 def initialize_download(
     url: str, media_type: Optional[int]
-) -> Tuple[bool, Optional[int], Optional[str]]:
+) -> Tuple[bool, Optional[str], Optional[Dict[str, Any]]]:
     """
     Initializes a download record and announces it.
 
     Returns:
-        A tuple of (success_status, generated_id, error_message).
+        A tuple of (success_status, error_message, record_dict).
     """
     try:
         record = Download(url=url, media_type=media_type)
         db.session.add(record)
         db.session.commit()
 
+        record_dict = record.to_dict()
+
         try:
-            current_app.config["ANNOUNCER"].announce(
-                EventType.CREATE, [record.to_dict()]
-            )
+            current_app.config["ANNOUNCER"].announce(EventType.CREATE, [record_dict])
         except Exception as e:
             logger.warning(f"Announcer failed: {e}")
 
-        return True, record.id, None
+        return True, None, record_dict
 
     except Exception as e:
         db.session.rollback()
 
         err_msg = f"Failed to initialize download record: {e}"
         logger.error(err_msg)
-        return False, None, err_msg
+        return False, err_msg, None
 
 
 def finalize_download(
     download_id: int, title: Optional[str], status: DownloadStatus
-) -> Tuple[bool, Optional[str]]:
+) -> Tuple[bool, Optional[str], Optional[Dict[str, Any]]]:
     """
-    Updates a download record with final data and announces it.
+    Updates a download record with final data.
 
     Returns:
-        A tuple of (success_status, error_message).
+        A tuple of (success_status, error_message, record_dict).
     """
     try:
         record = db.session.get(Download, download_id)
         if not record:
-            return False, f"Download ID {download_id} not found."
+            return False, f"Download ID {download_id} not found.", None
 
         record.title = title
         record.end_time = int(datetime.now(timezone.utc).timestamp())
@@ -158,18 +158,12 @@ def finalize_download(
 
         db.session.commit()
 
-        try:
-            current_app.config["ANNOUNCER"].announce(
-                EventType.UPDATE, [record.to_dict()]
-            )
-        except Exception as e:
-            logger.warning(f"Announcer failed: {e}")
-
-        return True, None
+        # Return the dictionary representation of the saved object
+        return True, None, record.to_dict()
 
     except Exception as e:
         db.session.rollback()
 
         err_msg = f"Failed to finalize download record #{download_id}: {e}"
         logger.error(err_msg)
-        return False, err_msg
+        return False, err_msg, None

@@ -1,12 +1,9 @@
 from typing import Dict
 
-from flask import request
+from flask import current_app, request
 from marshmallow import ValidationError
 
-from app.constants import (
-    DownloadStatus,
-    MediaType,
-)
+from app.constants import DownloadStatus, EventType, MediaType
 from app.routes.api import bp
 from app.schemas.execution import DownloadRequestSchema
 from app.services.download_service import (
@@ -54,7 +51,8 @@ def download_media():
         item_media_type = item_data.get("media_type")
         provided_title = item_data.get("title")
 
-        success, download_id, error = initialize_download(url, item_media_type)
+        success, error, record_dict = initialize_download(url, item_media_type)
+        download_id = record_dict["id"] if success and record_dict else None
         report[url] = DownloadReportItem(url=url, status=success, error=error)
 
         if success:
@@ -87,9 +85,10 @@ def download_media():
             if child_url in seen_urls:
                 continue
 
-            child_success, child_id, child_error = initialize_download(
+            child_success, child_error, child_record = initialize_download(
                 child_url, item_media_type
             )
+            child_id = child_record["id"] if child_success and child_record else None
 
             # Regardless of success status, we want to keep track of the url,
             # since if it fails and multiple parents expand into lists containing
@@ -111,7 +110,12 @@ def download_media():
 
     # PROCESSING
 
+    finalized_records = []
+
     for download_id, url, item_media_type, provided_title in final_processing_queue:
+        if download_id is None:
+            continue
+
         title = provided_title if provided_title else scrape_title(url)
 
         # Download
@@ -131,7 +135,7 @@ def download_media():
             report[url].error = str(e)
 
         # Finalize DB record
-        success, error = finalize_download(
+        success, error, record_dict = finalize_download(
             download_id,  # type: ignore[arg-type]
             title,
             DownloadStatus.DONE if report[url].status else DownloadStatus.FAILED,
@@ -139,8 +143,22 @@ def download_media():
 
         if report[url].status:
             report[url].status = success
+
         if error:
             report[url].error = error
+
+        if record_dict:
+            finalized_records.append(record_dict)
+
+    # BULK ANNOUNCEMENT
+
+    if finalized_records:
+        try:
+            current_app.config["ANNOUNCER"].announce(
+                EventType.UPDATE, finalized_records
+            )
+        except Exception as e:
+            logger.warning(f"Announcer failed: {e}")
 
     final_json_report = [item.to_dict() for item in report.values()]
     return api_response(data=final_json_report)
