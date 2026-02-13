@@ -1,8 +1,10 @@
 import os
+import shutil
 import tempfile
 import threading
 import time
 from datetime import datetime
+from pathlib import Path
 from unittest.mock import MagicMock
 
 import pytest
@@ -29,6 +31,8 @@ def db_instance():
     os.close(db_fd)
     db_uri = f"sqlite:///{os.path.abspath(db_path)}"
 
+    tmp_dir_path = tempfile.mkdtemp()
+
     announcer = MessageAnnouncer()
 
     app.config.update(
@@ -38,6 +42,7 @@ def db_instance():
             "SQLALCHEMY_ENGINE_OPTIONS": {"connect_args": {"timeout": 10}},
             "API_SECRET_KEY": "test-secret-key",
             "TESTING": True,
+            "DOWNLOAD_DIR": Path(tmp_dir_path),
             "ANNOUNCER": announcer,
         }
     )
@@ -51,6 +56,9 @@ def db_instance():
     # Cleanup after the whole session is done
     if os.path.exists(db_path):
         os.remove(db_path)
+
+    if os.path.exists(tmp_dir_path):
+        shutil.rmtree(tmp_dir_path)
 
 
 @pytest.fixture(scope="session", autouse=True)
