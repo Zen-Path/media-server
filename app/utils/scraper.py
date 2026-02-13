@@ -127,7 +127,11 @@ def expand_collection_urls(url: str, depth: int = 0) -> List[str]:
         if not result.success:
             return []
 
-        data = json.loads(result.output)
+        output_str = result.output.strip() if result.output else ""
+        if output_str:
+            data = json.loads(output_str)
+        else:
+            return []
 
         # If there is only ONE unique level (e.g., all are level 6), it is probably
         # a collection of gallery links.
