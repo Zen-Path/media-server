@@ -67,6 +67,13 @@ export const STATUS_CONFIG = Object.freeze({
 });
 
 export class ColumnData {
+    id: string;
+    label: string;
+    field: string;
+    sortable: boolean;
+    cssClass: string;
+    icon: string;
+
     constructor({
         id,
         label = null,

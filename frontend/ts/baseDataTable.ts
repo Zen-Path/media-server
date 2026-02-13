@@ -1,7 +1,25 @@
+import { ColumnData } from "./constants";
 import { copyToClipboard, createIconLabelPair } from "./utils";
 
 export class BaseDataTable {
-    constructor(container) {
+    entryMap: Map<number, BaseDataRow>;
+    entryList: BaseDataRow[];
+    dom: {
+        container: HTMLElement;
+        header: HTMLDivElement;
+        body: HTMLDivElement;
+        selectAll: HTMLInputElement;
+        sortIndicators: Map<string, HTMLElement>;
+    };
+    lastSort: { field: any; direction: any };
+    isSorted: boolean;
+    columnsMap: Map<string, ColumnData>;
+    columnsList: any[];
+    selectedCount: number;
+    lastSelectedIndex: null;
+    isSelected: boolean;
+
+    constructor(container: HTMLElement) {
         if (!container) throw new Error("A container element is required.");
 
         this.entryMap = new Map();
@@ -9,7 +27,6 @@ export class BaseDataTable {
 
         this.dom = {
             container,
-            header: null,
             body: null,
             selectAll: null,
             sortIndicators: new Map(),
@@ -21,6 +38,7 @@ export class BaseDataTable {
         this.columnsMap = {};
         this.columnsList = [];
 
+        this.isSelected = false;
         this.selectedCount = 0;
 
         this.lastSelectedIndex = null;
@@ -40,7 +58,11 @@ export class BaseDataTable {
         this.dom.container.append(tableWrapper);
     }
 
-    _addEntries(entriesData, RowClass, tableRef) {
+    _addEntries(
+        entriesData: any,
+        RowClass: typeof BaseDataRow,
+        tableRef: this
+    ) {
         console.log(entriesData);
         const fragment = document.createDocumentFragment();
 
@@ -82,7 +104,7 @@ export class BaseDataTable {
                     fragment.prepend(rowEl);
                 }
             } catch (error) {
-                console.error(`Couldn't add entry ${entry?.id}:`, error);
+                console.error(`Couldn't add entry ${entryData?.id}:`, error);
             }
         }
 
@@ -152,7 +174,7 @@ export class BaseDataTable {
         return input;
     }
 
-    _createActions() {
+    _createActions(): HTMLDivElement {
         throw new Error("Implement 'initData'.");
     }
 
@@ -193,7 +215,7 @@ export class BaseDataTable {
 
     // PUBLIC
 
-    sort(field, direction = 1) {
+    sort(field: string, direction = 1) {
         console.log(
             `Sorting by ${field} in ${direction === 1 ? "asc" : "desc"} order.`,
             direction
@@ -219,7 +241,7 @@ export class BaseDataTable {
         this.#updateSortIndicators();
     }
 
-    handleSortClick(field) {
+    handleSortClick(field: string) {
         const newDirection =
             this.lastSort.field === field && this.lastSort.direction === 1
                 ? -1
@@ -227,7 +249,7 @@ export class BaseDataTable {
         this.sort(field, newDirection);
     }
 
-    filter(searchValue) {
+    filter(searchValue: string) {
         const query = String(searchValue).trim().toLowerCase();
 
         requestAnimationFrame(() => {
@@ -243,11 +265,11 @@ export class BaseDataTable {
         });
     }
 
-    deleteEntries(ids) {
+    deleteEntries(ids: number[]) {
         const idList = Array.isArray(ids) ? ids : [ids];
         if (idList.length === 0) return;
 
-        let deletedIds = [];
+        let deletedIds: number[] = [];
         let selectedCount = 0;
 
         idList.forEach((id) => {
@@ -291,7 +313,7 @@ export class BaseDataTable {
         return deletedIds;
     }
 
-    async copyFields(field, unique = true) {
+    async copyFields(field: string, unique = true) {
         const processableEntries = this.getProcessableEntries();
         if (processableEntries.length === 0) return false;
 
@@ -302,7 +324,7 @@ export class BaseDataTable {
         return await copyToClipboard(finalDataStr);
     }
 
-    toggleAll(checked) {
+    toggleAll(checked: boolean) {
         this.getVisibleEntries().forEach((entry) => {
             entry.isSelected = checked;
         });
@@ -329,11 +351,49 @@ export class BaseDataTable {
 }
 
 export class BaseDataRow {
-    constructor(data, table) {
+    data: any;
+    table: any;
+    dom: {
+        checkbox: HTMLInputElement;
+        mediaTypeCell: HTMLDivElement;
+        row: HTMLDivElement;
+        startTimeEl: any;
+        statusCell: HTMLDivElement;
+        titleEl: HTMLSpanElement;
+        urlEl: HTMLSpanElement;
+    };
+    sortValues: {
+        id: number;
+        title: string;
+        url: string;
+        mediaType: number;
+
+        startTime: number;
+        endTime: number;
+        updateTime: number;
+
+        status: number;
+        isSelected: boolean;
+    };
+    displayValues: {
+        id: string;
+        title: string;
+        url: string;
+
+        startTime: string;
+        endTime: string;
+        updateTime: string;
+    };
+    searchIndex: string;
+
+    private _isSelected: boolean;
+    private _isVisible: boolean;
+
+    constructor(data: any, table: any) {
         this.data = structuredClone(data);
         this.table = table;
 
-        this.dom = { row: null };
+        this.dom = {};
 
         // Storage for pre-calculated values
         this.sortValues = {};
@@ -370,15 +430,15 @@ export class BaseDataRow {
         if (this.dom.row) this.dom.row.classList.toggle("hidden", !value);
     }
 
-    initData() {
+    initData(data) {
         throw new Error("Implement 'initData'.");
     }
 
-    render() {
+    render(): HTMLDivElement {
         throw new Error("Implement 'render'.");
     }
 
-    update() {
+    update(newData) {
         throw new Error("Implement 'update'.");
     }
 

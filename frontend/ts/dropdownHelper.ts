@@ -25,7 +25,7 @@ export function createMenuTrigger(actions) {
 /**
  * Generates the actual dropdown HTML on demand.
  */
-function renderDropdownMenu(actions, anchorBtn) {
+function renderDropdownMenu(actions: any[], anchorBtn: HTMLButtonElement) {
     const menu = document.createElement("div");
     menu.setAttribute("popover", "auto");
     menu.className = "dropdown-content";

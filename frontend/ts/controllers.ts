@@ -2,7 +2,7 @@ import { deleteDownloads } from "./apiService";
 import { showToast } from "./utils";
 import Swal from "sweetalert2";
 
-export async function handleBulkDelete(ids) {
+export async function handleBulkDelete(ids: number[]) {
     if (!ids || ids.length === 0) {
         return showToast("No entries provided to delete.", "warning");
     }

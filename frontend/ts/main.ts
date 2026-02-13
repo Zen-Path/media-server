@@ -6,7 +6,7 @@ import { fetchDownloads } from "./apiService";
 import "../css/main.css";
 import "../css/dashboard.css";
 
-const debouncedFilter = debounce((searchValue) => {
+const debouncedFilter = debounce((searchValue: string) => {
     requestAnimationFrame(() => {
         downloadsTable.filter(searchValue);
     });
@@ -14,7 +14,14 @@ const debouncedFilter = debounce((searchValue) => {
 
 // Only starts filtering after a small delay
 function filterTable() {
-    const searchValue = document.getElementById("searchInput").value;
+    const searchInput = document.getElementById(
+        "searchInput"
+    ) as HTMLInputElement | null;
+
+    let searchValue = "";
+    if (searchInput) {
+        searchValue = searchInput.value;
+    }
 
     const clearBtn = document.getElementById("clearBtn");
     if (clearBtn) {
@@ -26,13 +33,23 @@ function filterTable() {
 
 // Updates UI and filters the table instantly
 function clearSearch() {
-    const input = document.getElementById("searchInput");
-    input.value = "";
+    const searchInput = document.getElementById(
+        "searchInput"
+    ) as HTMLInputElement | null;
 
-    document.getElementById("clearBtn").classList.remove("show");
+    if (searchInput) {
+        searchInput.value = "";
+        searchInput.focus();
+    }
+
+    const clearBtn = document.getElementById(
+        "clearBtn"
+    ) as HTMLButtonElement | null;
+    if (clearBtn) {
+        clearBtn.classList.remove("show");
+    }
+
     downloadsTable.filter("");
-
-    input.focus();
 }
 
 function showTableInfo() {
@@ -54,7 +71,7 @@ function refreshData() {
 
 // SSE handles
 
-function handleUpdates(payload) {
+function handleUpdates(payload: any[]) {
     payload.forEach((entryData) => {
         const entry = downloadsTable.entryMap.get(entryData.id);
         if (entry === undefined) {
@@ -71,6 +88,11 @@ function handleUpdates(payload) {
 // MAIN
 
 const downloadsTableContainer = document.getElementById("downloadsTable");
+
+if (!downloadsTableContainer) {
+    throw new Error("Required element #downloadsTable not found.");
+}
+
 const downloadsTable = new DownloadsTable(downloadsTableContainer);
 window.downloadsTable = downloadsTable;
 

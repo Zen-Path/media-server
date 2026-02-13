@@ -14,7 +14,7 @@ import { showToast } from "./utils";
 import { handleBulkDelete } from "./controllers";
 
 export class DownloadsTable extends BaseDataTable {
-    constructor(container) {
+    constructor(container: HTMLElement) {
         super(container);
 
         this.columnsMap = {
@@ -74,7 +74,7 @@ export class DownloadsTable extends BaseDataTable {
         this.init();
     }
 
-    add(entries) {
+    add(entries: any) {
         this._addEntries(entries, DownloadRow, this);
     }
 
@@ -175,7 +175,7 @@ export class DownloadsTable extends BaseDataTable {
 }
 
 export class DownloadRow extends BaseDataRow {
-    constructor(data, tableRef) {
+    constructor(data: any, tableRef: any) {
         super(data, tableRef);
         // Initializing data here due to private methods
         this.initData(data);
@@ -230,21 +230,21 @@ export class DownloadRow extends BaseDataRow {
             `${this.displayValues.title} ${this.displayValues.url} ${this.displayValues.id}`.toLowerCase();
     }
 
-    #validateNumberField(value) {
+    #validateNumberField(value: number) {
         if (typeof value === "number" && value >= 0) {
             return value;
         }
         return -1;
     }
 
-    #validateTextField(value) {
+    #validateTextField(value: string) {
         if (typeof value === "string" && value.trim().length > 0) {
             return value.trim();
         }
         return "";
     }
 
-    #validateDateField(value) {
+    #validateDateField(value: number) {
         if (typeof value !== "number") {
             return 0;
         }
@@ -258,12 +258,12 @@ export class DownloadRow extends BaseDataRow {
         return value;
     }
 
-    #validateIntOptionsField(value, options) {
+    #validateIntOptionsField(value: number, options: number[]) {
         if (typeof value !== "number") return -1;
         if (options.includes(value)) return value;
     }
 
-    #formatDateField(value) {
+    #formatDateField(value: number) {
         if (value === 0) return "-";
         return toLocalStandardTime(value);
     }
@@ -292,6 +292,7 @@ export class DownloadRow extends BaseDataRow {
                 case columns.START_TIME.id:
                     cell.textContent = this.displayValues.startTime;
                     cell.title = this.#generateTimeDiffTooltip();
+                    this.dom.startTimeEl = cell;
                     break;
                 case columns.STATUS.id:
                     cell.append(this.#renderStatusContent());
@@ -421,7 +422,7 @@ export class DownloadRow extends BaseDataRow {
                 label: "Copy Title",
                 icon: "fa-quote-left",
                 onClick: async () => {
-                    const result = copyToClipboard(this.data.title);
+                    const result = await copyToClipboard(this.data.title);
                     if (result) {
                         showToast("Title copied to clipboard!", "success");
                     } else {
@@ -433,7 +434,7 @@ export class DownloadRow extends BaseDataRow {
                 label: "Copy URL",
                 icon: "fa-link",
                 onClick: async () => {
-                    const result = copyToClipboard(this.data.url);
+                    const result = await copyToClipboard(this.data.url);
                     if (result) {
                         showToast("URL copied to clipboard!", "success");
                     } else {

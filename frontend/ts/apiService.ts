@@ -2,9 +2,9 @@ import { API_SECRET_KEY } from "./constants";
 
 /**
  * Fetches the list of downloads from the API.
- * @returns {Promise<Object>} The JSON response payload.
+ * @returns The JSON response payload.
  */
-export async function fetchDownloads() {
+export async function fetchDownloads(): Promise<object> {
     try {
         const response = await fetch("/api/downloads", {
             method: "GET",
@@ -29,10 +29,10 @@ export async function fetchDownloads() {
 
 /**
  * Bulk deletes downloads by their IDs.
- * @param {Array<number>} ids - An array of download IDs to delete.
- * @returns {Promise<Object>} The JSON response payload.
+ * @param ids - An array of download IDs to delete.
+ * @returns The JSON response payload.
  */
-export async function deleteDownloads(ids) {
+export async function deleteDownloads(ids: Array<number>): Promise<object> {
     try {
         const response = await fetch("/api/bulkDelete", {
             method: "POST",
