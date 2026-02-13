@@ -1,26 +1,14 @@
-import json
 import time
-from functools import wraps
 
-from colorama import Fore, Style
-from flask import current_app, g, request
+from flask import Response, current_app, g, request
 
 from app.routes.api import bp
+from app.utils.log_helpers import build_request_log, build_response_log
 from app.utils.logger import logger
 
-
-def skip_logging(f):
-    """
-    Decorator to mark a route to skip logging.
-    """
-
-    # Using @wraps ensures metadata (like docstrings) is preserved.
-    @wraps(f)
-    def wrapper(*args, **kwargs):
-        return f(*args, **kwargs)
-
-    wrapper._skip_logging = True
-    return wrapper
+# Max bytes to attempt pretty-printing, otherwise use the raw text for performance
+MAX_PRETTY_PRINT_SIZE = 50 * 1024  # 50 KB
+LOG_TRUNCATE_LENGTH = 1000
 
 
 @bp.before_request
@@ -32,66 +20,53 @@ def log_request():
             return
 
     g.start_time = time.time()
-
     params = request.args.to_dict()
-    if "apiKey" in params:
-        params["apiKey"] = "***"
-
     body = None
-    try:
-        if request.is_json:
-            body = request.get_json(silent=True)
-        elif request.form:
-            body = request.form.to_dict()
-        elif request.data:
-            body = request.data.decode("utf-8", errors="ignore")
-    except Exception:
-        body = "<Unparseable Body>"
 
-    # TODO: add helper that will trim to length and apply consistent trimmed style
+    # Only attempt to parse body if content actually exists
+    if request.content_length and request.content_length > 0:
+        try:
+            if request.is_json:
+                body = request.get_json(silent=True)
+            elif request.form:
+                body = request.form.to_dict()
+            else:
+                body = request.get_data(as_text=True)
 
-    output_lines = []
-    if params:
-        output_lines.append(f"params: {json.dumps(params, indent=4)}")
+        except Exception:
+            body = "<Unparseable Body>"
 
-    if body:
-        data_fmt = (
-            json.dumps(body, indent=4) if isinstance(body, (dict, list)) else body
-        )
-        output_lines.append(f"body: {data_fmt}")
-
-    if output_lines:
-        logger.info(
-            f"{Fore.LIGHTBLUE_EX}REQUEST:{Fore.LIGHTBLACK_EX}\n"
-            f"{'\n'.join(output_lines)}{Style.RESET_ALL}"
-        )
+    log_str = build_request_log(params, body, max_length=LOG_TRUNCATE_LENGTH)
+    if log_str:
+        logger.info(log_str)
 
 
 @bp.after_request
-def log_response(response):
+def log_response(response: Response):
     if getattr(g, "skip_logging", False):
         return response
 
     duration = time.time() - g.get("start_time", time.time())
 
     try:
-        if response.is_json:
-            json_data = response.get_json()
-            data_fmt = json.dumps(json_data, indent=4, ensure_ascii=False)
+        # If the payload is massive, skip JSON parsing/formatting entirely.
+        if response.content_length and response.content_length > MAX_PRETTY_PRINT_SIZE:
+            data = response.get_data(as_text=True)[:LOG_TRUNCATE_LENGTH]
+        elif response.is_json:
+            data = response.get_json()
         else:
-            data_fmt = response.get_data(as_text=True)
+            data = response.get_data(as_text=True)
 
     except Exception:
-        data_fmt = "<Unreadable Response>"
+        data = "<Unreadable Response>"
 
-    max_response_length = 1000
-    if len(data_fmt) > max_response_length:
-        data_fmt = data_fmt[:max_response_length] + "\n... (truncated)"
-
-    logger.info(
-        f"{Fore.LIGHTYELLOW_EX}RESPONSE: {Fore.LIGHTBLACK_EX}"
-        f"{request.method} {request.path} (duration: {duration:.4f}s):\n"
-        f"{data_fmt}{Style.RESET_ALL}"
+    log_str = build_response_log(
+        method=request.method,
+        path=request.path,
+        duration=duration,
+        data=data,
+        max_length=LOG_TRUNCATE_LENGTH,
     )
+    logger.info(log_str)
 
     return response

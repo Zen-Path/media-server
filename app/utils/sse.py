@@ -5,6 +5,7 @@ from typing import Any, Dict, List
 from colorama import Fore, Style
 
 from app.constants import EventType
+from app.utils.log_helpers import truncate_text
 from app.utils.logger import logger
 from app.utils.tools import recursive_camelize
 
@@ -36,7 +37,7 @@ class MessageAnnouncer:
 
         logger.info(
             f"{Fore.LIGHTBLUE_EX}ANNOUNCEMENT:\n{Fore.LIGHTBLACK_EX}"
-            f"{json.dumps(camel_msg, indent=4)}{Style.RESET_ALL}"
+            f"{truncate_text(json.dumps(camel_msg, indent=4))}{Style.RESET_ALL}"
         )
 
         # SSE Standard format: "data: <json>\n\n"
