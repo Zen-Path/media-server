@@ -1,37 +1,17 @@
 from typing import Dict
 
-from flask import current_app, request
-from marshmallow import ValidationError
-
-from app.constants import DownloadStatus, EventType, MediaType
-from app.routes.api import bp
-from app.schemas.execution import DownloadRequestSchema
+from app.constants import DownloadStatus, MediaType
 from app.services.download_service import (
     finalize_download,
     initialize_download,
 )
-from app.utils.api_response import api_response
 from app.utils.downloaders import Gallery
 from app.utils.logger import logger
 from app.utils.scraper import expand_collection_urls, scrape_title
 from app.utils.tools import DownloadReportItem
 
 
-@bp.route("/media/download", methods=["POST"])
-def download_media():
-    json_data = request.get_json(silent=True)
-    if not json_data:
-        return api_response(error="Missing JSON payload", status_code=400)
-
-    try:
-        data = DownloadRequestSchema().load(json_data)
-        items = data["items"]
-        range_start = data.get("range_start")
-        range_end = data.get("range_end")
-
-    except ValidationError as err:
-        return api_response(error=str(err.messages), status_code=400)
-
+def process_download_request(items, range_start, range_end):
     report: Dict[str, DownloadReportItem] = {}
 
     # DEDUPLICATION
@@ -150,15 +130,4 @@ def download_media():
         if record_dict:
             finalized_records.append(record_dict)
 
-    # BULK ANNOUNCEMENT
-
-    if finalized_records:
-        try:
-            current_app.config["ANNOUNCER"].announce(
-                EventType.UPDATE, finalized_records
-            )
-        except Exception as e:
-            logger.warning(f"Announcer failed: {e}")
-
-    final_json_report = [item.to_dict() for item in report.values()]
-    return api_response(data=final_json_report)
+    return [item.to_dict() for item in report.values()], finalized_records

@@ -116,7 +116,7 @@ def test_invalid_scenarios(payload, error_msg, client, auth_headers):
     assert error_msg.lower() in data["error"].lower()
 
 
-@patch("app.routes.api.media.initialize_download")
+@patch("app.services.execution_service.initialize_download")
 def test_initial_recording_deduplication(mock_start, client, auth_headers):
     """Verify that the initial recording phase uses list(set(urls))."""
     mock_start.return_value = (True, 1, None)
@@ -134,8 +134,8 @@ def test_initial_recording_deduplication(mock_start, client, auth_headers):
     assert mock_start.call_count == 2
 
 
-@patch("app.routes.api.media.expand_collection_urls")
-@patch("app.routes.api.media.Gallery.download")
+@patch("app.services.execution_service.expand_collection_urls")
+@patch("app.services.execution_service.Gallery.download")
 @patch("requests.get")
 def test_gallery_expansion_flow(
     mock_get, mock_gallery, mock_expand, client, auth_headers
@@ -164,7 +164,7 @@ def test_gallery_expansion_flow(
 
 
 @patch("requests.get")
-@patch("app.routes.api.media.Gallery.download")
+@patch("app.services.execution_service.Gallery.download")
 def test_title_scrape_failure_handling(mock_gallery, mock_get, client, auth_headers):
     """
     Verify that a failed title scrape adds a warning but doesn't fail the
@@ -186,7 +186,7 @@ def test_title_scrape_failure_handling(mock_gallery, mock_get, client, auth_head
     assert first_download["status"] is True
 
 
-@patch("app.routes.api.media.Gallery.download")
+@patch("app.services.execution_service.Gallery.download")
 def test_gallery_dl_failure_reporting(mock_gallery, client, auth_headers):
     """Verify that a non-zero return code from gallery-dl marks status as False."""
     # TODO: change when adding unit tests
@@ -209,7 +209,7 @@ def test_gallery_dl_failure_reporting(mock_gallery, client, auth_headers):
     assert "Command failed".lower() in first_download["error"].lower()
 
 
-@patch("app.routes.api.media.Gallery.download")
+@patch("app.services.execution_service.Gallery.download")
 def test_gallery_dl_failure_patterns(mock_gallery, client, auth_headers):
     """Verify that if failure patterns are matched return status is False."""
     # TODO: change when adding unit tests
@@ -234,7 +234,7 @@ def test_gallery_dl_failure_patterns(mock_gallery, client, auth_headers):
     assert "[reddit][info]" in first_download["output"]
 
 
-@patch("app.routes.api.media.Gallery.download")
+@patch("app.services.execution_service.Gallery.download")
 def test_return_files(mock_gallery, client, auth_headers):
     """Verify that file paths are return for successful downloads."""
     files = [

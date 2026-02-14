@@ -21,7 +21,7 @@ def skip_logging(f):
 
 from app.routes.api import (  # noqa: E402, F401
     downloads,
+    execution,
     general,
     logging_middleware,
-    media,
 )

@@ -26,10 +26,10 @@ def test_download_announcements(client, announcer, auth_headers):
     target_media_type = MediaType.GALLERY
     mock_title = "SSE Gallery"
 
-    with patch("app.routes.api.media.scrape_title") as mock_scrape:
+    with patch("app.services.execution_service.scrape_title") as mock_scrape:
         mock_scrape.return_value = mock_title
 
-        with patch("app.utils.downloaders.Gallery.download") as mock_dl:
+        with patch("app.services.execution_service.Gallery.download") as mock_dl:
             mock_dl.return_value = DownloadReportItem(status=True)
 
             payload = {"items": [{"url": target_url, "mediaType": target_media_type}]}
