@@ -1,6 +1,6 @@
 "use strict";
 
-import { createDownloadForm } from "./createDownloadForm";
+import { DownloadFormGenerator } from "./createDownloadForm";
 import { BASE_URL, downloadMedia } from "./apiService";
 
 import STYLES from "../css/style.css?inline";
@@ -12,7 +12,9 @@ function main() {
     });
 
     GM_registerMenuCommand("Open Download Form", async () => {
-        const formData = await createDownloadForm(STYLES);
+        const form = new DownloadFormGenerator(STYLES);
+        const formData = await form.open();
+
         console.log("Download Form Data:", formData);
 
         if (!formData) return;
