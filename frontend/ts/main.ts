@@ -3,6 +3,10 @@ import { handleColorScheme, debounce, StreamManager, showToast } from "./utils";
 import { DownloadsTable } from "./downloadsTable";
 import { fetchDownloads } from "./apiService";
 
+import { Grid, html } from "gridjs";
+
+import "gridjs/dist/theme/mermaid.css";
+
 import "../css/main.css";
 import "../css/dashboard.css";
 
@@ -86,6 +90,71 @@ function handleUpdates(payload: any[]) {
 }
 
 // MAIN
+
+const grid = new Grid({
+    columns: [
+        { id: "id", name: "ID" },
+        { id: "mediaType", name: "Media Type" },
+        {
+            name: "Name",
+            // We don't bind 'id' here because this is a composite column
+            formatter: (_, row) => {
+                console.log(_, row);
+                // row.cells returns an array of ALL columns (even hidden ones)
+                // Order matches the columns array below:
+                // Index 0: Name (Current)
+                // Index 1: Title (Hidden)
+                // Index 2: URL (Hidden)
+
+                const title = row.cells[3].data;
+                const url = row.cells[4].data;
+
+                return html(`
+          <a href="${url}" target="_blank" style="display: flex; flex-direction: column; text-decoration: none;">
+            <span class="title truncate" style="font-weight: bold; color: #333;" title="${title}">
+                ${title}
+            </span>
+            <span class="url truncate" style="font-size: 0.85em; color: #888;" title="${url}">
+                ${url}
+            </span>
+          </a>
+        `);
+            },
+        },
+        // HIDDEN COLUMNS (Essential for accessing the data)
+        { id: "title", name: "Title", hidden: true },
+        { id: "url", name: "URL", hidden: true },
+        {
+            id: "startTime",
+            name: "Start Time",
+            // Convert Unix timestamp (seconds) to readable date
+            formatter: (cell) => new Date(cell * 1000).toLocaleString(),
+        },
+        {
+            id: "status",
+            name: "Status",
+            // Optional: Map status codes to text
+            formatter: (cell) =>
+                cell === 3 ? "Done" : cell === 5 ? "Error" : "Pending",
+        },
+    ],
+
+    // 2. Connect your async function here
+    data: async () => {
+        const response = await fetchDownloads();
+        return response.data; // Grid.js needs the array, not the wrapper object
+    },
+
+    search: true,
+    sort: true,
+    pagination: {
+        limit: 25,
+    },
+});
+const wrapper = document.getElementById("wrapper");
+if (wrapper) {
+    grid.render(wrapper);
+}
 
 const downloadsTableContainer = document.getElementById("downloadsTable");
 
