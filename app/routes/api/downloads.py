@@ -127,3 +127,23 @@ def batch_delete_downloads() -> Tuple[Response, int]:
     except Exception as e:
         logger.error(f"Bulk Delete Error: {e}")
         return api_response(error=str(e), status_code=500)
+
+
+@bp.route("/downloads/<int:download_id>", methods=["DELETE"])
+def delete_download(download_id: int) -> Tuple[Response, int]:
+    deleted_ids = download_service.bulk_delete_downloads([download_id])
+
+    try:
+        if deleted_ids:
+            try:
+                current_app.config["ANNOUNCER"].announce(
+                    EventType.DELETE, {"ids": deleted_ids}
+                )
+            except Exception as e:
+                logger.warning(f"Announcer failed: {e}")
+
+        return api_response(data={"ids": deleted_ids})
+
+    except Exception as e:
+        logger.error(f"Delete Error: {e}")
+        return api_response(error=str(e), status_code=500)
