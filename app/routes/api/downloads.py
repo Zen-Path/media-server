@@ -103,8 +103,8 @@ def update_download(download_id: int) -> Tuple[Response, int]:
         return api_response(error=str(e), status_code=500)
 
 
-@bp.route("/bulkDelete", methods=["POST"])
-def bulk_delete_downloads() -> Tuple[Response, int]:
+@bp.route("/downloads", methods=["DELETE"])
+def batch_delete_downloads() -> Tuple[Response, int]:
     json_data = request.get_json()
 
     try:

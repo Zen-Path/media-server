@@ -78,7 +78,7 @@ def test_wrong_method(client, auth_headers):
 
 def test_no_content_type_header(client, auth_headers):
     """Sending data without the 'application/json' header"""
-    res = client.post(API_BULK_DELETE, headers=auth_headers, data="{}")
+    res = client.delete(API_BULK_DELETE, headers=auth_headers, data="{}")
 
     assert res.status_code == 415
 
@@ -108,7 +108,7 @@ def test_database_exception(client, auth_headers, seed):
     with patch.object(
         db.session, "commit", side_effect=SQLAlchemyError("Database Locked")
     ):
-        res = client.post(API_BULK_DELETE, headers=auth_headers, json={"ids": [1]})
+        res = client.delete(API_BULK_DELETE, headers=auth_headers, json={"ids": [1]})
 
         data = res.get_json()
         print(data)
@@ -123,7 +123,9 @@ def test_database_exception(client, auth_headers, seed):
 def test_massive_payload_handling(client, auth_headers):
     """Verify system doesn't crash with a massive list of IDs."""
     massive_ids = list(range(10000))
-    res = client.post(API_BULK_DELETE, headers=auth_headers, json={"ids": massive_ids})
+    res = client.delete(
+        API_BULK_DELETE, headers=auth_headers, json={"ids": massive_ids}
+    )
     # The system should either process it or return a controlled error, not 500
     assert res.status_code in [200, 413]  # 413 is Request Entity Too Large
 
@@ -134,7 +136,7 @@ def test_concurrent_operations(client, auth_headers, seed):
 
     def make_request(i):
         # Every thread tries to delete the same IDs to force a collision/race
-        return requests.post(
+        return requests.delete(
             f"{BASE_URL}/{API_BULK_DELETE}",
             headers=auth_headers,
             json={"ids": list(range(1, 51))},

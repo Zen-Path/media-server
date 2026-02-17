@@ -75,7 +75,7 @@ def test_system_resilience_to_announcer_failure(client, auth_headers, seed):
 
         # Try to delete. Even if the dashboard notification fails, the DB delete
         # should happen.
-        res = client.post(API_BULK_DELETE, headers=auth_headers, json={"ids": [100]})
+        res = client.delete(API_BULK_DELETE, headers=auth_headers, json={"ids": [100]})
 
         assert res.status_code == 200
         assert res.get_json()["status"] is True

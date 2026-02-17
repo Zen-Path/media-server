@@ -34,8 +34,8 @@ export async function fetchDownloads(): Promise<object> {
  */
 export async function deleteDownloads(ids: Array<number>): Promise<object> {
     try {
-        const response = await fetch("/api/bulkDelete", {
-            method: "POST",
+        const response = await fetch("/api/downloads", {
+            method: "DELETE",
             headers: {
                 "Content-Type": "application/json",
                 "X-API-Key": API_SECRET_KEY,
