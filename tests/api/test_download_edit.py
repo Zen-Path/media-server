@@ -2,7 +2,7 @@ import pytest
 
 from app.constants import MediaType
 
-from ..conftest import API_BULK_EDIT, API_GET_DOWNLOADS
+from ..conftest import API_DOWNLOADS
 
 
 @pytest.mark.parametrize(
@@ -50,7 +50,7 @@ from ..conftest import API_BULK_EDIT, API_GET_DOWNLOADS
 def test_invalid_scenarios(payload, error_msg, client, auth_headers, seed):
     seed([{"id": 1}])
 
-    res = client.patch(API_BULK_EDIT, headers=auth_headers, json=payload)
+    res = client.patch(API_DOWNLOADS, headers=auth_headers, json=payload)
     assert res.status_code == 400
 
     data = res.get_json()
@@ -120,7 +120,7 @@ def test_valid_scenarios(
 ):
     seed(seed_data)
 
-    res = client.patch(API_BULK_EDIT, headers=auth_headers, json=payload)
+    res = client.patch(API_DOWNLOADS, headers=auth_headers, json=payload)
     assert res.status_code == 200
 
     data = res.get_json()
@@ -183,13 +183,13 @@ def test_bulk_edit_persistence(
     target_id = seeded_rows[0].id
 
     res = client.patch(
-        API_BULK_EDIT, headers=auth_headers, json=[{"id": target_id, **payload}]
+        API_DOWNLOADS, headers=auth_headers, json=[{"id": target_id, **payload}]
     )
     data = res.get_json()
     assert data["status"]
     assert data["data"][0]["status"]
 
-    history_after = client.get(API_GET_DOWNLOADS, headers=auth_headers).json
+    history_after = client.get(API_DOWNLOADS, headers=auth_headers).json
     print(history_after)
     assert len(history_after["data"]) == 1
 

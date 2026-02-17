@@ -1,8 +1,8 @@
-from ..conftest import API_GET_DOWNLOADS
+from ..conftest import API_DOWNLOADS
 
 
 def test_empty_return(client, auth_headers):
-    history = client.get(API_GET_DOWNLOADS, headers=auth_headers).json
+    history = client.get(API_DOWNLOADS, headers=auth_headers).json
     assert len(history["data"]) == 0
 
 
@@ -11,7 +11,7 @@ def test_valid_scenarios(client, auth_headers, seed, sample_download_row):
     seeded_rows = seed([sample_download_row])
     target_id = seeded_rows[0].id
 
-    history = client.get(API_GET_DOWNLOADS, headers=auth_headers).json
+    history = client.get(API_DOWNLOADS, headers=auth_headers).json
     assert len(history["data"]) == 1
 
     row = history["data"][0]

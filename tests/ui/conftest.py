@@ -3,7 +3,7 @@ from typing import Any, Optional
 import pytest
 from playwright.sync_api import Page, expect
 
-from tests.conftest import API_GET_DOWNLOADS
+from tests.conftest import API_DOWNLOADS
 from tests.ui.pages.dashboard_page import DashboardPage
 
 
@@ -32,7 +32,7 @@ def mock_downloads(page: Page):
             "error": error,
         }
         page.route(
-            f"**{API_GET_DOWNLOADS}",
+            f"**{API_DOWNLOADS}",
             lambda route: route.fulfill(
                 status=200,
                 content_type="application/json",

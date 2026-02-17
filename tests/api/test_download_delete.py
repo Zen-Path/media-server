@@ -1,6 +1,6 @@
 import pytest
 
-from ..conftest import API_BULK_DELETE, API_GET_DOWNLOADS
+from ..conftest import API_DOWNLOADS
 
 
 @pytest.mark.parametrize(
@@ -13,7 +13,7 @@ from ..conftest import API_BULK_DELETE, API_GET_DOWNLOADS
     ],
 )
 def test_invalid_scenarios(delete_ids, error_msg, client, auth_headers):
-    res = client.delete(API_BULK_DELETE, headers=auth_headers, json={"ids": delete_ids})
+    res = client.delete(API_DOWNLOADS, headers=auth_headers, json={"ids": delete_ids})
     assert res.status_code == 400
 
     data = res.get_json()
@@ -51,7 +51,7 @@ def test_valid_scenarios(
 ):
     seed([{"id": i} for i in seed_ids])
 
-    res = client.delete(API_BULK_DELETE, headers=auth_headers, json={"ids": delete_ids})
+    res = client.delete(API_DOWNLOADS, headers=auth_headers, json={"ids": delete_ids})
     data = res.get_json()
 
     assert res.status_code == 200
@@ -64,11 +64,9 @@ def test_database_clearing(client, auth_headers, seed, sample_download_row):
     seeded_rows = seed([sample_download_row])
     target_id = seeded_rows[0].id
 
-    res = client.delete(
-        API_BULK_DELETE, headers=auth_headers, json={"ids": [target_id]}
-    )
+    res = client.delete(API_DOWNLOADS, headers=auth_headers, json={"ids": [target_id]})
     data = res.get_json()
     assert data["status"]
 
-    history_after = client.get(API_GET_DOWNLOADS, headers=auth_headers).json
+    history_after = client.get(API_DOWNLOADS, headers=auth_headers).json
     assert len(history_after["data"]) == 0

@@ -8,8 +8,7 @@ from sqlalchemy.exc import SQLAlchemyError
 
 from app.extensions import db
 from tests.conftest import (
-    API_BULK_DELETE,
-    API_GET_DOWNLOADS,
+    API_DOWNLOADS,
     API_HEALTH,
     BASE_URL,
 )
@@ -19,11 +18,11 @@ def test_auth_valid(client, auth_headers):
     """
     Verify that API endpoints accept valid credentials via header and query string.
     """
-    resp = client.get(API_GET_DOWNLOADS, headers=auth_headers)
+    resp = client.get(API_DOWNLOADS, headers=auth_headers)
     assert resp.status_code == 200
 
     valid_key = auth_headers["X-API-Key"]
-    resp = client.get(API_GET_DOWNLOADS, query_string={"apiKey": valid_key})
+    resp = client.get(API_DOWNLOADS, query_string={"apiKey": valid_key})
     assert resp.status_code == 200
 
 
@@ -44,7 +43,7 @@ def test_auth_invalid(client, request_kwargs):
     Verify that API endpoints reject missing or invalid credentials via headers or
     query args.
     """
-    resp = client.get(API_GET_DOWNLOADS, **request_kwargs)
+    resp = client.get(API_DOWNLOADS, **request_kwargs)
     assert resp.status_code == 401
 
 
@@ -71,14 +70,14 @@ def test_health_check(client):
 
 def test_wrong_method(client, auth_headers):
     """Sending a POST request to a GET endpoint"""
-    res = client.post(API_GET_DOWNLOADS, headers=auth_headers)
+    res = client.post(API_DOWNLOADS, headers=auth_headers)
 
     assert res.status_code == 405
 
 
 def test_no_content_type_header(client, auth_headers):
     """Sending data without the 'application/json' header"""
-    res = client.delete(API_BULK_DELETE, headers=auth_headers, data="{}")
+    res = client.delete(API_DOWNLOADS, headers=auth_headers, data="{}")
 
     assert res.status_code == 415
 
@@ -108,7 +107,7 @@ def test_database_exception(client, auth_headers, seed):
     with patch.object(
         db.session, "commit", side_effect=SQLAlchemyError("Database Locked")
     ):
-        res = client.delete(API_BULK_DELETE, headers=auth_headers, json={"ids": [1]})
+        res = client.delete(API_DOWNLOADS, headers=auth_headers, json={"ids": [1]})
 
         data = res.get_json()
         print(data)
@@ -123,9 +122,7 @@ def test_database_exception(client, auth_headers, seed):
 def test_massive_payload_handling(client, auth_headers):
     """Verify system doesn't crash with a massive list of IDs."""
     massive_ids = list(range(10000))
-    res = client.delete(
-        API_BULK_DELETE, headers=auth_headers, json={"ids": massive_ids}
-    )
+    res = client.delete(API_DOWNLOADS, headers=auth_headers, json={"ids": massive_ids})
     # The system should either process it or return a controlled error, not 500
     assert res.status_code in [200, 413]  # 413 is Request Entity Too Large
 
@@ -137,7 +134,7 @@ def test_concurrent_operations(client, auth_headers, seed):
     def make_request(i):
         # Every thread tries to delete the same IDs to force a collision/race
         return requests.delete(
-            f"{BASE_URL}/{API_BULK_DELETE}",
+            f"{BASE_URL}/{API_DOWNLOADS}",
             headers=auth_headers,
             json={"ids": list(range(1, 51))},
             timeout=5,

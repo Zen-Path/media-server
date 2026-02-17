@@ -4,7 +4,7 @@ from unittest.mock import patch
 from app.constants import DownloadStatus, EventType, MediaType
 from app.utils.tools import DownloadReportItem
 
-from ..conftest import API_BULK_DELETE, API_DOWNLOAD
+from ..conftest import API_DOWNLOAD, API_DOWNLOADS
 
 
 def parse_sse(raw_msg: str) -> dict:
@@ -75,7 +75,7 @@ def test_system_resilience_to_announcer_failure(client, auth_headers, seed):
 
         # Try to delete. Even if the dashboard notification fails, the DB delete
         # should happen.
-        res = client.delete(API_BULK_DELETE, headers=auth_headers, json={"ids": [100]})
+        res = client.delete(API_DOWNLOADS, headers=auth_headers, json={"ids": [100]})
 
         assert res.status_code == 200
         assert res.get_json()["status"] is True

@@ -6,7 +6,7 @@ from app.constants import DownloadStatus, MediaType
 from app.models.download import Download
 from app.utils.tools import DownloadReportItem
 
-from ..conftest import API_DOWNLOAD, API_GET_DOWNLOADS
+from ..conftest import API_DOWNLOAD, API_DOWNLOADS
 
 
 class MockCmdResult:
@@ -43,7 +43,7 @@ def test_simple_download(client, auth_headers):
         # assert first_download["title"] == mock_title
 
         # Persistence
-        history = client.get(API_GET_DOWNLOADS, headers=auth_headers).json
+        history = client.get(API_DOWNLOADS, headers=auth_headers).json
         assert len(history["data"]) == 1
         assert history["data"][0]["status"] == DownloadStatus.DONE
 
