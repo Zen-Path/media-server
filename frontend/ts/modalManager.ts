@@ -1,4 +1,9 @@
-import { MEDIA_TYPE_CONFIG, STATUS_CONFIG, API_SECRET_KEY } from "./constants";
+import {
+    MEDIA_TYPE_CONFIG,
+    STATUS_CONFIG,
+    API_SECRET_KEY,
+    API_DOWNLOADS,
+} from "./constants";
 import { showToast } from "./utils";
 
 export const ModalManager = {
@@ -85,7 +90,7 @@ export const ModalManager = {
         });
 
         try {
-            const res = await fetch(`/api/bulkEdit`, {
+            const res = await fetch(API_DOWNLOADS, {
                 method: "PATCH",
                 headers: {
                     "Content-Type": "application/json",

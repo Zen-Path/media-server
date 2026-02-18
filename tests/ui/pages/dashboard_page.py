@@ -1,12 +1,13 @@
 from playwright.sync_api import Page
 
+from app.constants import PAGE_DASHBOARD
 from tests.conftest import BASE_URL
 
 
 class DashboardPage:
     def __init__(self, page: Page):
         self.page = page
-        self.url = f"{BASE_URL}/dashboard"
+        self.url = f"{BASE_URL}{PAGE_DASHBOARD}"
 
         self.icon_label_container = ".icon-label-group"
 

@@ -63,3 +63,16 @@ NON_COLLECTION_PATTERNS = [
     re.compile(r"^https?://(?:www\.)?reddit\.com/r/\w+/comments/.*/?"),
     re.compile(r"^(?:https?://)?(?:www\.)?example\.com.*"),
 ]
+
+# API
+
+API_PREFIX = "/api"
+
+# fmt: off
+API_DOWNLOADS       = f"{API_PREFIX}/downloads"
+API_EVENTS          = f"{API_PREFIX}/events"
+API_HEALTH          = f"{API_PREFIX}/health"
+API_MEDIA_DOWNLOAD  = f"{API_PREFIX}/media/download"
+# fmt: on
+
+PAGE_DASHBOARD = "/dashboard"

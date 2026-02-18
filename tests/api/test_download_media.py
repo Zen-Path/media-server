@@ -2,11 +2,9 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from app.constants import DownloadStatus, MediaType
+from app.constants import API_DOWNLOADS, API_MEDIA_DOWNLOAD, DownloadStatus, MediaType
 from app.models.download import Download
 from app.utils.tools import DownloadReportItem
-
-from ..conftest import API_DOWNLOAD, API_DOWNLOADS
 
 
 class MockCmdResult:
@@ -26,7 +24,7 @@ def test_simple_download(client, auth_headers):
         mock_get.return_value.text = f"<html><title>{mock_title}</title></html>"
 
         payload = {"items": [{"url": mock_url, "mediaType": MediaType.VIDEO}]}
-        response = client.post(API_DOWNLOAD, headers=auth_headers, json=payload)
+        response = client.post(API_MEDIA_DOWNLOAD, headers=auth_headers, json=payload)
         assert response.status_code == 200
 
         resp_data = response.get_json()
@@ -56,7 +54,7 @@ def test_stress(client, auth_headers):
     for i in range(url_count):
         unique_url = f"https://example.com/image-{i}.png"
         res = client.post(
-            API_DOWNLOAD,
+            API_MEDIA_DOWNLOAD,
             headers=auth_headers,
             json={"items": [{"url": unique_url, "mediaType": MediaType.IMAGE}]},
         )
@@ -107,7 +105,7 @@ def test_stress(client, auth_headers):
     ],
 )
 def test_invalid_scenarios(payload, error_msg, client, auth_headers):
-    res = client.post(API_DOWNLOAD, headers=auth_headers, json=payload)
+    res = client.post(API_MEDIA_DOWNLOAD, headers=auth_headers, json=payload)
     assert res.status_code == 400
 
     data = res.get_json()
@@ -125,7 +123,7 @@ def test_initial_recording_deduplication(mock_start, client, auth_headers):
     items_data = [{"url": url, "mediaType": MediaType.IMAGE} for url in urls]
 
     client.post(
-        API_DOWNLOAD,
+        API_MEDIA_DOWNLOAD,
         headers=auth_headers,
         json={"items": items_data},
     )
@@ -154,7 +152,7 @@ def test_gallery_expansion_flow(
     mock_get.return_value = mock_response
 
     payload = {"items": [{"url": parent_url, "mediaType": MediaType.GALLERY}]}
-    resp_data = client.post(API_DOWNLOAD, headers=auth_headers, json=payload)
+    resp_data = client.post(API_MEDIA_DOWNLOAD, headers=auth_headers, json=payload)
 
     data = resp_data.get_json()
     assert any(parent_url == download_data["url"] for download_data in data["data"])
@@ -175,7 +173,7 @@ def test_title_scrape_failure_handling(mock_gallery, mock_get, client, auth_head
 
     url = "http://slow-site.com/img.jpg"
     res = client.post(
-        API_DOWNLOAD,
+        API_MEDIA_DOWNLOAD,
         headers=auth_headers,
         json={"items": [{"url": url, "mediaType": MediaType.IMAGE}]},
     )
@@ -196,7 +194,7 @@ def test_gallery_dl_failure_reporting(mock_gallery, client, auth_headers):
 
     url = "https://example.com"
     resp_data = client.post(
-        API_DOWNLOAD,
+        API_MEDIA_DOWNLOAD,
         headers=auth_headers,
         json={"items": [{"url": url, "mediaType": MediaType.GALLERY}]},
     )
@@ -221,7 +219,7 @@ def test_gallery_dl_failure_patterns(mock_gallery, client, auth_headers):
 
     url = "https://example.com"
     resp_data = client.post(
-        API_DOWNLOAD,
+        API_MEDIA_DOWNLOAD,
         headers=auth_headers,
         json={"items": [{"url": url, "mediaType": MediaType.GALLERY}]},
     )
@@ -246,7 +244,7 @@ def test_return_files(mock_gallery, client, auth_headers):
 
     url = "https://example.com"
     res = client.post(
-        API_DOWNLOAD,
+        API_MEDIA_DOWNLOAD,
         headers=auth_headers,
         json={"items": [{"url": url, "mediaType": MediaType.GALLERY}]},
     )

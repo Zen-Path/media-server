@@ -6,7 +6,14 @@ from pathlib import Path
 
 from dotenv import load_dotenv
 
-from app.constants import DownloadStatus, EventType, MediaType
+from app.constants import (
+    API_DOWNLOADS,
+    API_MEDIA_DOWNLOAD,
+    PAGE_DASHBOARD,
+    DownloadStatus,
+    EventType,
+    MediaType,
+)
 
 BASE_DIR = Path(__file__).resolve().parent
 ENV_PATH = BASE_DIR / ".." / ".env"
@@ -22,6 +29,9 @@ CONSTANTS_TO_EXPORT = {
     "EVENT_TYPE": EventType,
     "SERVER_PORT": os.getenv("SERVER_PORT"),
     "API_SECRET_KEY": os.getenv("API_SECRET_KEY"),
+    "API_DOWNLOADS": API_DOWNLOADS,
+    "API_MEDIA_DOWNLOAD": API_MEDIA_DOWNLOAD,
+    "PAGE_DASHBOARD": PAGE_DASHBOARD,
 }
 
 # GENERATOR

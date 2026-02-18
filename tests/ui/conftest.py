@@ -3,7 +3,7 @@ from typing import Any, Optional
 import pytest
 from playwright.sync_api import Page, expect
 
-from tests.conftest import API_DOWNLOADS
+from app.constants import API_DOWNLOADS
 from tests.ui.pages.dashboard_page import DashboardPage
 
 

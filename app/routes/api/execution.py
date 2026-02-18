@@ -3,7 +3,7 @@ from typing import Tuple
 from flask import Response, current_app, request
 from marshmallow import ValidationError
 
-from app.constants import EventType
+from app.constants import API_MEDIA_DOWNLOAD, EventType
 from app.routes.api import bp
 from app.schemas.execution import DownloadRequestSchema
 from app.services import execution_service
@@ -11,7 +11,7 @@ from app.utils.api_response import api_response
 from app.utils.logger import logger
 
 
-@bp.route("/media/download", methods=["POST"])
+@bp.route(API_MEDIA_DOWNLOAD, methods=["POST"])
 def execute_download() -> Tuple[Response, int]:
     """
     Trigger a media download.

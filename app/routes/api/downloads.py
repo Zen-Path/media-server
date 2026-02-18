@@ -3,7 +3,7 @@ from typing import Tuple
 from flask import Response, current_app, request
 from marshmallow import ValidationError
 
-from app.constants import EventType
+from app.constants import API_DOWNLOADS, EventType
 from app.routes.api import bp
 from app.schemas.download import (
     BulkDeleteSchema,
@@ -15,14 +15,14 @@ from app.utils.api_response import api_response
 from app.utils.logger import logger
 
 
-@bp.route("/downloads", methods=["GET"])
+@bp.route(API_DOWNLOADS, methods=["GET"])
 def get_all_downloads() -> Tuple[Response, int]:
     downloads = download_service.get_all_downloads()
     data = [d.to_dict() for d in downloads]
     return api_response(data=data)
 
 
-@bp.route("/downloads/<int:download_id>", methods=["GET"])
+@bp.route(f"{API_DOWNLOADS}/<int:download_id>", methods=["GET"])
 def get_download(download_id: int) -> Tuple[Response, int]:
     download = download_service.get_download_by_id(download_id)
     if not download:
@@ -30,7 +30,7 @@ def get_download(download_id: int) -> Tuple[Response, int]:
     return api_response(data=download.to_dict())
 
 
-@bp.route("/downloads", methods=["PATCH"])
+@bp.route(API_DOWNLOADS, methods=["PATCH"])
 def batch_update_downloads() -> Tuple[Response, int]:
     json_data = request.get_json(silent=True)
 
@@ -65,7 +65,7 @@ def batch_update_downloads() -> Tuple[Response, int]:
         return api_response(error=str(e), status_code=500)
 
 
-@bp.route("/downloads/<int:download_id>", methods=["PATCH"])
+@bp.route(f"{API_DOWNLOADS}/<int:download_id>", methods=["PATCH"])
 def update_download(download_id: int) -> Tuple[Response, int]:
     json_data = request.get_json(silent=True)
 
@@ -103,7 +103,7 @@ def update_download(download_id: int) -> Tuple[Response, int]:
         return api_response(error=str(e), status_code=500)
 
 
-@bp.route("/downloads", methods=["DELETE"])
+@bp.route(API_DOWNLOADS, methods=["DELETE"])
 def batch_delete_downloads() -> Tuple[Response, int]:
     json_data = request.get_json()
 
@@ -129,7 +129,7 @@ def batch_delete_downloads() -> Tuple[Response, int]:
         return api_response(error=str(e), status_code=500)
 
 
-@bp.route("/downloads/<int:download_id>", methods=["DELETE"])
+@bp.route(f"{API_DOWNLOADS}/<int:download_id>", methods=["DELETE"])
 def delete_download(download_id: int) -> Tuple[Response, int]:
     deleted_ids = download_service.bulk_delete_downloads([download_id])
 

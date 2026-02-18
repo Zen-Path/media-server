@@ -1,10 +1,14 @@
 import json
 from unittest.mock import patch
 
-from app.constants import DownloadStatus, EventType, MediaType
+from app.constants import (
+    API_DOWNLOADS,
+    API_MEDIA_DOWNLOAD,
+    DownloadStatus,
+    EventType,
+    MediaType,
+)
 from app.utils.tools import DownloadReportItem
-
-from ..conftest import API_DOWNLOAD, API_DOWNLOADS
 
 
 def parse_sse(raw_msg: str) -> dict:
@@ -33,7 +37,7 @@ def test_download_announcements(client, announcer, auth_headers):
             mock_dl.return_value = DownloadReportItem(status=True)
 
             payload = {"items": [{"url": target_url, "mediaType": target_media_type}]}
-            res = client.post(API_DOWNLOAD, headers=auth_headers, json=payload)
+            res = client.post(API_MEDIA_DOWNLOAD, headers=auth_headers, json=payload)
             assert res.status_code == 200
 
             mock_scrape.assert_called_once_with(target_url)

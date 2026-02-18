@@ -154,9 +154,3 @@ def sample_download_row():
         "end_time": datetime.fromisoformat("2025-01-01T10:11:20").timestamp(),
         "order_number": 0,
     }
-
-
-API_HEALTH = "/api/health"
-API_STREAM = "/api/events"
-API_DOWNLOAD = "/api/media/download"
-API_DOWNLOADS = "/api/downloads"

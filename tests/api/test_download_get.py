@@ -1,4 +1,4 @@
-from ..conftest import API_DOWNLOADS
+from app.constants import API_DOWNLOADS
 
 
 def test_empty_return(client, auth_headers):

@@ -1,4 +1,4 @@
-import { API_SECRET_KEY } from "./constants";
+import { API_SECRET_KEY, API_DOWNLOADS } from "./constants";
 
 /**
  * Fetches the list of downloads from the API.
@@ -6,7 +6,7 @@ import { API_SECRET_KEY } from "./constants";
  */
 export async function fetchDownloads(): Promise<object> {
     try {
-        const response = await fetch("/api/downloads", {
+        const response = await fetch(API_DOWNLOADS, {
             method: "GET",
             headers: {
                 "Content-Type": "application/json",
@@ -34,7 +34,7 @@ export async function fetchDownloads(): Promise<object> {
  */
 export async function deleteDownloads(ids: Array<number>): Promise<object> {
     try {
-        const response = await fetch("/api/downloads", {
+        const response = await fetch(API_DOWNLOADS, {
             method: "DELETE",
             headers: {
                 "Content-Type": "application/json",

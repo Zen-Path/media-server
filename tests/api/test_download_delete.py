@@ -1,6 +1,6 @@
 import pytest
 
-from ..conftest import API_DOWNLOADS
+from app.constants import API_DOWNLOADS
 
 
 @pytest.mark.parametrize(

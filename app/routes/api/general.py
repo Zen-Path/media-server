@@ -4,6 +4,7 @@ from typing import Tuple
 
 from flask import Response, current_app, request
 
+from app.constants import API_EVENTS, API_HEALTH
 from app.routes.api import bp
 from app.utils.api_response import api_response
 
@@ -39,7 +40,7 @@ def require_api_key() -> None | Tuple[Response, int]:
 # ROUTES
 
 
-@bp.route("/health", methods=["GET"])
+@bp.route(API_HEALTH, methods=["GET"])
 def health_check() -> Tuple[Response, int]:
     """
     Public health check endpoint.
@@ -53,7 +54,7 @@ def health_check() -> Tuple[Response, int]:
     )
 
 
-@bp.route("/events")
+@bp.route(API_EVENTS)
 def events():
     announcer = current_app.config["ANNOUNCER"]
 

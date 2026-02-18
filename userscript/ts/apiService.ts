@@ -3,10 +3,11 @@ import {
     DOWNLOAD_STATUS,
     SERVER_PORT,
     API_SECRET_KEY,
+    API_MEDIA_DOWNLOAD,
 } from "../../shared/constants";
 
 export const BASE_URL = `http://localhost:${SERVER_PORT}`;
-const API_DOWNLOAD = `${BASE_URL}/api/media/download`;
+const API_FULL_MEDIA_DOWNLOAD = `${BASE_URL}${API_MEDIA_DOWNLOAD}`;
 
 interface DownloadPayload {
     urls: string[];
@@ -44,7 +45,7 @@ export function downloadMedia(
 
     GM_xmlhttpRequest({
         method: "POST",
-        url: API_DOWNLOAD,
+        url: API_FULL_MEDIA_DOWNLOAD,
         headers: {
             "Content-Type": "application/json",
             "X-API-Key": API_SECRET_KEY,

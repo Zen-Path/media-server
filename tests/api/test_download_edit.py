@@ -1,8 +1,6 @@
 import pytest
 
-from app.constants import MediaType
-
-from ..conftest import API_DOWNLOADS
+from app.constants import API_DOWNLOADS, MediaType
 
 
 @pytest.mark.parametrize(

@@ -6,12 +6,9 @@ import pytest
 import requests
 from sqlalchemy.exc import SQLAlchemyError
 
+from app.constants import API_DOWNLOADS, API_HEALTH
 from app.extensions import db
-from tests.conftest import (
-    API_DOWNLOADS,
-    API_HEALTH,
-    BASE_URL,
-)
+from tests.conftest import BASE_URL
 
 
 def test_auth_valid(client, auth_headers):

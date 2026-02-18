@@ -4,6 +4,7 @@ from pathlib import Path
 from flask import Flask, request
 from flask_cors import CORS
 
+from app.constants import API_PREFIX
 from app.routes.api import bp as api_bp
 from app.routes.main import bp as main_bp
 from app.utils.api_response import api_response
@@ -32,7 +33,7 @@ CORS(app)  # Enable CORS for all routes
 
 
 app.register_blueprint(main_bp)
-app.register_blueprint(api_bp, url_prefix="/api")
+app.register_blueprint(api_bp)
 
 app.config["APP_VERSION"] = PKG_VERSION
 
@@ -48,7 +49,7 @@ def inject_global_vars():
 
 @app.errorhandler(404)
 def handle_404(e):
-    if request.path.startswith("/api/"):
+    if request.path.startswith(API_PREFIX):
         return api_response(
             error="Not Found",
             data={"message": f"The requested URL {request.path!r} was not found."},
