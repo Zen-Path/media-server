@@ -29,7 +29,7 @@ def main():
     download_dir = Path(
         os.getenv("DOWNLOAD_DIR") or os.getenv("XDG_DOWNLOAD_DIR") or "downloads"
     )
-    logger.debug(f"Download dir: {download_dir}")
+    logger.debug(f"Download dir: {str(download_dir)!r}")
 
     # Needs to be an abs path
     if demo_mode:
