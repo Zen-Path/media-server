@@ -129,7 +129,18 @@ def expand_collection_urls(url: str, depth: int = 0) -> List[str]:
 
         output_str = result.output.strip() if result.output else ""
         if output_str:
-            data = json.loads(output_str)
+            # Filter out lines matching [anything][anything]
+            clean_lines = [
+                line
+                for line in output_str.splitlines()
+                if not re.match(r"\[.+\]\[.+\]", line.strip())
+            ]
+
+            cleaned_output = "\n".join(clean_lines).strip()
+            if not cleaned_output:
+                return []
+
+            data = json.loads(cleaned_output)
         else:
             return []
 
