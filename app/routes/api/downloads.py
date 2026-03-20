@@ -7,8 +7,7 @@ from app.constants import API_DOWNLOADS, EventType
 from app.routes.api import bp
 from app.schemas.download import (
     BulkDeleteSchema,
-    DownloadBulkUpdateSchema,
-    DownloadUpdateBaseSchema,
+    DownloadUpdateSchema,
     GetDownloadsQuerySchema,
 )
 from app.services import download_service
@@ -42,15 +41,15 @@ def get_downloads() -> Tuple[Response, int]:
 
 
 @bp.route(API_DOWNLOADS, methods=["PATCH"])
-def batch_update_downloads() -> Tuple[Response, int]:
+def update_downloads() -> Tuple[Response, int]:
     json_data = request.get_json(silent=True)
 
     if not json_data:
         return api_response(error="Missing JSON body", status_code=400)
 
     try:
-        data = DownloadBulkUpdateSchema(many=True).load(json_data)
-        results = download_service.bulk_edit_downloads(data)  # type: ignore
+        data = DownloadUpdateSchema(many=True).load(json_data)
+        results = download_service.update_downloads(data)  # type: ignore
 
         updates_to_announce = [
             {"id": res["id"], **res["updates"]}
@@ -72,45 +71,7 @@ def batch_update_downloads() -> Tuple[Response, int]:
         return api_response(error=str(err.messages), status_code=400)
 
     except Exception as e:
-        logger.error(f"Bulk Edit Error: {e}")
-        return api_response(error=str(e), status_code=500)
-
-
-@bp.route(f"{API_DOWNLOADS}/<int:download_id>", methods=["PATCH"])
-def update_download(download_id: int) -> Tuple[Response, int]:
-    json_data = request.get_json(silent=True)
-
-    if not json_data:
-        return api_response(error="Missing JSON body", status_code=400)
-
-    try:
-        updates = DownloadUpdateBaseSchema().load(json_data)
-
-        # Inject the ID from the URL so the service knows what to target
-        updates["id"] = download_id  # type: ignore
-
-        results = download_service.bulk_edit_downloads([updates])  # type: ignore
-        result = results[0]
-
-        if not result["status"] and result.get("error") == "ID not found":
-            return api_response(error="Download not found", status_code=404)
-
-        if result.get("status") and result.get("updates"):
-            try:
-                updates_to_announce = [{"id": result["id"], **result["updates"]}]
-                current_app.config["ANNOUNCER"].announce(
-                    EventType.UPDATE, updates_to_announce
-                )
-            except Exception as e:
-                logger.warning(f"Announcer failed: {e}")
-
-        return api_response(data=result)
-
-    except ValidationError as err:
-        return api_response(error=str(err.messages), status_code=400)
-
-    except Exception as e:
-        logger.error(f"Update Error: {e}")
+        logger.error(f"Download update error: {e}")
         return api_response(error=str(e), status_code=500)
 
 

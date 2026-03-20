@@ -167,7 +167,7 @@ def test_valid_scenarios(
         "reset_media_type",
     ],
 )
-def test_bulk_edit_persistence(
+def test_update_persistence(
     payload,
     new_title,
     new_media_type,

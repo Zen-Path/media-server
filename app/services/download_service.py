@@ -26,7 +26,7 @@ def get_downloads(ids: Optional[List[int]] = None) -> List[Download]:
     return query.order_by(Download.id.desc()).all()
 
 
-def bulk_edit_downloads(updates: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+def update_downloads(updates: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
     """
     Process bulk updates.
     Returns a list of results with {id, status, error, updates}.

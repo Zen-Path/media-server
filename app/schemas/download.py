@@ -29,18 +29,13 @@ class GetDownloadsQuerySchema(Schema):
         return data
 
 
-class DownloadUpdateBaseSchema(Schema):
-    """Schema for validating editable fields of a Download instance."""
+class DownloadUpdateSchema(Schema):
+    """Schema for validating an update item for a Download instance."""
 
+    id = fields.Integer(required=True, strict=True)
     title = TitleField()
     media_type = MediaTypeField()
     status = DownloadStatusField()
-
-
-class DownloadBulkUpdateSchema(DownloadUpdateBaseSchema):
-    """Schema for a batch update item, requiring an explicit ID"""
-
-    id = fields.Integer(required=True, strict=True)
 
 
 class BulkDeleteSchema(Schema):
