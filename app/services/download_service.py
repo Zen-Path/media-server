@@ -12,14 +12,18 @@ from app.models.download import Download
 from app.utils.logger import logger
 
 
-def get_all_downloads():
-    """Fetches all downloads ordered by ID descending."""
-    return Download.query.order_by(Download.id.desc()).all()
+def get_downloads(ids: Optional[List[int]] = None) -> List[Download]:
+    """
+    Fetches downloads, ordered by ID descending.
+    If a list of IDs is provided, fetches only those specific downloads.
+    Otherwise, fetches all downloads.
+    """
+    query = Download.query
 
+    if ids:
+        query = query.filter(Download.id.in_(ids))
 
-def get_download_by_id(download_id: int) -> Download | None:
-    """Fetches a single download."""
-    return Download.query.get(download_id)
+    return query.order_by(Download.id.desc()).all()
 
 
 def bulk_edit_downloads(updates: List[Dict[str, Any]]) -> List[Dict[str, Any]]:

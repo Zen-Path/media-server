@@ -9,6 +9,7 @@ from app.schemas.download import (
     BulkDeleteSchema,
     DownloadBulkUpdateSchema,
     DownloadUpdateBaseSchema,
+    GetDownloadsQuerySchema,
 )
 from app.services import download_service
 from app.utils.api_response import api_response
@@ -16,18 +17,28 @@ from app.utils.logger import logger
 
 
 @bp.route(API_DOWNLOADS, methods=["GET"])
-def get_all_downloads() -> Tuple[Response, int]:
-    downloads = download_service.get_all_downloads()
+def get_downloads() -> Tuple[Response, int]:
+    try:
+        args = GetDownloadsQuerySchema().load(request.args)
+    except ValidationError as err:
+        print(err)
+        return api_response(error=str(err.messages), status_code=400)
+
+    if "ids" in args:
+        id_list = args["ids"]
+
+        downloads = download_service.get_downloads(id_list)
+
+        if len(id_list) == 1 and not downloads:
+            return api_response(error="Download not found", status_code=404)
+
+        data = [d.to_dict() for d in downloads]
+        return api_response(data=data)
+
+    # Fetch all downloads if no 'ids' query parameter is provided
+    downloads = download_service.get_downloads()
     data = [d.to_dict() for d in downloads]
     return api_response(data=data)
-
-
-@bp.route(f"{API_DOWNLOADS}/<int:download_id>", methods=["GET"])
-def get_download(download_id: int) -> Tuple[Response, int]:
-    download = download_service.get_download_by_id(download_id)
-    if not download:
-        return api_response(error="Download not found", status_code=404)
-    return api_response(data=download.to_dict())
 
 
 @bp.route(API_DOWNLOADS, methods=["PATCH"])
