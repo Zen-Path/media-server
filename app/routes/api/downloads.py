@@ -6,7 +6,7 @@ from marshmallow import ValidationError
 from app.constants import API_DOWNLOADS, EventType
 from app.routes.api import bp
 from app.schemas.download import (
-    BulkDeleteSchema,
+    DeleteDownloadsSchema,
     DownloadUpdateSchema,
     GetDownloadsQuerySchema,
 )
@@ -76,12 +76,12 @@ def update_downloads() -> Tuple[Response, int]:
 
 
 @bp.route(API_DOWNLOADS, methods=["DELETE"])
-def batch_delete_downloads() -> Tuple[Response, int]:
+def delete_downloads() -> Tuple[Response, int]:
     json_data = request.get_json()
 
     try:
-        data = BulkDeleteSchema().load(json_data)
-        deleted_ids = download_service.bulk_delete_downloads(data["ids"])  # type: ignore
+        data = DeleteDownloadsSchema().load(json_data)
+        deleted_ids = download_service.delete_downloads(data["ids"])  # type: ignore
 
         if deleted_ids:
             try:
@@ -97,25 +97,5 @@ def batch_delete_downloads() -> Tuple[Response, int]:
         return api_response(error=str(err.messages), status_code=400)
 
     except Exception as e:
-        logger.error(f"Bulk Delete Error: {e}")
-        return api_response(error=str(e), status_code=500)
-
-
-@bp.route(f"{API_DOWNLOADS}/<int:download_id>", methods=["DELETE"])
-def delete_download(download_id: int) -> Tuple[Response, int]:
-    deleted_ids = download_service.bulk_delete_downloads([download_id])
-
-    try:
-        if deleted_ids:
-            try:
-                current_app.config["ANNOUNCER"].announce(
-                    EventType.DELETE, {"ids": deleted_ids}
-                )
-            except Exception as e:
-                logger.warning(f"Announcer failed: {e}")
-
-        return api_response(data={"ids": deleted_ids})
-
-    except Exception as e:
-        logger.error(f"Delete Error: {e}")
+        logger.error(f"Download delete error: {e}")
         return api_response(error=str(e), status_code=500)

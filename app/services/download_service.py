@@ -89,7 +89,7 @@ def update_downloads(updates: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
     return results
 
 
-def bulk_delete_downloads(ids: List[int]) -> List[int]:
+def delete_downloads(ids: List[int]) -> List[int]:
     """
     Deletes downloads by ID.
     Ignores records that don't exist.

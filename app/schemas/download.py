@@ -38,7 +38,7 @@ class DownloadUpdateSchema(Schema):
     status = DownloadStatusField()
 
 
-class BulkDeleteSchema(Schema):
+class DeleteDownloadsSchema(Schema):
     ids = fields.List(
         fields.Int(strict=True), required=True, validate=validate.Length(min=1)
     )
