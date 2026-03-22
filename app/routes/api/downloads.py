@@ -22,19 +22,12 @@ def get_downloads() -> Tuple[Response, int]:
     except ValidationError as err:
         return api_response(error=str(err.messages), status_code=400)
 
-    if args and "ids" in args:
-        id_list = args["ids"]  # type: ignore
+    id_list: list[int] | None = args.get("ids")  # type: ignore
+    downloads = download_service.get_downloads(id_list)
 
-        downloads = download_service.get_downloads(id_list)
+    if id_list and len(id_list) == 1 and not downloads:
+        return api_response(error="Download not found", status_code=404)
 
-        if len(id_list) == 1 and not downloads:
-            return api_response(error="Download not found", status_code=404)
-
-        data = [d.to_dict() for d in downloads]
-        return api_response(data=data)
-
-    # Fetch all downloads if no 'ids' query parameter is provided
-    downloads = download_service.get_downloads()
     data = [d.to_dict() for d in downloads]
     return api_response(data=data)
 
