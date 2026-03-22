@@ -112,13 +112,6 @@ def test_get_downloads_ignores_unknown_params(
     assert data[0]["id"] == target_id
 
 
-def test_get_download_not_found(client, auth_headers):
-    """Test that a 404 is returned if exactly one ID is requested but does not exist."""
-    response = client.get(f"{API_DOWNLOADS}?ids=9999", headers=auth_headers)
-    assert response.status_code == 404
-    assert response.json["error"] is not None
-
-
 def test_get_downloads_invalid_ids_format(client, auth_headers):
     """Test that a 400 is returned if the IDs are not valid integers."""
     response = client.get(f"{API_DOWNLOADS}?ids=1,abc,3", headers=auth_headers)

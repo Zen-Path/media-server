@@ -25,9 +25,6 @@ def get_downloads() -> Tuple[Response, int]:
     id_list: list[int] | None = args.get("ids")  # type: ignore
     downloads = download_service.get_downloads(id_list)
 
-    if id_list and len(id_list) == 1 and not downloads:
-        return api_response(error="Download not found", status_code=404)
-
     data = [d.to_dict() for d in downloads]
     return api_response(data=data)
 
