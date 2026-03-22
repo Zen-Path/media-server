@@ -93,25 +93,6 @@ def test_get_downloads_by_multiple_ids(client, auth_headers, seed, sample_downlo
     assert id_2 in returned_ids
 
 
-def test_get_downloads_ignores_unknown_params(
-    client, auth_headers, seed, sample_download_row
-):
-    """Test that undefined query parameters are safely ignored."""
-    seeded_rows = seed([sample_download_row])
-    target_id = seeded_rows[0].id
-
-    # We pass 'foo=bar' and 'sort=asc' which are not defined in GetDownloadsQuerySchema
-    response = client.get(
-        f"{API_DOWNLOADS}?ids={target_id}&foo=bar&sort=asc", headers=auth_headers
-    )
-
-    assert response.status_code == 200
-
-    data = response.json["data"]
-    assert len(data) == len(seeded_rows)
-    assert data[0]["id"] == target_id
-
-
 def test_get_downloads_invalid_ids_format(client, auth_headers):
     """Test that a 400 is returned if the IDs are not valid integers."""
     response = client.get(f"{API_DOWNLOADS}?ids=1,abc,3", headers=auth_headers)

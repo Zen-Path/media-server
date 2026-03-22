@@ -145,3 +145,22 @@ def test_concurrent_operations(client, auth_headers, seed):
     # None should cause a 500 server crash
     for res in results:
         assert res.status_code == 200
+
+
+def test_get_request_ignores_unknown_query_params(
+    client, auth_headers, seed, sample_download_row
+):
+    """Test that unknown query parameters are safely ignored."""
+    seeded_rows = seed([sample_download_row])
+    target_id = seeded_rows[0].id
+
+    # We pass 'foo=bar' and 'sort=asc' which are not defined in GetDownloadsQuerySchema
+    response = client.get(
+        f"{API_DOWNLOADS}?ids={target_id}&foo=bar&sort=asc", headers=auth_headers
+    )
+
+    assert response.status_code == 200
+
+    data = response.json["data"]
+    assert len(data) == len(seeded_rows)
+    assert data[0]["id"] == target_id
