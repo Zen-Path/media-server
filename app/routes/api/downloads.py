@@ -20,7 +20,6 @@ def get_downloads() -> Tuple[Response, int]:
     try:
         args = GetDownloadsQuerySchema().load(request.args)
     except ValidationError as err:
-        print(err)
         return api_response(error=str(err.messages), status_code=400)
 
     if "ids" in args:
