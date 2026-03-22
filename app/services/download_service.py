@@ -1,5 +1,5 @@
 from datetime import datetime, timezone
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional, Tuple, cast
 
 from flask import current_app
 
@@ -9,6 +9,7 @@ from app.constants import (
 )
 from app.extensions import db
 from app.models.download import Download
+from app.schemas.download import DownloadSchema
 from app.utils.logger import logger
 
 
@@ -125,7 +126,8 @@ def initialize_download(
         db.session.add(record)
         db.session.commit()
 
-        record_dict = record.to_dict()
+        raw_dump = DownloadSchema().dump(record)
+        record_dict = cast(Dict[str, Any], raw_dump)
 
         try:
             current_app.config["ANNOUNCER"].announce(EventType.CREATE, [record_dict])
@@ -162,8 +164,10 @@ def finalize_download(
 
         db.session.commit()
 
-        # Return the dictionary representation of the saved object
-        return True, None, record.to_dict()
+        raw_dump = DownloadSchema().dump(record)
+        record_dict = cast(Dict[str, Any], raw_dump)
+
+        return True, None, record_dict
 
     except Exception as e:
         db.session.rollback()

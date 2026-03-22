@@ -7,6 +7,7 @@ from app.constants import API_DOWNLOADS, EventType
 from app.routes.api import bp
 from app.schemas.download import (
     DeleteDownloadsSchema,
+    DownloadSchema,
     DownloadUpdateSchema,
     GetDownloadsQuerySchema,
 )
@@ -25,7 +26,7 @@ def get_downloads() -> Tuple[Response, int]:
     id_list: list[int] | None = args.get("ids")  # type: ignore
     downloads = download_service.get_downloads(id_list)
 
-    data = [d.to_dict() for d in downloads]
+    data = DownloadSchema(many=True).dump(downloads)
     return api_response(data=data)
 
 

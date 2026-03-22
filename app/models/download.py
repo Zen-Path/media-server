@@ -31,21 +31,3 @@ class Download(db.Model):  # type: ignore[name-defined]
 
     status = db.Column(db.Integer, default=DownloadStatus.PENDING, nullable=False)
     status_message = db.Column(db.Text, nullable=True)
-
-    def to_dict(self):
-        """
-        Serializes the object to a dictionary for JSON responses.
-        Converts Python snake_case to JavaScript camelCase.
-        """
-        return {
-            "id": self.id,
-            "url": self.url,
-            "title": self.title,
-            "mediaType": self.media_type,
-            "orderNumber": self.order_number,
-            "startTime": self.start_time,
-            "endTime": self.end_time,
-            "updateTime": self.update_time,
-            "status": self.status,
-            "statusMessage": self.status_message,
-        }
