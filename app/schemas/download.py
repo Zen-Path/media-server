@@ -3,24 +3,28 @@ from marshmallow import EXCLUDE, Schema, fields, pre_load, validate
 from app.schemas import DownloadStatusField, MediaTypeField, TitleField
 
 
-class DownloadSchema(Schema):
+class DownloadUpdateSchema(Schema):
+    """Schema for validating an update item for a Download instance."""
+
+    id = fields.Int(required=True, strict=True)
+    title = TitleField()
+    media_type = MediaTypeField()
+
+    status = DownloadStatusField()
+    status_message = fields.Str(data_key="statusMessage", allow_none=True)
+
+
+class DownloadSchema(DownloadUpdateSchema):
     """
     Validates the structure of a single Download object.
     """
 
-    id = fields.Int(required=True, strict=True)
-    url = fields.Str(required=True)
-    title = TitleField()
-    media_type = MediaTypeField()
-
+    url = fields.URL(required=True)
     order_number = fields.Int(data_key="orderNumber", required=True, strict=True)
 
     start_time = fields.Int(data_key="startTime", required=True, strict=True)
     end_time = fields.Int(data_key="endTime", allow_none=True, strict=True)
     update_time = fields.Int(data_key="updateTime", allow_none=True, strict=True)
-
-    status = DownloadStatusField()
-    status_message = fields.Str(data_key="statusMessage", allow_none=True)
 
 
 class GetDownloadsQuerySchema(Schema):
@@ -47,15 +51,6 @@ class GetDownloadsQuerySchema(Schema):
                 data["ids"] = data["ids"].split(",")
 
         return data
-
-
-class DownloadUpdateSchema(Schema):
-    """Schema for validating an update item for a Download instance."""
-
-    id = fields.Integer(required=True, strict=True)
-    title = TitleField()
-    media_type = MediaTypeField()
-    status = DownloadStatusField()
 
 
 class DeleteDownloadsSchema(Schema):
