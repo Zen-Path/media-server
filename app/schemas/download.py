@@ -3,6 +3,26 @@ from marshmallow import EXCLUDE, Schema, fields, pre_load, validate
 from app.schemas import DownloadStatusField, MediaTypeField, TitleField
 
 
+class DownloadSchema(Schema):
+    """
+    Validates the structure of a single Download object.
+    """
+
+    id = fields.Int(required=True, strict=True)
+    url = fields.Str(required=True)
+    title = TitleField()
+    media_type = MediaTypeField()
+
+    order_number = fields.Int(data_key="orderNumber", required=True, strict=True)
+
+    start_time = fields.Int(data_key="startTime", required=True, strict=True)
+    end_time = fields.Int(data_key="endTime", allow_none=True, strict=True)
+    update_time = fields.Int(data_key="updateTime", allow_none=True, strict=True)
+
+    status = DownloadStatusField()
+    status_message = fields.Str(data_key="statusMessage", allow_none=True)
+
+
 class GetDownloadsQuerySchema(Schema):
     """Schema for validating query parameters when getting Downloads."""
 
