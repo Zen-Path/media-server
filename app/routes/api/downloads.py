@@ -22,8 +22,8 @@ def get_downloads() -> Tuple[Response, int]:
     except ValidationError as err:
         return api_response(error=str(err.messages), status_code=400)
 
-    if "ids" in args:
-        id_list = args["ids"]
+    if args and "ids" in args:
+        id_list = args["ids"]  # type: ignore
 
         downloads = download_service.get_downloads(id_list)
 
