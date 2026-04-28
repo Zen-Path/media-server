@@ -1,6 +1,6 @@
 from marshmallow import fields, validate
 
-from app.constants import DownloadStatus, MediaType
+from app.constants import MAX_TITLE_LENGTH, DownloadStatus, MediaType
 
 
 class TitleField(fields.Str):
@@ -8,6 +8,9 @@ class TitleField(fields.Str):
 
     def __init__(self, **kwargs):
         kwargs.setdefault("allow_none", True)
+        # TODO: Instead of discarding titles that are too long, we should just trim
+        # them. Would require new test cases.
+        kwargs.setdefault("validate", validate.Length(max=MAX_TITLE_LENGTH))
         super().__init__(**kwargs)
 
 

@@ -27,6 +27,10 @@ from app.constants import API_DOWNLOADS, MediaType
             "not a valid string",
         ),
         (
+            [{"id": 1, "title": "a" * 1000}],
+            "longer than maximum length",
+        ),
+        (
             [{"id": 1, "mediaType": "123"}],
             "not a valid integer",
         ),
@@ -41,6 +45,7 @@ from app.constants import API_DOWNLOADS, MediaType
         "id_none",
         "id_wrong_type",
         "title_wrong_type",
+        "title_too_long",
         "media_type_wrong_type",
         "status_wrong_type",
     ],

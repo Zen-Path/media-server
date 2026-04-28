@@ -72,6 +72,14 @@ def test_stress(client, auth_headers):
         ({"items": [{"url": None}]}, "field may not be null"),
         ({"items": [{"url": "123"}]}, "not a valid url"),
         (
+            {"items": [{"url": "https://example.com", "title": 1}]},
+            "not a valid string",
+        ),
+        (
+            {"items": [{"url": "https://example.com", "title": "a" * 1000}]},
+            "longer than maximum length",
+        ),
+        (
             {"items": [{"url": "https://example.com", "mediaType": "Image"}]},
             "not a valid integer",
         ),
@@ -97,6 +105,8 @@ def test_stress(client, auth_headers):
         "items_empty",
         "url_none",
         "url_wrong_type",
+        "title_wrong_type",
+        "title_too_long",
         "media_type_wrong_type",
         "media_type_negative_id",
         "field_snake_case",

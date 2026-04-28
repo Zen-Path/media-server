@@ -1,6 +1,6 @@
 from datetime import datetime, timezone
 
-from app.constants import DownloadStatus
+from app.constants import MAX_TITLE_LENGTH, DownloadStatus
 from app.extensions import db
 
 
@@ -9,7 +9,7 @@ class Download(db.Model):  # type: ignore[name-defined]
 
     id = db.Column(db.Integer, primary_key=True)
     url = db.Column(db.String, nullable=False)
-    title = db.Column(db.String(255), nullable=True)
+    title = db.Column(db.String(MAX_TITLE_LENGTH), nullable=True)
     media_type = db.Column(db.Integer, nullable=True)
 
     order_number = db.Column(db.Integer, default=0)
