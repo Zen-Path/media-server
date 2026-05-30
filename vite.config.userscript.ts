@@ -19,9 +19,6 @@ export default defineConfig({
                 author: "Zen-Path",
                 description:
                     "Send a download request for a URL to a local media server.",
-                supportURL:
-                    "https://github.com/Zen-Path/flexycon/tree/main/dotfiles/src/scripts/media_server",
-                homepageURL: "https://github.com/Zen-Path/flexycon",
                 icon: "https://www.svgrepo.com/show/230395/download.svg",
                 grant: [
                     "GM_registerMenuCommand",

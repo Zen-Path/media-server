@@ -1,4 +1,12 @@
 {
+    "author": "Zen-Path",
+    "bugs": {
+        "url": "https://github.com/Zen-Path/media-server/issues"
+    },
+    "dependencies": {
+        "sweetalert2": "^11.26.18"
+    },
+    "description": "A script that handles download requests for URLs.",
     "devDependencies": {
         "@types/node": "^25.2.3",
         "@types/tampermonkey": "^5.0.5",
@@ -8,15 +16,21 @@
         "vite-plugin-monkey": "^7.1.9",
         "vitest": "^4.0.18"
     },
+    "homepage": "https://github.com/Zen-Path/media-server#readme",
+    "keywords": [],
+    "license": "MIT",
+    "name": "media-server",
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/Zen-Path/media-server.git"
+    },
     "scripts": {
-        "gen": "python scripts/gen_constants.py",
         "build:frontend": "npm run gen && vite build",
         "build:userscript": "npm run gen && vite build --config vite.config.userscript.ts",
-        "watch": "npm run gen && vite build --watch",
+        "gen": "python scripts/gen_constants.py",
         "tests": "vitest --root .",
-        "tests:run": "vitest run --root ."
+        "tests:run": "vitest run --root .",
+        "watch": "npm run gen && vite build --watch"
     },
-    "dependencies": {
-        "sweetalert2": "^11.26.18"
-    }
+    "type": "module"
 }
