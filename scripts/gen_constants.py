@@ -16,7 +16,7 @@ from app.constants import (
 )
 
 BASE_DIR = Path(__file__).resolve().parent
-ENV_PATH = BASE_DIR / ".." / ".env"
+ENV_PATH = BASE_DIR.parent / ".env"
 OUTPUT_FILE = BASE_DIR.parent / "shared" / "constants.ts"
 
 load_dotenv(dotenv_path=ENV_PATH)

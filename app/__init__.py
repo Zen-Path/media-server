@@ -13,8 +13,8 @@ from app.utils.tools import get_version
 
 app = Flask(
     __name__,
-    template_folder=Path("../frontend") / "templates",
-    static_folder=Path("../frontend") / "static",
+    template_folder=Path(__file__).parent.parent / "frontend" / "templates",
+    static_folder=Path(__file__).parent.parent / "frontend" / "static",
 )
 
 CORS(app)  # Enable CORS for all routes
