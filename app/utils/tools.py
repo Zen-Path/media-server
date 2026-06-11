@@ -1,9 +1,24 @@
 import secrets
 import subprocess
+import tomllib
 from dataclasses import asdict, dataclass, field
+from pathlib import Path
 from typing import List, Optional
 
 from app.utils.logger import logger
+
+PYPROJECT_PATH = Path(__file__).parent.parent.parent / "pyproject.toml"
+
+
+def get_version() -> str:
+    """Reads the package version from the package metadata."""
+    try:
+        with PYPROJECT_PATH.open("rb") as f:
+            data = tomllib.load(f)
+        return data["project"]["version"]
+    except (FileNotFoundError, KeyError, tomllib.TOMLDecodeError) as e:
+        logger.warning(f"Unable to find the version number: {e}")
+        return "0.0.1"
 
 
 @dataclass
