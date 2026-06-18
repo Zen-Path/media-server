@@ -28,6 +28,7 @@ export default defineConfig({
                     "GM_addElement",
                 ],
                 noframes: true,
+                "run-at": "document-start",
             },
 
             build: {
