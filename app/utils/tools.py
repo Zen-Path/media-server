@@ -3,6 +3,7 @@ import subprocess
 import tomllib
 from dataclasses import asdict, dataclass, field
 from pathlib import Path
+from typing import Sequence
 
 from app.utils.logger import logger
 
@@ -69,7 +70,11 @@ def recursive_camelize(data):
 @dataclass
 class CommandResult:
     return_code: int
-    output: str
+    raw_output: str
+
+    @property
+    def output(self) -> str:
+        return self.raw_output.strip()
 
     @property
     def success(self) -> bool:
@@ -79,15 +84,16 @@ class CommandResult:
         return self.output
 
 
-def run_command(command: list[str]) -> CommandResult:
+def run_command(command: Sequence[str | int | Path], tokens: int = 4) -> CommandResult:
     """Run a shell command and return its result."""
-    cmd_identifier = secrets.token_hex(5)  # 8 hex chars
+    cmd_identifier = secrets.token_hex(tokens)
 
-    logger.debug(f"Running {command} with id '{cmd_identifier}'")
+    normalized_cmd = [str(p) if not isinstance(p, str) else p for p in command]
+    logger.debug(f"Running {normalized_cmd} with id {cmd_identifier!r}")
 
-    output = []
+    output: list[str] = []
     with subprocess.Popen(
-        command,
+        normalized_cmd,
         stdout=subprocess.PIPE,
         stderr=subprocess.STDOUT,
         universal_newlines=True,
@@ -95,13 +101,13 @@ def run_command(command: list[str]) -> CommandResult:
     ) as process:
         if process.stdout is not None:
             for line in process.stdout:
-                output.append(line)
+                output.append(line)  # newline is included
                 logger.debug(line.strip())
 
         return_code = process.wait()
 
     logger.debug(
-        f"Command with id '{cmd_identifier}' finished with return code {return_code}"
+        f"Command with id {cmd_identifier!r} finished with return code {return_code}"
     )
 
-    return CommandResult(return_code=return_code, output="\n".join(output))
+    return CommandResult(return_code=return_code, raw_output="".join(output))
