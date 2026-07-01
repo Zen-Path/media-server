@@ -34,7 +34,7 @@ class DownloadReportItem:
         return asdict(self)
 
 
-def to_camel_case(snake_str):
+def to_camel_case(snake_str: str) -> str:
     if not snake_str:
         return snake_str
 

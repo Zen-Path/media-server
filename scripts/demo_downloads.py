@@ -357,7 +357,7 @@ def get_demo_downloads(
                 }
             )
 
-    processed_data = []
+    processed_data: list[dict[str, Any]] = []
     for item in raw_data:
         if isinstance(item["start_time"], datetime):
             item["start_time"] = int(item["start_time"].timestamp())
