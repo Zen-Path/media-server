@@ -1,5 +1,3 @@
-from typing import Dict
-
 from app.constants import DownloadStatus, MediaType
 from app.services.download_service import (
     finalize_download,
@@ -12,7 +10,7 @@ from app.utils.tools import DownloadReportItem
 
 
 def process_download_request(items, range_start, range_end):
-    report: Dict[str, DownloadReportItem] = {}
+    report: dict[str, DownloadReportItem] = {}
 
     # DEDUPLICATION
 

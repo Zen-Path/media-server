@@ -3,7 +3,6 @@ import subprocess
 import tomllib
 from dataclasses import asdict, dataclass, field
 from pathlib import Path
-from typing import List, Optional
 
 from app.utils.logger import logger
 
@@ -23,13 +22,13 @@ def get_version() -> str:
 
 @dataclass
 class DownloadReportItem:
-    url: Optional[str] = None
+    url: str | None = None
     status: bool = True
-    error: Optional[str] = None
-    warnings: List[str] = field(default_factory=list)
+    error: str | None = None
+    warnings: list[str] = field(default_factory=list)
     log: str = ""
     output: str = ""
-    files: List[str] = field(default_factory=list)
+    files: list[str] = field(default_factory=list)
 
     def to_dict(self):
         return asdict(self)
@@ -80,7 +79,7 @@ class CommandResult:
         return self.output
 
 
-def run_command(command: List[str]) -> CommandResult:
+def run_command(command: list[str]) -> CommandResult:
     """Run a shell command and return its result."""
     cmd_identifier = secrets.token_hex(5)  # 8 hex chars
 

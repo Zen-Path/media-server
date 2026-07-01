@@ -1,6 +1,5 @@
 import re
 from abc import ABC, abstractmethod
-from typing import List, Optional
 
 from flask import current_app
 
@@ -12,9 +11,9 @@ class Media(ABC):
     @abstractmethod
     def download(
         cls,
-        urls: List[str],
-        range_start: Optional[int] = None,
-        range_end: Optional[int] = None,
+        urls: list[str],
+        range_start: int | None = None,
+        range_end: int | None = None,
     ) -> DownloadReportItem:
         pass
 
@@ -38,9 +37,9 @@ class Gallery(Media):
     @classmethod
     def download(
         cls,
-        urls: List[str],
-        range_start: Optional[int] = None,
-        range_end: Optional[int] = None,
+        urls: list[str],
+        range_start: int | None = None,
+        range_end: int | None = None,
     ) -> DownloadReportItem:
         """
         Download media using 'gallery-dl'.

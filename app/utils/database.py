@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 from app.extensions import db
 from app.models.download import Download
@@ -27,8 +27,8 @@ def init_db(app):
 
 
 def seed_db(
-    data: Optional[List[Dict[str, Any]]] = None, row_count: Optional[int] = None
-):
+    data: list[dict[str, Any]] | None = None, row_count: int | None = None
+) -> list[Download]:
     """
     Seeds the database with provided data.
     """
@@ -38,7 +38,7 @@ def seed_db(
         "url": "https://default.com/media",
     }
 
-    entries: List[Download] = [Download(**{**defaults, **row}) for row in data_to_use]
+    entries: list[Download] = [Download(**{**defaults, **row}) for row in data_to_use]
 
     try:
         db.session.add_all(entries)

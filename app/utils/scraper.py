@@ -2,7 +2,7 @@ import html
 import json
 import re
 from pathlib import Path
-from typing import Dict, List, Optional
+from typing import Any
 from urllib.parse import unquote, urlparse
 
 import requests
@@ -43,7 +43,7 @@ def get_filename_from_url(url: str) -> str:
     return f"{filename} - {domain}"
 
 
-def scrape_title(url: str, headers: Optional[Dict] = None) -> str:
+def scrape_title(url: str, headers: dict[str, Any] | None = None) -> str:
     """
     Scrapes the title of a webpage OR generates a filename for direct files.
     """
@@ -104,7 +104,7 @@ def scrape_title(url: str, headers: Optional[Dict] = None) -> str:
         return get_filename_from_url(url)
 
 
-def expand_collection_urls(url: str, depth: int = 0) -> List[str]:
+def expand_collection_urls(url: str, depth: int = 0) -> list[str]:
     """
     Determines if a URL is a collection and expands it.
     Rejects direct file urls and known patterns.

@@ -1,5 +1,5 @@
 from datetime import datetime, timezone
-from typing import Any, Dict, List, Optional, Tuple, cast
+from typing import Any, cast
 
 from flask import current_app
 
@@ -13,7 +13,7 @@ from app.schemas.download import DownloadSchema
 from app.utils.logger import logger
 
 
-def get_downloads(ids: Optional[List[int]] = None) -> List[Download]:
+def get_downloads(ids: list[int] | None = None) -> list[Download]:
     """
     Fetches downloads, ordered by ID descending.
     If a list of IDs is provided, fetches only those specific downloads.
@@ -27,7 +27,7 @@ def get_downloads(ids: Optional[List[int]] = None) -> List[Download]:
     return query.order_by(Download.id.desc()).all()
 
 
-def update_downloads(updates: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+def update_downloads(updates: list[dict[str, Any]]) -> list[dict[str, Any]]:
     """
     Process bulk updates.
     Returns a list of results with {id, status, error, updates}.
@@ -90,13 +90,13 @@ def update_downloads(updates: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
     return results
 
 
-def delete_downloads(ids: List[int]) -> List[int]:
+def delete_downloads(ids: list[int]) -> list[int]:
     """
     Deletes downloads by ID.
     Ignores records that don't exist.
 
     Returns:
-        List[int]: A list of IDs that were successfully found and deleted.
+        list[int]: A list of IDs that were successfully found and deleted.
     """
     existing_records = Download.query.filter(Download.id.in_(ids)).all()
     existing_ids = [d.id for d in existing_records]
@@ -113,8 +113,8 @@ def delete_downloads(ids: List[int]) -> List[int]:
 
 
 def initialize_download(
-    url: str, media_type: Optional[int]
-) -> Tuple[bool, Optional[str], Optional[Dict[str, Any]]]:
+    url: str, media_type: int | None
+) -> tuple[bool, str | None, dict[str, Any] | None]:
     """
     Initializes a download record and announces it.
 
@@ -127,7 +127,7 @@ def initialize_download(
         db.session.commit()
 
         raw_dump = DownloadSchema().dump(record)
-        record_dict = cast(Dict[str, Any], raw_dump)
+        record_dict = cast(dict[str, Any], raw_dump)
 
         try:
             current_app.config["ANNOUNCER"].announce(EventType.CREATE, [record_dict])
@@ -145,8 +145,8 @@ def initialize_download(
 
 
 def finalize_download(
-    download_id: int, title: Optional[str], status: DownloadStatus
-) -> Tuple[bool, Optional[str], Optional[Dict[str, Any]]]:
+    download_id: int, title: str | None, status: DownloadStatus
+) -> tuple[bool, str | None, dict[str, Any] | None]:
     """
     Updates a download record with final data.
 
@@ -165,7 +165,7 @@ def finalize_download(
         db.session.commit()
 
         raw_dump = DownloadSchema().dump(record)
-        record_dict = cast(Dict[str, Any], raw_dump)
+        record_dict = cast(dict[str, Any], raw_dump)
 
         return True, None, record_dict
 

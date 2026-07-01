@@ -1,5 +1,3 @@
-from typing import Tuple
-
 from flask import Response, current_app, request
 from marshmallow import ValidationError
 
@@ -17,7 +15,7 @@ from app.utils.logger import logger
 
 
 @bp.route(API_DOWNLOADS, methods=["GET"])
-def get_downloads() -> Tuple[Response, int]:
+def get_downloads() -> tuple[Response, int]:
     try:
         args = GetDownloadsQuerySchema().load(request.args)
     except ValidationError as err:
@@ -31,7 +29,7 @@ def get_downloads() -> Tuple[Response, int]:
 
 
 @bp.route(API_DOWNLOADS, methods=["PATCH"])
-def update_downloads() -> Tuple[Response, int]:
+def update_downloads() -> tuple[Response, int]:
     json_data = request.get_json(silent=True)
 
     if not json_data:
@@ -66,7 +64,7 @@ def update_downloads() -> Tuple[Response, int]:
 
 
 @bp.route(API_DOWNLOADS, methods=["DELETE"])
-def delete_downloads() -> Tuple[Response, int]:
+def delete_downloads() -> tuple[Response, int]:
     json_data = request.get_json()
 
     try:

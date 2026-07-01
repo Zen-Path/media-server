@@ -1,6 +1,6 @@
 import json
 import queue
-from typing import Any, Dict, List
+from typing import Any
 
 from colorama import Fore, Style
 
@@ -16,7 +16,7 @@ class MessageAnnouncer:
     """
 
     def __init__(self) -> None:
-        self.listeners: List[queue.Queue] = []
+        self.listeners: list[queue.Queue] = []
         self.msg_buffer_size = 10
 
     def listen(self) -> queue.Queue:
@@ -27,7 +27,7 @@ class MessageAnnouncer:
         self.listeners.append(q)
         return q
 
-    def announce(self, event_type: EventType, payload: Dict[str, Any]) -> None:
+    def announce(self, event_type: EventType, payload: dict[str, Any]) -> None:
         """
         Broadcasts a message to all active listeners.
         Removes listeners that are full (stale or disconnected).

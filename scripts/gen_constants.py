@@ -3,6 +3,7 @@ import os
 import sys
 from enum import Enum
 from pathlib import Path
+from typing import Any
 
 from dotenv import load_dotenv
 
@@ -23,7 +24,7 @@ load_dotenv(dotenv_path=ENV_PATH)
 
 
 # Map the Python object to the desired JavaScript variable name
-CONSTANTS_TO_EXPORT = {
+CONSTANTS_TO_EXPORT: dict[str, Any] = {
     "DOWNLOAD_STATUS": DownloadStatus,
     "MEDIA_TYPE": MediaType,
     "EVENT_TYPE": EventType,
@@ -37,7 +38,7 @@ CONSTANTS_TO_EXPORT = {
 # GENERATOR
 
 
-def get_js_value(py_value):
+def get_js_value(py_value: Any) -> str:
     """
     intelligently converts a Python value to a JSON-compatible JS string.
     """
@@ -63,10 +64,10 @@ def generate():
         os.makedirs(output_dir, exist_ok=True)
 
     js_lines = [
-        "// ------------------------------------------------------------------",
+        "// " + "-" * 60,
         "// AUTO-GENERATED FILE. DO NOT EDIT.",
         "// Run 'npm run gen' to update.",
-        "// ------------------------------------------------------------------",
+        "// " + "-" * 60,
         "",
     ]
 

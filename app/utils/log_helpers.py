@@ -1,5 +1,5 @@
 import json
-from typing import Any, Dict, Union
+from typing import Any
 
 from colorama import Fore, Style
 
@@ -25,7 +25,7 @@ def format_payload(data: Any, max_length: int = 1000, indent: int = 4) -> str:
 
 
 def build_request_log(
-    params: Dict[str, Any], body: Union[Dict, str, None], max_length: int = 1000
+    params: dict[str, Any], body: dict | str | None, max_length: int = 1000
 ) -> str:
     """Constructs the formatted request log string."""
     output_lines = []

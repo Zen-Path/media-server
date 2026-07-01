@@ -1,4 +1,4 @@
-from typing import Any, Optional
+from typing import Any
 
 import pytest
 from playwright.sync_api import Page, expect
@@ -13,7 +13,7 @@ def configure_playwright_expect():
 
 
 @pytest.fixture
-def dashboard(page):
+def dashboard(page: Page) -> DashboardPage:
     return DashboardPage(page)
 
 
@@ -23,7 +23,7 @@ def mock_downloads(page: Page):
 
     def _mock(
         data: Any = None,
-        error: Optional[str] = None,
+        error: str | None = None,
         status: bool = True,
     ):
         response = {

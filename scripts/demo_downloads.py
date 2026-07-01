@@ -1,11 +1,11 @@
 import random
 from datetime import datetime, timedelta
 from functools import lru_cache
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 from app.constants import DownloadStatus, MediaType
 
-DEFAULT_OPTIONS = {
+DEFAULT_OPTIONS: dict[str, Any] = {
     "end_time_probability": 0.9,
     "max_days_offset": 200,
     "max_duration_seconds": 3600,
@@ -19,7 +19,7 @@ DEFAULT_OPTIONS = {
 
 
 def resolve_status(
-    item: Dict[str, Any], rng: random.Random, config: Dict[str, Any], now: datetime
+    item: dict[str, Any], rng: random.Random, config: dict[str, Any], now: datetime
 ) -> int:
     """
     Enforces logical consistency between status and timestamps.
@@ -68,8 +68,8 @@ def resolve_status(
 
 @lru_cache(maxsize=1)
 def get_demo_downloads(
-    now: Optional[datetime] = None, row_count: Optional[int] = None, **options: Any
-) -> List[Dict[str, Any]]:
+    now: datetime | None = None, row_count: int | None = None, **options: Any
+) -> list[dict[str, Any]]:
     config = {**DEFAULT_OPTIONS, **options}
 
     # Avoid side effects on global random
@@ -77,7 +77,7 @@ def get_demo_downloads(
 
     now = now or datetime.now()
 
-    raw_data: List[Dict[str, Any]] = [
+    raw_data: list[dict[str, Any]] = [
         {
             "url": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
             "title": "Rick Astley - Never Gonna Give You Up (Official Video) - YouTube",

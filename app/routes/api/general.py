@@ -1,6 +1,5 @@
 import secrets
 from datetime import datetime, timezone
-from typing import Tuple
 
 from flask import Response, current_app, request
 
@@ -12,7 +11,7 @@ from app.utils.api_response import api_response
 
 
 @bp.before_request
-def require_api_key() -> None | Tuple[Response, int]:
+def require_api_key() -> None | tuple[Response, int]:
     """
     Global authorization middleware for the API endpoints.
     """
@@ -41,7 +40,7 @@ def require_api_key() -> None | Tuple[Response, int]:
 
 
 @bp.route(API_HEALTH, methods=["GET"])
-def health_check() -> Tuple[Response, int]:
+def health_check() -> tuple[Response, int]:
     """
     Public health check endpoint.
     """

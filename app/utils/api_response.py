@@ -1,4 +1,4 @@
-from typing import Any, Optional, Tuple, Union
+from typing import Any
 
 from flask import Response, jsonify
 
@@ -7,10 +7,10 @@ from app.utils.tools import recursive_camelize
 
 def api_response(
     data: Any = None,
-    error: Optional[str] = None,
-    status: Optional[Union[bool, str]] = None,
+    error: str | None = None,
+    status: bool | str | None = None,
     status_code: int = 200,
-) -> Tuple[Response, int]:
+) -> tuple[Response, int]:
     """
     Standardized API response structure.
 
