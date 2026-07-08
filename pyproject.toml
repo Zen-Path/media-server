@@ -13,8 +13,8 @@ dependencies = [
     "Flask-SQLAlchemy==3.1.1",
 
     # downloaders
-    "gallery_dl==1.31.4",
-    "yt-dlp==2026.6.9",
+    "gallery_dl==1.32.5",
+    "yt-dlp==2026.7.4",
 
     # util
     "bs4==0.0.2",           # for html parsing
