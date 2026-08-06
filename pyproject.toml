@@ -42,7 +42,7 @@ description = "A script that handles download requests for URLs."
 name = "media_server"
 readme = "README.md"
 requires-python = ">=3.12"
-version = "5.7.0"
+version = "5.8.0"
 
 [tool.setuptools.packages.find]
 where = ["."]
@@ -82,3 +82,16 @@ target-version = "py314"
     line-ending               = "auto"
     quote-style               = "double"
     skip-magic-trailing-comma = false
+
+
+[tool.bumpversion]
+allow_dirty = true
+parse       = "(?P<major>\\d+)\\.(?P<minor>\\d+)\\.(?P<patch>\\d+)"
+replace     = "{new_version}"
+search      = "{current_version}"
+serialize   = ["{major}.{minor}.{patch}"]
+
+    [[tool.bumpversion.files]]
+    filename = "pyproject.toml"
+    replace  = 'version = "{new_version}"'
+    search   = 'version = "{current_version}"'
