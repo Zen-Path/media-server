@@ -7,7 +7,7 @@ const STATUS_ICONS = Object.freeze({
     [DOWNLOAD_STATUS.DONE]:         "🟩",
     [DOWNLOAD_STATUS.FAILED]:       "🟥",
     [DOWNLOAD_STATUS.MIXED]:        "🟨",
-})
+});
 
 let statusFlashTimer = null;
 
