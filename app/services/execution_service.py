@@ -1,3 +1,5 @@
+from urllib.parse import urlparse, urlunparse
+
 from app.constants import DownloadStatus, MediaType
 from app.services.download_service import (
     finalize_download,
@@ -9,6 +11,21 @@ from app.utils.scraper import expand_collection_urls, scrape_title
 from app.utils.tools import DownloadReportItem
 
 
+def clean_url(url: str) -> str:
+    """
+    Cleans and normalizes a given URL based on specific rules.
+    """
+    parsed = urlparse(url)
+    netloc = parsed.netloc
+    query = parsed.query
+
+    if netloc == "pt.eporner.com":
+        netloc = "www.eporner.com"
+        parsed = parsed._replace(path=parsed.path.replace("/foto/", "/photo/"))
+
+    return urlunparse(parsed._replace(netloc=netloc, query=query))
+
+
 def process_download_request(items, range_start, range_end):
     report: dict[str, DownloadReportItem] = {}
 
@@ -17,9 +34,12 @@ def process_download_request(items, range_start, range_end):
     # First URL seen wins. Any subsequent duplicates are ignored.
     unique_items = {}
     for item in items:
-        url = item["url"]
-        if url not in unique_items:
-            unique_items[url] = item
+        cleaned_url = clean_url(item["url"])
+        item["url"] = cleaned_url
+
+        # Deduplicate based on the clean URL
+        if cleaned_url not in unique_items:
+            unique_items[cleaned_url] = item
 
     # INITIAL RECORDING
 
@@ -60,11 +80,13 @@ def process_download_request(items, range_start, range_end):
         report[parent_url].log += f" Expanded into {len(expanded_urls)} items."
 
         for child_url in expanded_urls:
-            if child_url in seen_urls:
+            cleaned_child_url = clean_url(child_url)
+
+            if cleaned_child_url in seen_urls:
                 continue
 
             child_success, child_error, child_record = initialize_download(
-                child_url, item_media_type
+                cleaned_child_url, item_media_type
             )
             child_id = child_record["id"] if child_success and child_record else None
 
@@ -72,10 +94,10 @@ def process_download_request(items, range_start, range_end):
             # since if it fails and multiple parents expand into lists containing
             # this url, we would keep re-trying to add it to the db. Retries should
             # be a user initiated action.
-            seen_urls.add(child_url)
+            seen_urls.add(cleaned_child_url)
 
-            report[child_url] = DownloadReportItem(
-                url=child_url,
+            report[cleaned_child_url] = DownloadReportItem(
+                url=cleaned_child_url,
                 status=child_success,
                 error=child_error,
                 log=f"Child of #{parent_id}",
@@ -83,7 +105,7 @@ def process_download_request(items, range_start, range_end):
 
             if child_success:
                 final_processing_queue.append(
-                    (child_id, child_url, item_media_type, None)
+                    (child_id, cleaned_child_url, item_media_type, None)
                 )
 
     # PROCESSING
