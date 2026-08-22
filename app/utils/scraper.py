@@ -130,10 +130,15 @@ def expand_collection_urls(url: str, depth: int = 0) -> list[str]:
         output_str = result.output.strip() if result.output else ""
         if output_str:
             # Filter out lines matching [anything][anything]
+            # TODO: add more examples
+            # [ytdl-generic][warning]
+            # [ytdl-generic][error]
+            # [ytdl-generic][info]
+
             clean_lines = [
                 line
                 for line in output_str.splitlines()
-                if not re.match(r"\[.+\]\[.+\]", line.strip())
+                if not re.search(r"\[[^\]]+\]\[[^\]]+\]", line)
             ]
 
             cleaned_output = "\n".join(clean_lines).strip()
@@ -168,5 +173,5 @@ def expand_collection_urls(url: str, depth: int = 0) -> list[str]:
         return list(dict.fromkeys(child_urls))
 
     except Exception:
-        logger.exception(f"Expansion error for {url}")
+        logger.exception(f"Expansion error for {url!r}")
         return []
