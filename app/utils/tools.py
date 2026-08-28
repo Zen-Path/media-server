@@ -10,7 +10,7 @@ from app.utils.logger import logger
 PYPROJECT_PATH = Path(__file__).parent.parent.parent / "pyproject.toml"
 
 
-def get_version() -> str:
+def get_project_version() -> str:
     """Reads the package version from the package metadata."""
     try:
         with PYPROJECT_PATH.open("rb") as f:
