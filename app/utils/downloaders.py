@@ -29,6 +29,10 @@ class Gallery(Media):
             "[gallery-dl] File size larger than allowed.",
         ),
         (
+            r"^\[[^\]]+\]\[warning\] NameResolutionError",
+            "[gallery-dl] Failed to resolve name.",
+        ),
+        (
             r"^\[[^\]]+\]\[error\]",
             lambda line: f"[gallery-dl] Error: {line.split(']')[-1].strip()}",
         ),
